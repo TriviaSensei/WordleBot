@@ -1,0 +1,68 @@
+.modal#new-stat-modal(tabindex="-1" aria-labelledby="new-stat-label" aria-hidden="true" data-bs-backdrop="static")
+    .modal-dialog.modal-dialog-centered
+        .modal-content#new-stat-modal-content
+            .modal-header
+                h5.modal-title#new-stat-label Custom Stat
+                button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+            .modal-body
+                .w-100.d-flex.flex-column
+                    input#stat-id(type="hidden")
+                    input#game-name(type="hidden")
+                    .input-group-c 
+                        .input-header.fw-semibold(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="A unique name for this stat") Name 
+                        .input-container
+                            input#stat-name(type="text")
+                    .input-group-c 
+                        .input-header.fw-semibold(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="The heading that shows on the stats table") Heading (max 10 chars)
+                        .input-container 
+                            input#stat-header(type="text" maxlength="10")
+                    .input-group-c 
+                        .input-header.fw-semibold(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="A description for the tooltip on this stat") Description 
+                        .input-container.w-100
+                            textarea#stat-description.w-100(rows="2")
+                    .input-group-h
+                        .input-header.fw-semibold.me-3(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Whether to include fill-ins from unplayed days in this stat. Will not do anything if the 'fill-in' setting for this game is set to 'none'.") Include fill-in scores 
+                        .input-container
+                            .setting-toggle
+                                input#allow-fill-in.toggle-box(type="checkbox" name="allow-fill-in")
+                                label(for="allow-fill-in")
+                                    .toggle-switch
+                                        .switch
+                    .input-group-h
+                        .input-header.fw-semibold.me-3(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Whether to initially sort the table by this column") Set as default sort 
+                        .input-container
+                            .setting-toggle
+                                input#default-sort.toggle-box(type="checkbox" name="default-sort")
+                                label(for="default-sort")
+                                    .toggle-switch
+                                        .switch
+                    .input-group-h
+                        .input-header.fw-semibold.me-3(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Which direction to sort by default") Default sort direction
+                        .input-group-h.align-items-center
+                            input#sort-asc(type="radio" name="default-sort-direction" value="1" checked)
+                            label(for="sort-asc") Ascending 
+                            input#sort-desc(type="radio" name="default-sort-direction" value="-1")
+                            label(for="sort-desc") Descending
+                    .input-group-h
+                        .input-header.fw-semibold.me-3(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Number of decimal places (0-2) to display") Decimal places 
+                        input#decimal-places(type="number" max="2" min="0" value="2")
+                    .input-group-h
+                        .input-header.fw-semibold.me-3(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="How to format the result") Format
+                        .input-group-h.align-items-center
+                            input#format-num(type="radio" name="result-format" value="number" checked)
+                            label(for="format-num") Number
+                            input#format-pct(type="radio" name="result-format" value="percent")
+                            label(for="format-pct" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Format result as a percent - you do not need to multiply by 100 in your calculation.") Percent
+                    .input-group-c
+                        .input-header.fw-semibold(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="Data filters to apply before summarizing") Filters
+                        .input-container.filter-container
+                            
+                        button#new-filter.btn.btn-primary.btn-sm.new-filter.my-2.w-25(type="button") New
+                    .input-group-c 
+                        .input-header.fw-semibold(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="How to calculate this stat") Calculation
+                        #calculation-area.input-container.calculation-container
+                        button#edit-calculation.btn.btn-primary.btn-sm.edit-calculation.my-2.w-25(type="button") Edit
+                        
+            .modal-footer
+                button#save-stat.btn.btn-primary(type="button") Save
+                button#close-stat.btn.btn-secondary(type="button" data-bs-dismiss="modal") Close

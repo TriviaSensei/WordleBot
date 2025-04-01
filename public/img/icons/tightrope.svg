@@ -1,0 +1,17 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#E9B308" />
+            <stop offset="100%" stop-color="#FFE72F" />
+        </linearGradient>
+    </defs>
+    <style>
+        .t {
+            font: italic 16px sans-serif;
+            font-weight: 900;
+            fill: #374151;
+        }
+    </style>
+    <path d="M 0 0 l 40 0 l -20 40 Z" fill="url(#g1)"/>
+    <text text-anchor="middle" x="19" y="22" class="t">T</text>
+</svg>

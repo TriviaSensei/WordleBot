@@ -1,0 +1,138 @@
+#nyt-connections-tab-pane {
+	.header-row > .result-header {
+		min-width: 4em;
+	}
+	.quordle-result {
+		position: relative;
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		width: 100%;
+		height: 100%;
+		padding-top: 3px;
+		padding-bottom: 3px;
+	}
+
+	.quordle-result > div:first-child {
+		display: grid;
+		height: 2em;
+		width: 2em;
+		position: relative;
+		border: 1px solid black;
+		margin-left: 0.2em;
+		div {
+			height: 50%;
+			width: 50%;
+			font-size: 0.75em;
+			position: absolute;
+			border: 3px solid;
+			line-height: 1em;
+			border-collapse: collapse;
+		}
+		.u-l {
+			left: 0;
+			top: 0;
+			border-color: var(--conn-yellow);
+			background-color: var(--conn-yellow);
+		}
+		.u-r {
+			right: 0;
+			top: 0;
+			border-color: var(--conn-green);
+			background-color: var(--conn-green);
+		}
+		.l-l {
+			left: 0;
+			bottom: 0;
+			border-color: var(--conn-blue);
+			background-color: var(--conn-blue);
+		}
+		.l-r {
+			right: 0;
+			bottom: 0;
+			border-color: var(--conn-purple);
+			background-color: var(--conn-purple);
+		}
+
+		.l-l.fail::before,
+		.l-l.fail::after {
+			border-color: var(--conn-blue);
+		}
+		.l-r.fail::before,
+		.l-r.fail::after {
+			border-color: var(--conn-purple);
+		}
+		.u-l.fail::before,
+		.u-l.fail::after {
+			border-color: var(--conn-yellow);
+		}
+		.u-r.fail::before,
+		.u-r.fail::after {
+			border-color: var(--conn-green);
+		}
+		.fail {
+			background-color: unset;
+		}
+		.fail::after,
+		.fail::before {
+			content: '';
+			position: absolute;
+			width: 141.4%;
+			height: 0;
+			left: 0;
+			transform-origin: left;
+		}
+		.fail::after {
+			top: 0;
+			transform: translateY(-1.5px) rotate(45deg);
+			/* transform: rotate(45deg); */
+			border-top: 3px solid;
+		}
+		.fail::before {
+			bottom: 0;
+			transform: translateY(1.5px) rotate(315deg);
+			border-bottom: 3px solid;
+		}
+	}
+
+	.quordle-result > div:nth-child(2) {
+		margin: 0 0.25em;
+		font-size: 0.95em;
+		text-align: center;
+		flex: 1;
+	}
+
+	.result-cell.blank .quordle-result > div:nth-child(2) {
+		color: darkslategrey;
+	}
+
+	.win {
+		color: blue;
+	}
+
+	.fail {
+		color: red;
+		position: relative;
+	}
+
+	.win.perfect {
+		background-color: var(--light-green);
+	}
+
+	.graph-cell {
+		.graph-container {
+			.bar:nth-child(1) {
+				background-color: var(--conn-yellow);
+			}
+			.bar:nth-child(2) {
+				background-color: var(--conn-green);
+			}
+			.bar:nth-child(3) {
+				background-color: var(--conn-blue);
+			}
+			.bar:nth-child(4) {
+				background-color: var(--conn-purple);
+			}
+		}
+	}
+}

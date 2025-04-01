@@ -1,0 +1,14 @@
+.modal#save-settings-modal(tabindex="-1" aria-labelledby="save-settings-label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false")
+    .modal-dialog.modal-dialog-centered
+        .modal-content#save-settings-modal-content
+            input#delete-game(type="hidden")
+            input#delete-id(type="hidden")
+            .modal-header
+                h5.modal-title#save-settings-label Settings Saved
+            .modal-body
+                h6.mb-3 Results
+                #save-successes.save-result.mb-3
+                #save-warnings.save-result.mb-3 
+                #save-errors.save-result
+            .modal-footer
+                button#close-save-settings.btn.btn-primary(type="button") OK

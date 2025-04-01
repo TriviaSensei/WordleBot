@@ -1,0 +1,27 @@
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+	 width="361px" height="219px" viewBox="0 0 361px 219px" >
+
+    <rect width="65px" height="65px" x="6px" y="6px" fill="#c9b457"></rect>
+    <rect width="65px" height="65px" x="77px" y="6px" fill="#787c7f"></rect>
+    <rect width="65px" height="65px" x="148px" y="6px" fill="#c9b457"></rect>
+    <rect width="65px" height="65px" x="219px" y="6px" fill="#c9b457"></rect>
+    <rect width="65px" height="65px" x="290px" y="6px" fill="#787c7f"></rect>
+
+    <rect width="65px" height="65px" x="6px" y="77px" fill="#c9b457"></rect>
+    <rect width="65px" height="65px" x="77px" y="77px" fill="#787c7f"></rect>
+    <rect width="65px" height="65px" x="148px" y="77px" fill="#6baa64"></rect>
+    <rect width="65px" height="65px" x="219px" y="77px" fill="#c9b457"></rect>
+    <rect width="65px" height="65px" x="290px" y="77px" fill="#787c7f"></rect>
+
+    <rect width="65px" height="65px" x="6px" y="148px" fill="#6baa64"></rect>
+    <rect width="65px" height="65px" x="77px" y="148px" fill="#6baa64"></rect>
+    <rect width="65px" height="65px" x="148px" y="148px" fill="#6baa64"></rect>
+    <rect width="65px" height="65px" x="219px" y="148px" fill="#6baa64"></rect>
+    <rect width="65px" height="65px" x="290px" y="148px" fill="#6baa64"></rect>
+</svg>
+<!--
+yellow: #c9b457
+green: #6baa64
+gray: #787c7f
+white: #feffff
+-->

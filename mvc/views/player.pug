@@ -1,0 +1,53 @@
+extends _base
+
+block styles 
+    each game, ind in data.gameData.data
+        - if (game.script && game.results.length > 0)
+            link(rel="stylesheet" href=`/css/${game.game.toLowerCase().split(' ').join('_')}.css`)
+block content 
+    .banner-container.ratio.ratio-16x9
+        div
+            .w-100.h-100.banner-div(style=`background-image:url('/img/banner_default.svg')`)
+            img.avatar(src=`${!data.playerData.avatar ? '/img/favicon.svg' : `https://cdn.discordapp.com/avatars/${data.playerData.userId}/${data.playerData.avatar}.png`}`)
+            .name-banner= `${data.playerData.globalName}${data.playerData.globalName.toLowerCase() === data.playerData.username.toLowerCase() ? '':` (${data.playerData.username})`}`
+    .body-container
+        h5.mt-5 Select month:
+        input#user-id(type="hidden" value=`${data.playerData.userId}`)
+        select#month-select
+
+        .report-area.mt-4
+            ul#report-tabs.nav.nav-tabs.nav-fill
+                each game,ind in data.gameData.data
+                    - var gameId = game.game.toLowerCase().split(' ').join('-');
+                    li(class=`nav-item ${game.results.length === 0 ? 'd-none' : ''}` role="presentation" data-game=`${gameId}`)
+                        button(class=`nav-link ${ind===0 ? 'active':''}` id=`${gameId}-tab` data-bs-toggle="tab" data-bs-target=`#${gameId}-tab-pane` type="button" role="tab" aria-controls=`${gameId}-tab-pane` aria-selected=`${ind===0}`)
+                            .d-flex.flex-row.align-items-center 
+                                img.game-icon(src=`/img/icons/${game.game.toLowerCase().split(' ').join('_')}.svg`)
+                                span= game.game
+            #report-panes.tab-content
+                - if (data.gameData.data.length === 0)
+                    div No data is available for this month 
+                - else 
+                    - var noneShown = true;
+                    each game,ind in data.gameData.data
+                        - var gameId = game.game.toLowerCase().split(' ').join('-');
+                        div(class=`tab-pane fade ${game.results.length === 0 ? 'd-none' : noneShown ? 'show active':''}` id=`${gameId}-tab-pane` role="tabpanel" aria-labelledby=`${gameId}-tab` tabindex=`${ind}`)
+                            - if (game.results.length !== 0) noneShown = false;
+                            .d-flex.flex-column.align-items-center.m-2.mt-4
+                                h2.d-flex.flex-row.align-items-center.mb-4
+                                    img.game-icon(src=`/img/icons/${game.game.toLowerCase().split(' ').join('_')}.svg`)
+                                    span= game.game
+                                .w-100.d-flex.flex-row
+                                    .f-1.overflow-hidden.position-relative
+                                        .sticky-top.mb-2.date-range= `${data.gameData.startDate} to ${data.gameData.endDate}`
+                                        .table-container
+                                            table.position-relative.standings-table(data-game=`${gameId}-table` data=`${JSON.stringify(gameData)}`)
+                                                thead.sticky-top
+                                                    tr.header-row.sticky-top
+                                                        th.fw-bold(colspan="2") Player
+                                                        th  
+block scripts 
+    script(src="/js/player_page.js" type="module" defer)
+    each game, ind in data.gameData.data
+        - if (game.script)
+            script(src=`/js/games/${game.game.toLowerCase().split(' ').join('_')}.js` type="module" defer)

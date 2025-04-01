@@ -1,0 +1,17 @@
+#wordle-tab-pane {
+	.wordle-answer {
+		font-size: 0.8em !important;
+	}
+
+	.reveal-button {
+		padding: 0 1em;
+	}
+
+	.bar {
+		background-color: var(--green);
+	}
+
+	.header-row > th.result-header {
+		min-width: 2.75em;
+	}
+}

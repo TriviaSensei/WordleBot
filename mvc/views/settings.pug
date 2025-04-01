@@ -1,0 +1,61 @@
+extends _base
+block styles 
+    link(rel="stylesheet" href="/css/settings.css")
+block content 
+    include modals/newStatModal
+    include modals/newFilterModal
+    include modals/calculationModal
+    include modals/clearAllModal
+    include modals/deleteStatModal
+    include modals/saveSettingsModal
+    
+    .banner-container.ratio.ratio-16x9
+        div
+            .w-100.h-100.banner-div(style=`background-image:url('${!data.serverData.banner ? "/img/banner_default.svg" : `https://cdn.discordapp.com/banners/${data.serverData.guildId}/${data.serverData.banner}.png`}');`)
+            img.avatar(src=`${!data.serverData.icon ? '/img/favicon.svg' : `https://cdn.discordapp.com/icons/${data.serverData.guildId}/${data.serverData.icon}.png`}`)
+            .name-banner= data.serverData.name
+    .body-container 
+        h5.mt-5.mb-3 Server Settings
+        button.btn.btn-primary.w-75.mb-3.save-settings-button(type="button") Save
+        #game-accordion.accordion.w-100
+            each setting,ind in data.serverData.settings
+                - const slug = setting.name.toLowerCase().split(' ').join('_')
+                div(class=`accordion-item ${data.serverData.games.includes(setting.name) ? '' : 'd-none'}` data-game=`${setting.name}`) 
+                    h2.accordion-header(id=`${slug}-header`)
+                        button(type="button" class=`accordion-button ${ind!==0 ? 'collapsed' : ''} ` data-bs-toggle="collapse" data-bs-target=`#${slug}-collapse` aria-expanded=`${ind===0 ? 'true':'false'}` aria-controls=`${slug}-collapse`) 
+                            img.game-icon(src=`/img/icons/${slug}.svg`) 
+                            span= setting.name
+                    div(id=`${slug}-collapse` class=`accordion-collapse collapse ${ind===0 ? 'show' : ''}` aria-labelledby=`${slug}-header` data-bs-parent="#game-accordion")
+                        .setting-container.w-100.p-2(data-name=`${setting.name}`)
+                            each item in setting.settings
+                                .input-group-c 
+                                    .input-header.fw-semibold 
+                                        span= item.label
+                                        img.help(src=`/img/help.svg` data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title=`${item.description}`)
+                                    .input-container 
+                                        - if (item.type==="number")
+                                            input(type="number" min=`${item.min}` max=`${item.max}` name=`${item.name}` value=`${item.value}`)
+                                        - else 
+                                            select(name=`${item.name}`)
+                                                each e in item.enum 
+                                                    - if (e.label && e.description)
+                                                        - if (item.value===e.label)
+                                                            option(value=`${e.label}` data-description=`${e.description}` selected)= e.label
+                                                        - else 
+                                                            option(value=`${e.label}` data-description=`${e.description}`)= e.label
+                                                    - else 
+                                                        - if (item.value===e)
+                                                            option(value=`${e}` data-description=`${e}` selected)= e
+                                                        - else
+                                                            option(value=`${e}` data-description=`${e}`)= e
+                                            .select-description
+                       
+                        .input-header.fw-semibold.px-2 Custom Stats
+                        .custom-stats-container.px-2.pb-2
+                        button.btn.btn-primary.btn-sm.new-stat.ms-2.mb-2(type="button" data-game=`${setting.name}` data-bs-toggle="modal" data-bs-target="#new-stat-modal") New
+
+        button.btn.btn-primary.w-75.mt-3.mb-5.save-settings-button(type="button") Save
+block scripts
+    script(src="/js/evaluator.js")
+    script(src="/js/customStats.js" type="module" defer)
+    script(src="/js/settings.js" type="module" defer)

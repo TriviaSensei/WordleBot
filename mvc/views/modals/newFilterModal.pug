@@ -1,0 +1,25 @@
+.modal#new-filter-modal(tabindex="-1" aria-labelledby="new-filter-label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false")
+    .modal-dialog.modal-dialog-centered
+        .modal-content#new-filter-modal-content
+            .modal-header
+                h5.modal-title#new-filter-label Edit Filter
+            .modal-body
+                .w-100.d-flex.flex-column
+                    input#filter-id(type="hidden")
+                    .input-group-c 
+                        .input-header.fw-semibold(data-bs-toggle="tooltip" data-bs-placement="left" data-bs-title="A unique name for this filter") Name 
+                        .input-container
+                            input#filter-name(type="text")
+                    .input-group-c 
+                        .input-header.fw-semibold Filter type 
+                        .input-group-h.align-items-center
+                            input#keep-filter(type="radio" name="filter-type" value="keep" checked)
+                            label(for="keep-filter") #[select#keep-drop #[option(value="keep") Keep] #[option(value="drop") Drop]] the #[select#best-worst #[option(value="best" selected) best] #[option(value="worst") worst]] #[input#keep-n(type="number" min="1" max="28" placeholder="#")] results on #[select#sort-data-item]
+                        .input-header ...or...
+                        .input-group-h.align-items-center 
+                            input#data-filter(type="radio" name="filter-type" value="data")
+                            label(for="data-filter") #[select#data-items(disabled)] #[select#comparators(disabled) #[option(value="lt") &lt;] #[option(value="lte") ≤] #[option(value="eq") =] #[option(value="gte") ≥] #[option(value="gt") &gt;]] #[input#compare-n(type="number" style="width:4em;" placeholder="#" disabled)]
+                        
+            .modal-footer
+                button#save-filter.btn.btn-primary(type="button") Save
+                button#close-filter.btn.btn-secondary(type="button") Close

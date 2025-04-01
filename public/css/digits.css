@@ -1,0 +1,12 @@
+#digits-tab-pane {
+	.header-row > th.result-header {
+		min-width: 3em;
+	}
+
+	.blank > div::before {
+		content: '(';
+	}
+	.blank > div::after {
+		content: ')';
+	}
+}

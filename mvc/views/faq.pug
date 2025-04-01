@@ -1,0 +1,80 @@
+extends _base
+
+block styles 
+    link(rel="stylesheet" href="/css/home.css")
+
+block content 
+    .banner-container.ratio.ratio-16x9
+        div
+            .w-100.h-100.banner-div(style=`background-image:url("/img/banner_default.svg")`)
+    .body-container 
+        h2.page-title(data-title="WordleBot" name="top") 
+        p.section-header(data-title="Intro" name="intro")
+        p WordleBot is a new Discord bot that automatically tracks results from your daily games and compiles them into an easy-to-read format. If you and your friends like to compete at Wordle, Quordle, Connections, and more, then WordleBot can make your competition a lot easier for players and admins alike.
+        p.section-header(data-title="Installation" name="install") 
+        p Use the following link to install WordleBot on your server. You must have "manage server" permissions on the server in order to install it. If you own or administer the server, it is likely that you have this permission. Clicking on the link will open Discord and prompt you to select a server on which to install WordleBot. You may also copy and paste the link into the chat on the server where you wish to install: 
+        .input-group.input-group-sm.mb-3 
+            span.input-group-text #[a(href="https://discord.com/oauth2/authorize?client_id=1326731868137062492") https://discord.com/oauth2/authorize?client_id=1326731868137062492]
+            button.copy-link(type="button") Copy
+        p.section-header(data-title="Basic use" name="use") 
+        p After installing WordleBot, start copying and pasting your game results right into your Discord server. WordleBot only monitors one channel per server for results, to avoid cluttering up the server. By default, this channel is the first one where it parses a game result, but you may set it to something else by having an administrator issue the command #[span.command #[a(href="" data-link="commands") sethome]] in the channel where you wish to track results. A warning is given if any results are pasted in a channel other than your Wordle home channel. 
+        p If a player happens to participate in more than one server where WordleBot is installed, WordleBot will cross-post pasted results on the player's behalf. In order for this to work, however, the player must paste a result into each server at least once with WordleBot watching. In other words, the act of pasting a result into a server is what registers you as being part of the server to WordleBot (and not just being on the roster of people on the server).
+        p.section-header(data-title="Supported games" name="games")
+        p WordleBot doesn't just support Wordle! Currently, there are #[span= games.length] daily games supported:
+        ul.w-100
+            each game in games 
+                li.w-100.d-flex.flex-row.align-items-center.mb-2
+                    img.game-icon(src=`/img/icons/${game.name.toLowerCase().split(' ').join('_')}.svg`)
+                    span #[a(href=`${game.url}` target="_blank")= game.name]
+        p Upon completion of each daily game, the game should offer you a chance to copy your results to the clipboard (usually with a "share" button of some sort). WordleBot will expect your result to look like the copy/paste from these games. You can even copy and paste more than one result into a single message (on separate lines) and they should all get picked up.
+        p.section-header(data-title="Bot interactions" name="bot-interaction")  
+        p WordleBot will acknowledge your post with a reaction or a reply if it detects any results in it. The following are the reactions you may get: 
+        ul.w-100 
+            li  🔥, ✅, 🎉 - Successfully posted result
+            li 1️⃣, 2️⃣, 3️⃣, etc. - Number of results successfully posted (if more than 1). If more than 10 results are simultaneously posted, the bot will instead reply to your message with the number of results.
+            li ⚠️ - One or more problems encountered while posting result. This one will typically be accompanied by a verbose error message. Pasting a result that was already recorded, or with an illegal character in it will trigger this warning.
+            li ✏️ - message edited (and results were added). You may edit a message to add more results to it. WordleBot will also reply and indicate how many additional results were added.
+        p.section-header(data-title="Commands" name="commands")
+        p WordleBot supports a series of commands that users and administrators can use to interact with the bot. Type one of these into any channel on your server (including the slash) to use them: 
+        ul.w-100 
+            li #[span.command sethome] - #[span.admin-only] This command sets the home channel for the server to the channel in which the command is run. Only results posted to that channel will be acknowledged and saved. The default value for this channel will be wherever the first result is pasted after installing WordleBot.
+            li #[span.command setgames] - #[span.admin-only] This command returns a menu of games to track on the server. Thus, if your server only plays Wordle and Connections, you can indicate that using this command. Your server standings page will only include results from the games selected. Your home channel will only receive cross-posted results from the games selected. Players may still post their other results in your channel, and they will be acknowledged and cross-posted to other servers if applicable. 
+            li #[span.command settings] - #[span.admin-only] This command will give you flexibility in how your games are ranked. For example, you may indicate that a player must submit at least 20 Wordle results to be eligible to win the month, or that mistakes in Connections should incur a heavier penalty. Your settings page will also give you the ability to create custom stats so that you can play your own way!
+            li #[span.command i] - This command causes the bot to reply to you with a link to your personal stats page, which is https://www.cyu.dev/wordle/player/[your user ID]
+            li #[span.command we] - This command causes the bot to reply to you with a link to the server stats page, which is https://www.cyu.dev/wordle/server/[your guild ID]
+            li #[span.command faq] - This command causes the bot to reply to you with a link to this page
+        p.section-header(data-title="FAQ" name="faq")
+        p Below are some more questions you might have about this tool. Hopefully, you found any information you need to install and use WordleBot. If you have additional questions, feel free to use the #[a(href="" data-link="email") e-mail form] at the bottom of this page
+        p.question Does it cost anything to use WordleBot?
+        p WordleBot is free to use. I will keep it that way unless I start incurring costs for data storage (which is likely a long way away, unless a lot of people start using this). However, if you enjoy using this bot, I would be honored to accept a donation #[a(href="https://www.buymeacoffee.com/charlesyu4j") here]. This is a hobby project, and not much more than that.
+        p.question What data is being collected?
+        p No personal information (e-mail, address, phone, etc.) will ever be collected. The data I have is limited to what is available on Discord - your server's name, ID, banner (if applicable), and icon, and your users' username, display name, ID, and profile picture, all of which is publicly available on your discord pages.
+        p.question Can you add support for [game]?
+        p Yes! Well...probably! I can add support for just about any daily game with a copy/paste share function. Send me a message below using the #[a(href="" data-link="email") e-mail form] and I can give it a shot.
+        p.question Can you add [feature]?
+        p Probably! Send me a message below using the #[a(href="" data-link="email") e-mail form] and I can give it a shot.
+        p.section-header(data-title="Contact" name="email")
+        .contact-container.mb-3
+            #form-container
+                #contact-form
+                    .mb-3
+                        label.form-label(for="name") Your name:
+                        input#name.form-control(type="text" placeholder="Your name" required)
+                    .mb-3
+                        label.form-label(for="email") E-mail address
+                        input#email.form-control(type="email" placeholder="name@example.com" required)
+                    .mb-3
+                        label.form-label(for="subject") Subject 
+                        select#subject.form-control
+                            option(value="") [Select a subject]
+                    .mb-3
+                        label.form-label(for="message") Your message
+                        textarea#message.form-control(required rows="6")
+                    .w-100.d-flex
+                        button.btn.btn-primary.send-button Send
+
+        .sticky-bottom.w-100.d-flex.flex-row
+            a#to-top(data-link="top") Back to top
+
+block scripts 
+    script(src="/js/faq.js" type="module" defer)

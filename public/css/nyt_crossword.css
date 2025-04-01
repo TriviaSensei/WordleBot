@@ -1,0 +1,11 @@
+#nyt-crossword-tab-pane,
+#nyt-mini-tab-pane {
+	tr.header-row {
+		height: 4.5em;
+	}
+	.header-row > th.result-header {
+		vertical-align: bottom;
+		background-color: var(--white);
+		min-width: 3em;
+	}
+}

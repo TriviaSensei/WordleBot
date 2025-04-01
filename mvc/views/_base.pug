@@ -1,0 +1,31 @@
+doctype html
+html
+    head
+        meta(name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0")
+        link(href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous")
+        link(rel="preconnect" href="https://fonts.googleapis.com")
+        link( rel="preconnect" href="https://fonts.gstatic.com" crossorigin)
+        link(href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Ubuntu:ital,wght@0,300;1,300&display=swap" rel="stylesheet")
+        link(rel="stylesheet" href="/css/_base.css")
+        - if (data?.dataItems)
+            each game in data.dataItems
+                - if (game.script)
+                    link(rel="stylesheet" href=`/css/${game.game.toLowerCase().split(' ').join('_')}.css`)
+        block styles
+        link(rel="icon" type="image/svg+xml" href="/img/favicon.svg")
+        meta(charset='UTF-8')
+        meta(name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+        title= title
+    body
+        - if (data)
+            #data-area(data=`${JSON.stringify(data)}`)
+        .container-all.no-select
+            .message.d-none
+            .container-main
+                block content
+
+        script(src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous")
+        script(src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js")
+        script(src="/js/utils/moment.js")
+        script(src="/js/utils/moment-timezone-with-data-10-year-range.js")
+        block scripts

@@ -1,0 +1,75 @@
+.no-select {
+	-webkit-touch-callout: auto; /* iOS Safari */
+	-webkit-user-select: auto; /* Safari */
+	-khtml-user-select: auto; /* Konqueror HTML */
+	-moz-user-select: auto; /* Old versions of Firefox */
+	-ms-user-select: auto; /* Internet Explorer/Edge */
+	user-select: auto;
+}
+
+.container-main {
+	overflow-y: auto;
+	scrollbar-width: thin;
+}
+.sticky-bottom > a {
+	opacity: 0.8;
+	background-color: var(--light-green);
+	padding: 0 0.5em;
+}
+
+.sticky-bottom > a:hover {
+	opacity: 1;
+}
+
+a[data-link] {
+	cursor: pointer;
+}
+
+p {
+	width: 100%;
+	text-align: left;
+}
+.section-header,
+.question {
+	font-weight: bold;
+	margin-bottom: 0.2em;
+}
+
+.page-title::after,
+.section-header::after {
+	content: attr(data-title);
+}
+
+.command {
+	background-color: var(--command-bg);
+	border: 1px solid var(--command-border);
+	padding: 0 0.2em;
+	font-weight: 600;
+}
+
+.command::before {
+	content: '/';
+}
+
+.game-icon {
+	height: 1.5em;
+	width: 1.5em;
+	margin-right: 1em;
+}
+
+.admin-only::after {
+	content: 'Admin only';
+	margin-right: 0.25em;
+	font-weight: bold;
+	background-color: var(--command-bg);
+	border: 1px solid var(--command-border);
+}
+
+.contact-container {
+	width: 100%;
+}
+
+.send-button {
+	margin: auto;
+	width: 60%;
+}

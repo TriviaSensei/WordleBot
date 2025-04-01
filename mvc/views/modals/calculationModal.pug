@@ -1,0 +1,44 @@
+.modal#calculation-modal(tabindex="-1" aria-labelledby="calculation-label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false")
+    .modal-dialog.modal-dialog-centered
+        .modal-content#calculation-modal-content.h-75
+            .modal-header
+                h5.modal-title#calculation-label Edit Calculation
+            .modal-body#calculation-modal-body(style="max-height: calc(100%-120px);overflow-y: auto")
+                .w-100.d-flex.flex-column
+                    .input-group-c
+                        .input-header.fw-semibold Preview
+                        #calculation-preview.calculation-container.mb-2
+                    .input-group-c
+                        .input-header.fw-semibold Calculations 
+                        .input-group-h.flex-wrap 
+                            button#operator-add.btn.btn-sm.btn-primary(data-type="operator") a + b 
+                            button#operator-subtract.btn.btn-sm.btn-primary(data-type="operator") a - b 
+                            button#operator-multiply.btn.btn-sm.btn-primary(data-type="operator") a × b 
+                            button#operator-divide.btn.btn-sm.btn-primary(data-type="operator") a / b 
+                            button#operator-sqrt.btn.btn-sm.btn-primary(data-type="operator")
+                                .sqrt 
+                                    .radicand
+                                        .content a
+                            button#operator-power.btn.btn-sm.btn-primary(data-type="operator") a#[sup b]
+                            button#operator-abs.btn.btn-sm.btn-primary(data-type="operator") |a|
+                            button#operator-max.btn.btn-sm.btn-primary(data-type="operator") max(a,b)
+                            button#operator-min.btn.btn-sm.btn-primary(data-type="operator") min(a,b)
+                    .input-group-c
+                        .input-header.fw-semibold Aggregations 
+                        .input-group-h.flex-wrap 
+                            button#aggregation-sum.btn.btn-sm.btn-primary(data-type="aggregator") SUM 
+                            button#aggregation-count.btn.btn-sm.btn-primary(data-type="aggregator") COUNT 
+                            button#aggregation-avg.btn.btn-sm.btn-primary(data-type="aggregator") AVG 
+                    .input-group-c
+                        .input-header.fw-semibold Data Items/Constants 
+                        .input-group-h.flex-wrap
+                            select#calculation-data-item.me-2
+                                option(value="") (Constant)
+                            input#calculation-constant.me-2(type="number")
+                            button#add-data.btn.btn-sm.btn-primary Add
+                    .input-group-h
+                        button#delete-item.btn.btn-warning Delete
+                        button#clear-all.btn.btn-danger(type="button") Clear All
+            .modal-footer
+                button#save-calculation.btn.btn-primary(type="button") Save
+                button#close-calculation.btn.btn-secondary(type="button") Close
