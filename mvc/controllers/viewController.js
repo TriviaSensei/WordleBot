@@ -3,8 +3,8 @@ const moment = require('moment-timezone');
 
 const Servers = require('../models/serverModel');
 const Results = require('../models/resultModel');
-const catchAsync = require('../utils/catchAsync');
-const AppError = require('../utils/appError');
+const catchAsync = require('../../utils/catchAsync');
+const AppError = require('../../utils/appError');
 const games = require('../../utils/gameList');
 
 const timezone = process.env.DEFAULT_TIMEZONE;

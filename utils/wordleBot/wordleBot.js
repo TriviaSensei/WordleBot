@@ -1,8 +1,7 @@
 const mongoose = require('mongoose');
-const Servers = require('../../models/serverModel');
-const Users = require('../../models/userModel');
-const resultSchema = require('../../models/resultModel');
-const serverDataSchema = require('../../models/serverDataSchema');
+const Servers = require('../../mvc/models/serverModel');
+const Users = require('../../mvc/models/userModel');
+const Results = require('../../mvc/models/resultModel');
 const { v4: uuidV4 } = require('uuid');
 const {
 	Client,
@@ -12,12 +11,12 @@ const {
 } = require('discord.js');
 const axios = require('axios');
 const moment = require('moment-timezone');
-const { parseResult } = require('../../utils/parseResult');
+const { parseResult } = require('../parseResult');
 const timezone = process.env.DEFAULT_TIMEZONE;
 const hostname =
 	process.env.NODE_ENV === 'development'
 		? 'localhost:3000'
-		: 'www.wordlebot.dev';
+		: 'www.wordlebot.gg';
 const settingsTokenDuration = 5;
 /**
  * servers:
@@ -940,10 +939,12 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 });
 
 client.on('ready', async (c) => {
+	console.log('Wordle Bot ready!');
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
+	await sendMonthlyUpdate();
 });
 
 // const sandbox = require('../../sandbox');
-
+client.login(process.env.WORDLE_BOT_TOKEN);
 module.exports = client;
