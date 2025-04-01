@@ -130,3 +130,19 @@ export const gameList = [
 		],
 	},
 ];
+export const achievements = [
+	{
+		id: 'first-timer',
+		name: 'First Timer',
+		img: 'first-timer',
+		description: 'Post a Wordle result',
+		color: '#6baa64',
+		games: ['Wordle'],
+		updateProgress: (old, data) => {
+			return true;
+		},
+		isComplete: (data) => {
+			return true;
+		},
+	},
+];

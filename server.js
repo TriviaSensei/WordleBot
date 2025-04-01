@@ -23,7 +23,7 @@ const server = app.listen(port, () => {
 
 const viewRouter = require('./mvc/routes/viewRoutes');
 const wordleRouter = require('./mvc/routes/wordleRoutes');
-const wordleBot = require('./utils/wordleBot/wordleBot');
+// const wordleBot = require('./utils/wordleBot/wordleBot');
 
 const path = require('path');
 

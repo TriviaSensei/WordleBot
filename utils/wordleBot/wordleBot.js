@@ -97,7 +97,8 @@ const handlePostQueue = async () => {
 	}
 
 	const { type, action } = postQueue[0];
-
+	console.log(`Handling post queue item:\n--------------------`);
+	console.log(postQueue[0]);
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
 		const re = /^(\%[0-9A-F]{2})+$/;
@@ -218,6 +219,7 @@ const testRegex = (str) => {
 const processResults = async (usr, gameInfo) => {
 	let failures = [];
 	let successes = [];
+	let achievements = [];
 
 	const results = await Promise.all(
 		gameInfo.map(async (info) => {
@@ -228,6 +230,8 @@ const processResults = async (usr, gameInfo) => {
 						game: info.name,
 						date: info.getDate(match),
 					};
+					console.log(`Data parsed:\n--------------`);
+					console.log(data);
 					if (!data.date) {
 						failures.push({
 							message: `No game date or number could be found in result for ${data.game}`,
@@ -288,6 +292,11 @@ const processResults = async (usr, gameInfo) => {
 								name: data.game,
 								match,
 							});
+							console.log('Creating result');
+							console.log({
+								...data,
+								data: gameResult.data,
+							});
 							const toReturn = await Results.create({
 								...data,
 								data: gameResult.data,
@@ -327,6 +336,7 @@ const processResults = async (usr, gameInfo) => {
 		results,
 		failures,
 		successes,
+		achievements,
 	};
 };
 
@@ -495,6 +505,7 @@ const sendMonthlyUpdate = async () => {
 			setTimeout(sendMonthlyUpdate, 14 * 8640000);
 			return;
 		}
+		//if the timeout is small enough, set it and save it, so when this runs again, it will actually send a message
 		monthlyUpdateTimeout = setTimeout(sendMonthlyUpdate, timeUntilNextUpdate);
 		return;
 	}
@@ -683,8 +694,12 @@ client.on('messageCreate', async (msg) => {
 	await updateLists(usr, srvr);
 
 	//process the actual result string(s)
-	const { results, failures, successes } = await processResults(usr, gameInfo);
+	const { results, failures, successes, achievements } = await processResults(
+		usr,
+		gameInfo
+	);
 
+	//message or reaction with results of post
 	if (failures.length !== 0) {
 		addReaction(msg, '⚠️');
 		addMessage({
@@ -727,6 +742,10 @@ client.on('messageCreate', async (msg) => {
 				});
 			}
 		} else addReaction(msg, results[0][0].reaction);
+	}
+	//handle achievements
+	if (achievements.length > 0) {
+		console.log(achievements);
 	}
 
 	const serversToRemove = [];
