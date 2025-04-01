@@ -485,13 +485,20 @@ const sendMonthlyUpdate = async () => {
 
 		const timeUntilNextUpdate =
 			new Date(nextUpdateDT) - new Date(currentDT) + 1000;
-		monthlyUpdateTimeout = setTimeout(sendMonthlyUpdate, timeUntilNextUpdate);
-		return console.log(
+		console.log(
 			`Next monthly wordle update going out in ${getTimeStr(
 				timeUntilNextUpdate
 			)}`
 		);
+		//can't set a timeout for a time greater than what a 32-bit signed integer can hold - don't save the timeout, but set it for 2 weeks from now (about 1/2 month) if the amount of time is too big
+		if (timeUntilNextUpdate >= Math.pow(2, 31) - 1) {
+			setTimeout(sendMonthlyUpdate, 14 * 8640000);
+			return;
+		}
+		monthlyUpdateTimeout = setTimeout(sendMonthlyUpdate, timeUntilNextUpdate);
+		return;
 	}
+	//clear the monthly update timeout
 	monthlyUpdateTimeout = null;
 	const serverData = await Servers.find();
 	const sp = currentDT.split('-');
@@ -513,6 +520,8 @@ const sendMonthlyUpdate = async () => {
 			},
 		});
 	});
+	//reset the timeout for a monthly update until next month
+	sendMonthlyUpdate();
 };
 
 client.on('interactionCreate', async (data) => {
