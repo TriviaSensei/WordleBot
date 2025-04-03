@@ -40,7 +40,6 @@ export const gameList = [
 	},
 	{
 		name: 'Sequence Quordle',
-
 		dataItems: quordleDataItems,
 	},
 	{
@@ -130,19 +129,87 @@ export const gameList = [
 		],
 	},
 ];
-export const achievements = [
-	{
-		id: 'first-timer',
-		name: 'First Timer',
-		img: 'first-timer',
-		description: 'Post a Wordle result',
-		color: '#6baa64',
-		games: ['Wordle'],
-		updateProgress: (old, data) => {
-			return true;
-		},
-		isComplete: (data) => {
-			return true;
-		},
-	},
-];
+
+const updateStreak = (old, data) => {
+	old.sort((a, b) => a.start - b.start);
+	//if the submitted data joins at the end of an existing streak, join it there
+	if (
+		old.some((oldData) => {
+			if (data.data.number === oldData.start + oldData.length) {
+				oldData.length++;
+				return true;
+			}
+		})
+	) {
+		//and then consolidate the streaks
+		const toReturn = [];
+		let currentStreak;
+		old.forEach((oldData, i) => {
+			//start current streak at the first substreak
+			if (i === 0) currentStreak = oldData;
+			//if the current element joins with the current streak, join it
+			else if (oldData.start === currentStreak.start + currentStreak.length) {
+				currentStreak.length = currentStreak.length + oldData.length;
+			}
+			//otherwise, end the current streak and start a new one
+			else {
+				toReturn.push(currentStreak);
+				currentStreak = oldData;
+			}
+			//if we're at the end, push the current streak
+			if (i === oldData.length - 1) toReturn.push(currentStreak);
+		});
+		return toReturn;
+	} else {
+		old.push({ start: data.data.number, length: 1 });
+		old.sort((a, b) => a.start - b.start);
+		return old;
+	}
+};
+
+const fitsAtEnd = (date, oldData) => {
+	const oldDate = new Date(moment.tz(oldData.start, timezone).format());
+	const desiredDate = new Date(
+		oldDate.setDate(oldDate.getDate() + oldData.length)
+	);
+	const desiredDateStr = moment.tz(desiredDate, timezone).format();
+	const testDateStr = moment.tz(date, timezone).format();
+	return desiredDateStr.split('T')[0] === testDateStr.split('T')[0];
+};
+
+const updateStreakDate = (old, data) => {
+	old.sort((a, b) => a.date - b.date);
+	//if the submitted data joins at the end of an existing streak, join it there
+	if (
+		old.some((oldData) => {
+			if (fitsAtEnd(data.data.date, oldData)) {
+				oldData.length++;
+				return true;
+			}
+		})
+	) {
+		//and then consolidate the streaks
+		const toReturn = [];
+		let currentStreak;
+		old.forEach((oldData, i) => {
+			//start current streak at the first substreak
+			if (i === 0) currentStreak = oldData;
+			//if the current element joins with the current streak, join it
+			else if (fitsAtEnd(oldData.start, currentStreak)) {
+				currentStreak.length = currentStreak.length + oldData.length;
+			}
+			//otherwise, end the current streak and start a new one
+			else {
+				toReturn.push(currentStreak);
+				currentStreak = oldData;
+			}
+			//if we're at the end, push the current streak
+			if (i === oldData.length - 1) toReturn.push(currentStreak);
+		});
+		return toReturn;
+	} else {
+		old.push({ start: data.data.number, length: 1 });
+		old.sort((a, b) => a.start - b.start);
+		return old;
+	}
+};

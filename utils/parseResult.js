@@ -1,7 +1,7 @@
 const moment = require('moment-timezone');
 const maxTimeZoneOffset = 14;
 const timezone = process.env.DEFAULT_TIMEZONE;
-
+const msInDay = 86400000;
 /*
 Parses done:
 Wordle
@@ -26,7 +26,7 @@ const getPuzzleDate = (number, baseNumber, baseDate) => {
 const getPuzzleNumber = (date, baseNumber, baseDate) => {
 	const dt = new Date(moment.tz(`${baseDate} 00:00`, timezone).format());
 	const diff = new Date(moment.tz(`${date} 00:00`, timezone).format()) - dt;
-	const diffDays = Math.round(diff / 86400000);
+	const diffDays = Math.round(diff / msInDay);
 	return baseNumber + diffDays;
 };
 
@@ -225,6 +225,83 @@ const processCrosswordDate = (dateIndex) => {
 		return null;
 	};
 };
+
+const getDateExtremes = () => {
+	const now = Date.now();
+	const countries = moment.tz.countries().reduce((p, c) => {
+		const toReturn = [...p];
+		const zones = moment.tz.zonesForCountry(c, true);
+		zones.forEach((z) => toReturn.push(z));
+		return toReturn;
+	}, []);
+	const extremes = countries.reduce(
+		(p, c) => {
+			const toReturn = {
+				...p,
+			};
+			if (!p.maxOffset || c.offset > p.maxOffset.offset) toReturn.maxOffset = c;
+			if (!p.minOffset || c.offset < p.minOffset.offset) toReturn.minOffset = c;
+			return toReturn;
+		},
+		{
+			maxOffset: null,
+			minOffset: null,
+		}
+	);
+	return [
+		moment.tz(now, extremes.maxOffset.name).format(),
+		moment.tz(now, extremes.minOffset.name).format(),
+	];
+};
+const getAvailableDates = () => {
+	const extremes = getDateExtremes();
+	const dates = [];
+	const dtStr = moment
+		.tz(`${extremes[0].split('T')[0]} 00:00`, timezone)
+		.format();
+	const lastDateStr = moment
+		.tz(`${extremes[1].split('T')[0]} 00:00`, timezone)
+		.format();
+	const lastDate = Date.parse(new Date(lastDateStr));
+	let dt = Date.parse(new Date(dtStr));
+	let i = dt;
+	while (i <= lastDate) {
+		const toPush = moment.tz(i, timezone).format().split('T')[0];
+		dates.push(toPush);
+		const newDt = new Date(i);
+		newDt.setDate(newDt.getDate() + 1);
+		i = Date.parse(newDt);
+	}
+	return dates;
+};
+exports.getAvailableDates = getAvailableDates;
+
+const currentCrosswords = () => {
+	//current time, date in NY
+	const currentDT = moment.tz(new Date(), timezone).format();
+	const currentDate = currentDT.split('T')[0];
+	//day of week in NY
+	const currentDOW = new Date(
+		moment.tz(`${currentDate} 00:00`, 'GMT').format()
+	).getDay();
+	//current hour in NY
+	const currentHr = Number(currentDT.split('T')[1].split(':')[0]);
+	//saturday or sunday after 6 PM ? two days available
+	let twoDays = false;
+	if (currentDOW === 0 || currentDOW === 6) {
+		if (currentHr >= 18) twoDays = true;
+	}
+	//any other day after 10 PM ? two days available
+	else if (currentHr >= 22) twoDays = true;
+
+	if (twoDays) {
+		const dt = new Date(moment.tz(`${currentDate} 00:00`, timezone).format());
+		dt.setDate(dt.getDate() + 1);
+		const dp = Date.parse(dt);
+		return [currentDate, moment.tz(dp, timezone).format().split('T')[0]];
+	} else return [currentDate];
+};
+
 /**
  * Regex - regex to match the result string
  * Data {
@@ -242,6 +319,7 @@ const matchers = [
 			/Wordle (\d{1,3},)?(\d{1,3})+ [\dX]\/6(\*)?((\n)?(\n(\u2B1B|\u2B1C|(\uD83D\uDFE9)|(\uD83D\uDFE8)){5}(.*)){1,6})?/g,
 		data: {
 			name: 'Wordle',
+			getCurrentPuzzles: getAvailableDates,
 			getData: (str) => {
 				try {
 					const firstLine = str.split('\n')[0];
@@ -308,6 +386,7 @@ const matchers = [
 			getData: processQuordle('Quordle'),
 			compareData: compareQuordle,
 			checkValidDate: checkValidDateOnly,
+			getCurrentPuzzles: getAvailableDates,
 			getLivePuzzle: (date) => {
 				return getPuzzleNumber(date.split('T')[0], 1082, '2025-01-10');
 			},
@@ -327,6 +406,7 @@ const matchers = [
 		data: {
 			name: 'Sequence Quordle',
 			checkValidDate: checkValidDateOnly,
+			getCurrentPuzzles: getAvailableDates,
 			getData: processQuordle('Sequence Quordle'),
 			compareData: compareQuordle,
 			getLivePuzzle: (date) => {
@@ -348,6 +428,7 @@ const matchers = [
 		data: {
 			name: 'Quordle Extreme',
 			checkValidDate: checkValidDateOnly,
+			getCurrentPuzzles: getAvailableDates,
 			getData: processQuordle('Quordle Extreme'),
 			compareData: compareQuordle,
 			getLivePuzzle: (date) => {
@@ -370,6 +451,7 @@ const matchers = [
 		data: {
 			name: 'NYT Connections',
 			checkValidDate: checkValidDateOnly,
+			getCurrentPuzzles: getAvailableDates,
 			getLivePuzzle: (date) => {
 				return getPuzzleNumber(date.split('T')[0], 581, '2025-01-12');
 			},
@@ -482,6 +564,10 @@ const matchers = [
 			getLivePuzzle: (date) => {
 				return getPuzzleNumber(date.split('T')[0], 645, '2025-01-13');
 			},
+			getCurrentPuzzles: () => {
+				const currentDT = moment.tz(Date.now(), timezone).format();
+				return [currentDT.split('T')[0]];
+			},
 			getData: (str) => {
 				const lines = str.split('\n');
 				const number = parseInt(
@@ -574,6 +660,7 @@ const matchers = [
 				return toReturn;
 			},
 			checkValidDate: checkValidDateOnly,
+			getCurrentPuzzles: getAvailableDates,
 			getData: (str) => {
 				const lines = str.split('\n');
 				const data = {
@@ -692,6 +779,16 @@ const matchers = [
 				return a.correct === b.correct && a.rarity === b.rarity;
 			},
 			checkValidDate: checkValidDateTime(6, timezone),
+			getCurrentPuzzles: () => {
+				const currentDT = moment.tz(new Date(), timezone).format();
+				const currentHr = Number(currentDT.split('T')[1].split(':')[0]);
+				if (currentHr < 6) {
+					const dt = new Date();
+					dt.setDate(dt.getDate() - 1);
+					return [moment.tz(Date.parse(dt), timezone).split('T')[0]];
+				}
+				return [currentDT.split('T')[0]];
+			},
 			getDate: (str) => {
 				const number = parseInt(str.split('\n')[0].split(' ')[2]);
 				return getPuzzleDate(number, 652, '2025-01-13');
@@ -725,10 +822,11 @@ const matchers = [
 			},
 			checkValidDate: (date) => {
 				let func;
-				if (date.getDay() === 0) func = checkValidDateTime(-6, timezone);
+				if (date.getDay() <= 1) func = checkValidDateTime(-6, timezone);
 				else func = checkValidDateTime(-2, timezone);
 				return func(date);
 			},
+			getCurrentPuzzles: currentCrosswords,
 			getReaction: () => {
 				return ['✅'];
 			},
@@ -751,10 +849,11 @@ const matchers = [
 			},
 			checkValidDate: (date) => {
 				let func;
-				if (date.getDay() === 0) func = checkValidDateTime(-6, timezone);
+				if (date.getDay() <= 1) func = checkValidDateTime(-6, timezone);
 				else func = checkValidDateTime(-2, timezone);
 				return func(date);
 			},
+			getCurrentPuzzles: currentCrosswords,
 			getReaction: () => {
 				return ['✅'];
 			},

@@ -1,3 +1,5 @@
+//SERVER GAME LIST
+
 /**
  * Settings for all games:
  * - minimum plays/number of results (same for all games on a server-level; integer 10-28, inclusive)
@@ -402,76 +404,3 @@ const gameList = [
 	},
 ];
 module.exports = gameList;
-
-// const getFilter = (getScore, n, comparator) => {
-// 	if (!['lt', 'lte', 'eq', 'gte', 'gt'].includes(comparator.toLowerCase()))
-// 		return null;
-// 	switch (comparator.toLowerCase()) {
-// 		case 'lt':
-// 			return (data) => getScore(data) < n;
-// 		case 'gt':
-// 			return (data) => getScore(data) > n;
-// 		case 'eq':
-// 			return (data) => getScore(data) === n;
-// 		case 'lte':
-// 			return (data) => getScore(data) <= n;
-// 		case 'gte':
-// 			return (data) => getScore(data) >= n;
-// 		default:
-// 			return null;
-// 	}
-// };
-// const [scoreLT, scoreLTE, scoreEQ, scoreGTE, scoreGT] = [
-// 	(scoreFn) => {
-// 		return {
-// 			name: 'scoreLT',
-// 			display: 'Keep only scores less than <N>',
-// 			filter: (n) => getFilter((data) => scoreFn(data), n, 'lt'),
-// 		};
-// 	},
-// 	(scoreFn) => {
-// 		return {
-// 			name: 'scoreLTE',
-// 			display: 'Keep only scores less than or equal to <N>',
-// 			filter: (n) => getFilter((data) => scoreFn(data), n, 'lte'),
-// 		};
-// 	},
-// 	(scoreFn) => {
-// 		return {
-// 			name: 'scoreEQ',
-// 			display: 'Keep only scores equal to <N>',
-// 			filter: (n) => getFilter((data) => scoreFn(data), n, 'eq'),
-// 		};
-// 	},
-// 	(scoreFn) => {
-// 		return {
-// 			name: 'scoreGTE',
-// 			display: 'Keep only scores greater than or equal to <N>',
-// 			filter: (n) => getFilter((data) => scoreFn(data), n, 'gte'),
-// 		};
-// 	},
-// 	(scoreFn) => {
-// 		return {
-// 			name: 'scoreGT',
-// 			display: 'Keep only scores greater than <N>',
-// 			filter: (n) => getFilter((data) => scoreFn(data), n, 'gt'),
-// 		};
-// 	},
-// ];
-// const basicComparators = (scoreFn) => {
-// 	return [scoreLT, scoreLTE, scoreEQ, scoreGTE, scoreGT].map((s) => s(scoreFn));
-// };
-// const winComparators = (winFn) => {
-// 	return [
-// 		{
-// 			name: 'wins',
-// 			display: 'Keep only wins',
-// 			filter: (data) => winFn(data),
-// 		},
-// 		{
-// 			name: 'losses',
-// 			display: 'Keep only losses',
-// 			filter: (data) => !winFn(data),
-// 		},
-// 	];
-// };

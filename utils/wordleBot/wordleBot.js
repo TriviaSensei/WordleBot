@@ -24,7 +24,8 @@ const settingsTokenDuration = 5;
  * bot test 2: 1328900288324698254
  */
 
-const games = require('../../utils/gameList');
+const games = require('../gameList');
+const achievements = require('../achievements');
 const gameList = games.map((g) => g.name);
 const authObj = {
 	withCredentials: true,
@@ -97,8 +98,6 @@ const handlePostQueue = async () => {
 	}
 
 	const { type, action } = postQueue[0];
-	console.log(`Handling post queue item:\n--------------------`);
-	console.log(postQueue[0]);
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
 		const re = /^(\%[0-9A-F]{2})+$/;
@@ -216,6 +215,56 @@ const testRegex = (str) => {
 	if (!match) return getCharCodes(str);
 };
 
+const handleAchievements = async (data) => {
+	const user = await Users.findById(data.user);
+	if (!user) return;
+	if (!user.achievements) user.achievements = [];
+	//see what achievements can be accomplished with this one,
+	//push to the user's list if not already there
+	const gameAchievements = achievements.filter(
+		(a) => a.games.length === 0 || a.games.includes(data.game)
+	);
+	const toReturn = [];
+	//push to the user if they don't have data for this achievement
+	await Promise.all(
+		gameAchievements.map(async (a) => {
+			let existing = user.achievements.find((ua) => ua.id === a.id);
+			if (!existing) {
+				existing = {
+					id: a.id,
+					complete: false,
+					completedDate: null,
+					progress: null,
+				};
+				user.achievements.push(existing);
+				user.markModified('achievements');
+			}
+		})
+	);
+	await user.save();
+
+	//for each user achievement
+	await Promise.all(
+		user.achievements.map(async (ua) => {
+			//if it's already complete, no need to do anything
+			if (ua?.complete) return;
+			//otherwise find the corresponding achievement in the server list
+			const ga = gameAchievements.find((ga) => ga.id === ua.id);
+			ua.progress = await ga.updateProgress(ua.progress, data);
+			ua.complete = await ga.isComplete(ua.progress);
+			if (ua.complete) {
+				toReturn.push(ua);
+				ua.progress = null;
+				ua.completedDate = new Date();
+			}
+		})
+	);
+	user.markModified('achievements');
+	await user.save();
+
+	return toReturn;
+};
+
 const processResults = async (usr, gameInfo) => {
 	let failures = [];
 	let successes = [];
@@ -230,8 +279,6 @@ const processResults = async (usr, gameInfo) => {
 						game: info.name,
 						date: info.getDate(match),
 					};
-					console.log(`Data parsed:\n--------------`);
-					console.log(data);
 					if (!data.date) {
 						failures.push({
 							message: `No game date or number could be found in result for ${data.game}`,
@@ -292,18 +339,12 @@ const processResults = async (usr, gameInfo) => {
 								name: data.game,
 								match,
 							});
-							console.log('Creating result');
-							console.log({
+							const toCreate = {
 								...data,
 								data: gameResult.data,
-							});
-							const toReturn = await Results.create({
-								...data,
-								data: gameResult.data,
-							});
-							// await Promise.all(usr.servers.map(async (s)=> {
-							//     if (s.guildId)
-							// }));
+							};
+							const toReturn = await Results.create(toCreate);
+
 							return {
 								data: toReturn,
 								reaction: info.getReaction(gameResult.data),
@@ -330,7 +371,15 @@ const processResults = async (usr, gameInfo) => {
 		})
 	);
 
-	// if (process.env.NODE_ENV === 'development') await Results.deleteMany({});
+	const allResults = results.reduce((p, c) => {
+		if (!c) return [...p];
+		else return [...p, ...c.filter((el) => el !== null).map((el) => el.data)];
+	}, []);
+	allResults.sort((a, b) => a.date - b.date);
+	for (var i = 0; i < allResults.length; i++) {
+		await handleAchievements(allResults[i]);
+	}
+	if (process.env.NODE_ENV === 'development') await Results.deleteMany({});
 
 	return {
 		results,
@@ -421,6 +470,7 @@ const updateUserData = async (userId) => {
 			banner: userData.banner || null,
 			banner_color: userData.banner_color || null,
 			servers: [],
+			achievements: [],
 		};
 		usr = await Users.create(newUser);
 		return usr;
@@ -670,6 +720,10 @@ client.on('interactionCreate', async (data) => {
 });
 
 client.on('messageCreate', async (msg) => {
+	// const ts = msg.createdTimestamp;
+	// console.log(ts);
+	// const dt = new Date(ts);
+	// console.log(dt);
 	if (!checkCorrectServer(msg.guildId)) return;
 
 	if (msg.author.id === me.id) return;
