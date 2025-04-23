@@ -115,7 +115,10 @@ a {
 	position: relative;
 }
 
-.report-area,
+.report-area {
+	width: 100%;
+}
+
 .report-area > * {
 	max-width: 100%;
 }
@@ -125,9 +128,18 @@ button.nav-link .game-icon {
 	margin-right: 0.5em;
 }
 
-h2 .game-icon {
+h2 .game-icon,
+h3 .game-icon {
 	height: calc(1.325rem + 0.9vw);
 	margin-right: 0.5em;
+}
+
+.accordion-button .game-icon {
+	height: 1rem;
+}
+.accordion-button {
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
 }
 
 .nav-link.active {

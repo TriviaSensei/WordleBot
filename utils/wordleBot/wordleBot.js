@@ -218,7 +218,13 @@ const testRegex = (str) => {
 const handleAchievements = async (data) => {
 	const user = await Users.findById(data.user);
 	if (!user) return;
-	if (!user.achievements) user.achievements = [];
+	if (!user.achievements) {
+		user.achievements = {
+			progress: [],
+			completed: [],
+		};
+	} else if (!user.achievements.completed) user.achievements.completed = [];
+	if (!user.achievements.progress) user.achievements.progress = [];
 	//see what achievements can be accomplished with this one,
 	//push to the user's list if not already there
 	const gameAchievements = achievements.filter(
@@ -228,37 +234,69 @@ const handleAchievements = async (data) => {
 	//push to the user if they don't have data for this achievement
 	await Promise.all(
 		gameAchievements.map(async (a) => {
-			let existing = user.achievements.find((ua) => ua.id === a.id);
-			if (!existing) {
-				existing = {
-					id: a.id,
-					complete: false,
-					completedDate: null,
-					progress: null,
-				};
-				user.achievements.push(existing);
-				user.markModified('achievements');
+			//if they've already completed the achievement, don't try to push anything
+			if (user.achievements.completed.some((ac) => ac.id === a.id)) return null;
+			//otherwise get the data item (if any) in the user's progress that has the progress in it
+			if (a.dataItem) {
+				let existingProgress = user.achievements.progress.find(
+					(ua) => ua.name === a.dataItem
+				);
+				//push a fresh item to the user's progress if they haven't started on this one
+				if (!existingProgress) {
+					user.achievements.progress.push({
+						name: a.dataItem,
+						progress: null,
+					});
+					user.markModified('achievements');
+				}
 			}
 		})
 	);
 	await user.save();
 
-	//for each user achievement
-	await Promise.all(
-		user.achievements.map(async (ua) => {
-			//if it's already complete, no need to do anything
-			if (ua?.complete) return;
-			//otherwise find the corresponding achievement in the server list
-			const ga = gameAchievements.find((ga) => ga.id === ua.id);
-			ua.progress = await ga.updateProgress(ua.progress, data);
-			ua.complete = await ga.isComplete(ua.progress);
-			if (ua.complete) {
-				toReturn.push(ua);
-				ua.progress = null;
-				ua.completedDate = new Date();
+	//for each applicable achievement
+	const dataItemsUpdated = [];
+	for (var i = 0; i < gameAchievements.length; i++) {
+		const ga = gameAchievements[i];
+		//if they've already completed this one, do nothing
+		const completedItem = user.achievements.completed.find(
+			(ca) => ca.id === ga.id
+		);
+		if (completedItem) continue;
+		//otherwise get the data item if there is one
+		let di;
+		if (ga.dataItem) {
+			di = user.achievements.progress.find((ap) => ap.name === ga.dataItem);
+			//update the progress once time
+			if (!dataItemsUpdated.includes(ga.dataItem)) {
+				di.progress = await ga.updateProgress(di?.progress, data);
+				dataItemsUpdated.push(ga.dataItem);
 			}
-		})
-	);
+		} else {
+			di = {
+				progress: null,
+			};
+			di.progress = await ga.updateProgress(null, data);
+		}
+
+		//check for completion
+		const complete = await ga.isComplete(di.progress);
+		//if complete, write to the data and add it to the toReturn array of completed achievements
+		if (complete) {
+			const { name, id, description } = ga;
+			user.achievements.completed.push({
+				id,
+				name,
+				date: new Date(),
+			});
+			toReturn.push({
+				name,
+				id,
+				description,
+			});
+		}
+	}
+
 	user.markModified('achievements');
 	await user.save();
 
@@ -341,6 +379,7 @@ const processResults = async (usr, gameInfo) => {
 							});
 							const toCreate = {
 								...data,
+								createdDate: new Date(),
 								data: gameResult.data,
 							};
 							const toReturn = await Results.create(toCreate);
@@ -377,10 +416,12 @@ const processResults = async (usr, gameInfo) => {
 	}, []);
 	allResults.sort((a, b) => a.date - b.date);
 	for (var i = 0; i < allResults.length; i++) {
-		await handleAchievements(allResults[i]);
+		const toPush = await handleAchievements(allResults[i]);
+		toPush.forEach((a) => {
+			achievements.push(a);
+		});
 	}
-	if (process.env.NODE_ENV === 'development') await Results.deleteMany({});
-
+	// if (process.env.NODE_ENV === 'development') await Results.deleteMany({});
 	return {
 		results,
 		failures,
@@ -593,7 +634,7 @@ client.on('interactionCreate', async (data) => {
 
 	let content;
 	if (commandName === 'i')
-		content = `Here is your personal stats page: https://${hostname}/wordle/player/${data.user.id}`;
+		content = `Here is your personal stats page: https://${hostname}/player/${data.user.id}`;
 	else if (commandName === 'we')
 		content = `Here is your server stats page: https://${hostname}/wordle/server/${data.guildId}`;
 	else if (commandName === 'faq')
@@ -785,12 +826,17 @@ client.on('messageCreate', async (msg) => {
 				}
 			} else {
 				addReaction(msg, '✅');
+
 				addMessage({
 					channelId: msg.channelId,
 					data: {
 						content: `<@${msg.author.id}> ${successes.length} ${
 							successes.length === 1 ? 'result' : 'results'
 						} successfully parsed`,
+						message_reference: {
+							type: 0,
+							message_id: msg.id,
+						},
 					},
 					flags: MessageFlags.Ephemeral,
 				});
@@ -799,7 +845,25 @@ client.on('messageCreate', async (msg) => {
 	}
 	//handle achievements
 	if (achievements.length > 0) {
-		console.log(achievements);
+		addReaction(msg, '🎖️');
+		addMessage({
+			channelId: msg.channelId,
+			data: {
+				content: `<@${msg.author.id}> Congratulations! You've unlocked ${
+					achievements.length === 1
+						? 'an achievement'
+						: `${achievements.length} achievements`
+				}!\n${achievements
+					.map((a) => {
+						return `\t🎖️ ${a.name}: ${a.description}`;
+					})
+					.join('\n')}`,
+				message_reference: {
+					type: 0,
+					message_id: msg.id,
+				},
+			},
+		});
 	}
 
 	const serversToRemove = [];

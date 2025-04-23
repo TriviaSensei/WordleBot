@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="81" height="81" viewBox="3 1 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0" stop-color="#E9B308"/>
+      <stop offset="1" stop-color="#FFE72F"/>
+    </linearGradient>
+  </defs>
+  <text style="fill: rgb(51, 51, 51); font-family: Arial; font-size: 15.5px; white-space: pre;" x="23.483" y="54.356">1K</text>
+  <g style="" transform="matrix(0.74042, 0, 0, 0.74042, 6.361168, 5.624845)">
+    <path d="M 15.978 6.269 L 55.978 6.269 L 35.978 46.269 L 15.978 6.269 Z" fill="url(#g1)"/>
+    <text text-anchor="middle" x="34.978" y="28.269" class="t" style="white-space: pre; fill: rgb(55, 65, 81); font-family: sans-serif; font-style: italic; font-weight: 900; line-height: normal; perspective-origin: 13.7674px 14.6875px; font-size: 16px;">T</text>
+  </g>
+</svg>

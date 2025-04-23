@@ -20,7 +20,13 @@ const userSchema = new mongoose.Schema({
 		type: [mongoose.Types.ObjectId],
 		ref: 'Servers',
 	},
-	achievements: { type: [Object], default: [] },
+	achievements: {
+		type: Object,
+		default: {
+			progress: [],
+			completed: [],
+		},
+	},
 });
 
 const Users = mongoose.model('Users', userSchema, 'users');

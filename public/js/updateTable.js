@@ -36,7 +36,6 @@ export const updateTable = (
 	columnOperators,
 	customStats
 ) => {
-	console.log(columnOperators);
 	//run each row operator, adding a summary column for each one
 	const header = table.querySelector('tr.header-row');
 

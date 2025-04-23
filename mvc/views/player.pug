@@ -1,9 +1,17 @@
 extends _base
 
+mixin achievement(ach,game,complete)
+    .achievement-container
+        //- div(class=`achievement ${complete ? 'complete':''}` style=`${complete ? `background-color: ${ach.color};` : ''}` data-bs-toggle="tooltip" data-bs-html="true" data-bs-title=`<div class="d-flex flex-column"><div class="achievement-title fw-semibold">${ach.name}</div><div class="achievement-description">${ach.description}</div>${complete ? '<div class="achievement-date">Completed ' + complete.date.toISOString().split('T')[0] + '</div>' : ''}</div>`)
+        //-     img(src=`/img/achievements/${game}/${complete && ach.alt ? `${ach.fname}-complete.${ach.ext}` : `${ach.fname}.${ach.ext}`}`)
+        img(src=`/img/achievements/${game}/${`${ach.fname}.${ach.ext}`}` class=`achievement ${complete ? 'complete':''}` data-count=`${ach.count >= 0 ? ach.count : ''}` style=`${complete ? `background-color: ${ach.color};` : ``}` data-bs-toggle="tooltip" data-bs-html="true" data-bs-title=`<div class="d-flex flex-column"><div class="achievement-title fw-semibold">${ach.name}</div><div class="achievement-description">${ach.description}</div><div class="achievement-progress">${complete ? 'Completed ' + complete.date.toISOString().split('T')[0] : 'Current: '+ ach.progress}</div></div>`)
+        .achievement-name.fw-semibold= ach.name
+
 block styles 
     each game, ind in data.gameData.data
         - if (game.script && game.results.length > 0)
             link(rel="stylesheet" href=`/css/${game.game.toLowerCase().split(' ').join('_')}.css`)
+    link(rel="stylesheet" href="/css/_achievements.css")
 block content 
     .banner-container.ratio.ratio-16x9
         div
@@ -17,13 +25,19 @@ block content
 
         .report-area.mt-4
             ul#report-tabs.nav.nav-tabs.nav-fill
+                - var noTabs = true;
+               
                 each game,ind in data.gameData.data
                     - var gameId = game.game.toLowerCase().split(' ').join('-');
                     li(class=`nav-item ${game.results.length === 0 ? 'd-none' : ''}` role="presentation" data-game=`${gameId}`)
-                        button(class=`nav-link ${ind===0 ? 'active':''}` id=`${gameId}-tab` data-bs-toggle="tab" data-bs-target=`#${gameId}-tab-pane` type="button" role="tab" aria-controls=`${gameId}-tab-pane` aria-selected=`${ind===0}`)
+                        button(class=`nav-link ${noTabs && game.results.length > 0 ? 'active':''}` id=`${gameId}-tab` data-bs-toggle="tab" data-bs-target=`#${gameId}-tab-pane` type="button" role="tab" aria-controls=`${gameId}-tab-pane` aria-selected=`${noTabs && game.results.length > 0}`)
+                            - if (game.results.length !== 0) noTabs = false;
                             .d-flex.flex-row.align-items-center 
                                 img.game-icon(src=`/img/icons/${game.game.toLowerCase().split(' ').join('_')}.svg`)
                                 span= game.game
+                li(class=`nav-item` role="presentation")
+                    button(class=`nav-link ${noTabs ? 'active':''}` id=`achievements-tab` data-bs-toggle="tab" data-bs-target=`#achievements-tab-pane` type="button" role="tab" aria-controls=`achievements-tab-pane` aria-selected=`${noTabs}`)
+                        .d-flex.flex-row.align-items-center 🎖️ Achievements 
             #report-panes.tab-content
                 - if (data.gameData.data.length === 0)
                     div No data is available for this month 
@@ -31,7 +45,7 @@ block content
                     - var noneShown = true;
                     each game,ind in data.gameData.data
                         - var gameId = game.game.toLowerCase().split(' ').join('-');
-                        div(class=`tab-pane fade ${game.results.length === 0 ? 'd-none' : noneShown ? 'show active':''}` id=`${gameId}-tab-pane` role="tabpanel" aria-labelledby=`${gameId}-tab` tabindex=`${ind}`)
+                        div(class=`tab-pane fade ${game.results.length === 0 ? 'd-none' : noneShown ? 'show active':''}` id=`${gameId}-tab-pane` role="tabpanel" aria-labelledby=`${gameId}-tab`)
                             - if (game.results.length !== 0) noneShown = false;
                             .d-flex.flex-column.align-items-center.m-2.mt-4
                                 h2.d-flex.flex-row.align-items-center.mb-4
@@ -46,6 +60,67 @@ block content
                                                     tr.header-row.sticky-top
                                                         th.fw-bold(colspan="2") Player
                                                         th  
+                    div(class=`tab-pane fade ${noneShown ? 'show active':''}` id=`achievements-tab-pane` role="tabpanel" aria-labelledby=`achievements-tab` )
+                        .d-flex.flex-column.align-items-center.m-2.mt-4
+                            h2.d-flex.flex-row.align-items-center.mb-4 🎖️ Achievements 
+                            .d-flex.flex-column.align-items-start.w-100
+                                ul#achievement-tabs.nav.nav-tabs.nav-fill(role="tablist")
+                                    li.nav-item(role="presentation")
+                                        button#all-tab.nav-link.active(type="button" data-bs-toggle="tab" data-bs-target="#all-achievement-tab-pane" role="tab"  aria-controls="all-tab-pane" aria-selected="true") 🎲 All/Multi
+                                    each game in data.gameData.data
+                                        - var gameSlug = game.game.toLowerCase().split(' ').join('-')
+                                        li.nav-item(role="presentation")
+                                            button.nav-link(id=`${gameSlug}-tab` type="button" data-bs-toggle="tab" data-bs-target=`#${gameSlug}-achievement-tab-pane` role="tab"  aria-controls=`${gameSlug}-tab-pane` aria-selected="false")
+                                                img.game-icon(src=`/img/icons/${gameSlug.split('-').join('_')}.svg`)
+                                                span= game.game
+                                #achievement-tab-content.tab-content
+                                    #all-achievement-tab-pane.tab-pane.fade.show.active(role="tabpanel" aria-labelledby="all-tab" tabindex="0")
+                                        .w-100.d-flex.flex-column.align-items-center
+                                            h3.py-3 🎲 All/Multi
+                                            .w-100.d-flex.flex-row.flex-wrap.pe-3
+                                                - var allPlays = data.achievements.filter(a=>a.games.length!==1 && a.fname !== '')
+                                                each ach in allPlays 
+                                                    - var complete = data.playerData.achievements.completed.find(ca=>ca.id===ach.id)
+                                                    +achievement(ach,'all',complete)
+                                    each game in data.gameData.data
+                                        - var gameSlug = game.game.toLowerCase().split(' ').join('-')
+                                        .tab-pane.fade(id=`${gameSlug}-achievement-tab-pane` role="tabpanel" aria-labelledby=`${gameSlug}-tab` tabindex="0")
+                                            .w-100.d-flex.flex-column.align-items-center
+                                                h3.py-3
+                                                    img.game-icon(src=`/img/icons/${gameSlug.split('-').join('_')}.svg`)
+                                                    span= game.game
+                                                .w-100.d-flex.flex-row.flex-wrap.pe-3
+                                                    -var achievements = data.achievements.filter(a=>a.games.length === 1 && a.games[0]===game.game && a.fname!== '')
+                                                    each ach in achievements 
+                                                        - var complete = data.playerData.achievements.completed.some(ca=>ca.id===ach.id)
+                                                        +achievement(ach,game.game.toLowerCase().split(' ').join('-'),complete)
+                                //- .w-100.accordion#achievements-accordion 
+                                //-     .accordion-item 
+                                //-         h2#all-multi.accordion-header
+                                //-             button.accordion-button(type="button" data-bs-toggle="collapse" data-bs-target="#all-div" aria-expanded="true" aria-controls="all-div") 🎲 All/Multi
+                                //-         #all-div.accordion-collapse.collapse.show(aria-labelledby="all-multi" data-bs-parent="#achievements-accordion")
+                                //-             .accordion-body
+                                //-                 .w-100.d-flex.flex-row.flex-wrap.mb-4
+                                //-                     - var allPlays = data.achievements.filter(a=>a.games.length!==1 && a.fname !== '')
+                                //-                     each ach in allPlays 
+                                //-                         - var complete = data.playerData.achievements.completed.find(ca=>ca.id===ach.id)
+                                //-                         +achievement(ach,'all',complete)
+                                //-     each game in data.gameData.data
+                                //-         - var gameSlug = game.game.toLowerCase().split(' ').join('-')
+                                //-         .accordion-item 
+                                //-             h2.accordion-header(id=`${gameSlug}-acc-button`)
+                                //-                 button.accordion-button.collapsed(type="button" data-bs-toggle="collapse" data-bs-target=`#${gameSlug}-acc-div` aria-expanded="false" aria-controls=`${gameSlug}-acc-div`)
+                                //-                     img.game-icon(src=`/img/icons/${gameSlug.split('-').join('_')}.svg`)
+                                //-                     span= game.game
+                                //-             .accordion-collapse.collapse(id=`${gameSlug}-acc-div` aria-labelledby=`${gameSlug}-acc-button` data-bs-parent="#achievements-accordion")
+                                //-                 .accordion-body 
+                                //-                     .w-100.d-flex.flex-row.flex-wrap.mb-4
+                                //-                         -var achievements = data.achievements.filter(a=>a.games.length === 1 && a.games[0]===game.game && a.fname!== '')
+                                //-                         each ach in achievements 
+                                //-                             - var complete = data.playerData.achievements.completed.some(ca=>ca.id===ach.id)
+                                //-                             +achievement(ach,game.game.toLowerCase().split(' ').join('-'),complete)
+                                    
+
 block scripts 
     script(src="/js/player_page.js" type="module" defer)
     each game, ind in data.gameData.data

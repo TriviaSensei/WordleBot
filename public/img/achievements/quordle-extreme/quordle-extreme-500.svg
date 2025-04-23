@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="81" height="81" viewBox="3 1 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <text style="fill: rgb(51, 51, 51); font-family: Arial; font-size: 15.5px; white-space: pre;" x="20.07" y="54.356">500</text>
+  <g>
+    <rect fill="#919191" x="18.21" y="10.318" width="14.808" height="14.808" style=""/>
+    <rect fill="#00cf85" x="33.018" y="10.318" width="14.808" height="14.808" style=""/>
+    <rect fill="#00cf85" x="18.21" y="25.126" width="14.808" height="14.808" style=""/>
+    <rect fill="#fdcc04" x="33.018" y="25.126" width="14.808" height="14.808" style=""/>
+    <path d="M 25.614 17.722 L 40.423 32.531" stroke-width="3" stroke="#f00" style=""/>
+    <path d="M 40.423 17.722 L 25.614 32.531" stroke-width="3" stroke="#f00" style=""/>
+  </g>
+</svg>

@@ -369,6 +369,7 @@ const matchers = [
 			getPuzzleNumberByDate: (date) => {
 				return getPuzzleNumber(date, 1300, '2025-01-09');
 			},
+			checkWin: (data) => data.score <= 6,
 			checkValidDate: checkValidDateOnly,
 			getReaction: (data) => {
 				const emojis = ['🎉', '🔥', null, null, null, '😅'];
@@ -397,6 +398,7 @@ const matchers = [
 			getPuzzleNumberByDate: (date) => {
 				return getPuzzleNumber(date, 1082, '2025-01-10');
 			},
+			checkWin: (data) => data.scores.reduce((p, c) => Math.max(p, c)) <= 9,
 			getReaction: quordleReaction(9),
 		},
 	},
@@ -419,6 +421,7 @@ const matchers = [
 			getPuzzleNumberByDate: (date) => {
 				return getPuzzleNumber(date, 1082, '2025-01-10');
 			},
+			checkWin: (data) => data.scores.reduce((p, c) => Math.max(p, c)) <= 10,
 			getReaction: quordleReaction(10),
 		},
 	},
@@ -441,6 +444,7 @@ const matchers = [
 			getPuzzleNumberByDate: (date) => {
 				return getPuzzleNumber(date, 165, '2025-01-10');
 			},
+			checkWin: (data) => data.scores.reduce((p, c) => Math.max(p, c)) <= 8,
 			getReaction: quordleReaction(8),
 		},
 	},
@@ -472,6 +476,7 @@ const matchers = [
 				return getPuzzleNumber(date, 581, '2025-01-12');
 			},
 			getData: (str) => {
+				const colors = ['yellow', 'green', 'blue', 'purple'];
 				const lines = str.split('\n');
 				let number;
 				lines.some((l) => {
@@ -499,6 +504,7 @@ const matchers = [
 					/(\uD83D\uDFE6){4}/,
 					/(\uD83D\uDFEA){4}/,
 				];
+				let found = 0;
 				lines.forEach((l, i) => {
 					if (l.length !== 8) {
 						return;
@@ -506,8 +512,16 @@ const matchers = [
 					const ind = regexes.findIndex((r) => {
 						return l.match(r);
 					});
-					if (ind >= 0) data.scores[ind]++;
-					else if (l.match(/(\uD83D[\uDFE8\uDFE9\uDFE6\uDFEA]){4}/))
+					if (ind >= 0) {
+						found++;
+						if (data.scores[ind] > 0) {
+							return {
+								status: 1,
+								message: `Connections #${number} has a duplicated completed group (${colors[ind]})`,
+							};
+						}
+						data.scores[ind] = found;
+					} else if (l.match(/(\uD83D[\uDFE8\uDFE9\uDFE6\uDFEA]){4}/))
 						data.mistakes++;
 				});
 				if (data.mistakes > 4)
@@ -515,15 +529,7 @@ const matchers = [
 						status: 1,
 						message: `Connections #${number} has too many mistakes`,
 					};
-				else if (data.scores.some((s) => s > 1)) {
-					const dupe = ['yellow', 'green', 'blue', 'purple'].find((c, i) => {
-						return data.scores[i] > 1;
-					});
-					return {
-						status: 1,
-						message: `Connections #${number} has a duplicated completed group (${dupe})`,
-					};
-				} else if (data.mistakes < 4 && data.scores.some((s) => s !== 1)) {
+				else if (data.mistakes < 4 && data.scores.some((s) => s === 0)) {
 					return {
 						status: 1,
 						message: `Connections #${number} has incomplete data`,
@@ -541,6 +547,8 @@ const matchers = [
 					}) && a.mistakes === b.mistakes
 				);
 			},
+			checkWin: (data) =>
+				data.scores.every((s) => s === 1) && data.mistakes < 4,
 			getReaction: (data) => {
 				const emojis = ['🔥', '✅', '✅', '😅', '😢'];
 				return emojis[data.mistakes];
@@ -602,6 +610,7 @@ const matchers = [
 			getPuzzleNumberByDate: (date) => {
 				return getPuzzleNumber(date, 645, '2025-01-13');
 			},
+			checkWin: (data) => data.score === 20,
 			getReaction: (data) => {
 				return ['✅'];
 			},
@@ -743,6 +752,7 @@ const matchers = [
 			getPuzzleNumberByDate: () => {
 				return null;
 			},
+			checkWin: (data) => data.misses < 3,
 			getReaction: (data) => {
 				if (data.correctAnswers === 9) return ['🔥', '🎉'];
 				else if (data.correctAnswers >= 7) return ['🎉'];
@@ -796,6 +806,7 @@ const matchers = [
 			getPuzzleNumberByDate: (date) => {
 				return getPuzzleNumber(date, 652, '2025-01-13');
 			},
+			checkWin: (data) => data.correct === 9,
 			getReaction: (data) => {
 				if (data.correct === 9) {
 					if (data.rarity < 100) return ['🔥'];
@@ -827,6 +838,7 @@ const matchers = [
 				return func(date);
 			},
 			getCurrentPuzzles: currentCrosswords,
+			checkWin: (data) => true,
 			getReaction: () => {
 				return ['✅'];
 			},
@@ -854,6 +866,7 @@ const matchers = [
 				return func(date);
 			},
 			getCurrentPuzzles: currentCrosswords,
+			checkWin: (data) => true,
 			getReaction: () => {
 				return ['✅'];
 			},

@@ -17,10 +17,12 @@ block content
 
         .report-area.mt-4
             ul#report-tabs.nav.nav-tabs.nav-fill
+                - var noTabs = true;
                 each game,ind in data.gameData.data
                     - var gameId = game.game.toLowerCase().split(' ').join('-');
                     li(class=`nav-item ${game.results.length === 0 ? 'd-none' : ''}` role="presentation" data-game=`${gameId}`)
-                        button(class=`nav-link ${ind===0 ? 'active':''}` id=`${gameId}-tab` data-bs-toggle="tab" data-bs-target=`#${gameId}-tab-pane` type="button" role="tab" aria-controls=`${gameId}-tab-pane` aria-selected=`${ind===0}`)
+                        button(class=`nav-link ${noTabs && game.results.length > 0 ? 'active':''}` id=`${gameId}-tab` data-bs-toggle="tab" data-bs-target=`#${gameId}-tab-pane` type="button" role="tab" aria-controls=`${gameId}-tab-pane` aria-selected=`${ind===0}`)
+                            - if (game.results.length !== 0) noTabs = false;
                             .d-flex.flex-row.align-items-center 
                                 img.game-icon(src=`/img/icons/${game.game.toLowerCase().split(' ').join('_')}.svg`)
                                 span= game.game

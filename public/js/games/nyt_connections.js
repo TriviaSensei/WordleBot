@@ -19,7 +19,7 @@ area.addEventListener('data-update', (e) => {
 			const d1 = createElement('div');
 			let win = data.mistakes <= 3;
 			data.scores.forEach((s, i) => {
-				const d = createElement(`.${arr[i]}${s === 1 ? '' : '.fail'}`);
+				const d = createElement(`.${arr[i]}${s > 0 ? '' : '.fail'}`);
 				d1.appendChild(d);
 			});
 			const inner = createElement('.quordle-result');
@@ -31,7 +31,7 @@ area.addEventListener('data-update', (e) => {
 					data.mistakes > 3
 						? 7 + data.scores.reduce(penalty, 0)
 						: data.scores.reduce((prev, curr) => {
-								return prev + curr;
+								return prev + (curr > 0 ? 1 : 0);
 						  }, 0) + data.mistakes;
 				d2.innerHTML = total;
 			} else d2.innerHTML = data.score;
@@ -46,7 +46,7 @@ area.addEventListener('data-update', (e) => {
 	};
 	const winFn = (data) => {
 		if (!data) return false;
-		return data.scores.every((s) => s === 1) && data.mistakes < 4;
+		return data.scores.every((s) => s > 0) && data.mistakes < 4;
 	};
 	const colors = ['🟨', '🟩', '🟦', '🟪'];
 	const individuals = {
@@ -58,7 +58,7 @@ area.addEventListener('data-update', (e) => {
 			if (!c || c.fillIn) return p;
 			return {
 				scores: p.scores.map((el, i) => {
-					return el + c.scores[i];
+					return el + (c.scores[i] > 0 ? 1 : 0);
 				}),
 				plays: p.plays + 1,
 			};
@@ -89,7 +89,7 @@ area.addEventListener('data-update', (e) => {
 		},
 	};
 	const avgFn = (data) => {
-		if (data.scores.every((s) => s === 1) && data.mistakes < 4)
+		if (data.scores.every((s) => s > 0) && data.mistakes < 4)
 			return 4 + data.mistakes;
 		return 7 + data.scores.reduce(penalty, 0);
 	};

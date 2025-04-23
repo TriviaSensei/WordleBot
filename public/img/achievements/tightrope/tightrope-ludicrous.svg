@@ -1,0 +1,91 @@
+<svg id="my-svg" width="400" height="400" viewBox="0 0 900 900" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/2000/xlink">
+    <defs> 
+        <pattern id="orange-stripes" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#ffa000" d="M 10 0 l 10 0 l -20 20 l 0 -10 z"/>
+            <path fill="#ffa000" d="M 20 10 l 0 10 l -10 0 z"/>
+        </pattern>
+        <pattern id="orange-stripes-reverse" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#ffa000" d="M 0 0 l 10 0 l -10 10 z"/>
+            <path fill="#ffa000" d="M 20 0 l -20 20 l 10 0 l 10 -10 z"/>
+        </pattern>
+        <pattern id="white-stripes" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#fff" d="M 10 0 l 10 0 l -20 20 l 0 -10 z"/>
+            <path fill="#fff" d="M 20 10 l 0 10 l -10 0 z"/>
+        </pattern>
+        <pattern id="white-stripes-reverse" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#fff" d="M 0 0 l 10 0 l -10 10 z"/>
+            <path fill="#fff" d="M 20 0 l -20 20 l 10 0 l 10 -10 z"/>
+        </pattern>
+        <pattern id="darkred-stripes" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#92000a" d="M 10 0 l 10 0 l -20 20 l 0 -10 z"/>
+            <path fill="#92000a" d="M 20 10 l 0 10 l -10 0 z"/>
+        </pattern>
+        <pattern id="darkred-stripes-reverse" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#92000a" d="M 0 0 l 10 0 l -10 10 z"/>
+            <path fill="#92000a" d="M 20 0 l -20 20 l 10 0 l 10 -10 z"/>
+        </pattern>
+        <pattern id="red-stripes" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#f00" d="M 10 0 l 10 0 l -20 20 l 0 -10 z"/>
+            <path fill="#f00" d="M 20 10 l 0 10 l -10 0 z"/>
+        </pattern>
+        <pattern id="red-stripes-reverse" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#f00" d="M 0 0 l 10 0 l -10 10 z"/>
+            <path fill="#f00" d="M 20 0 l -20 20 l 10 0 l 10 -10 z"/>
+        </pattern>
+        <pattern id="black-stripes" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#000" d="M 10 0 l 10 0 l -20 20 l 0 -10 z"/>
+            <path fill="#000" d="M 20 10 l 0 10 l -10 0 z"/>
+        </pattern>
+        <pattern id="black-stripes-reverse" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#000" d="M 0 0 l 10 0 l -10 10 z"/>
+            <path fill="#000" d="M 20 0 l -20 20 l 10 0 l 10 -10 z"/>
+        </pattern>
+        <pattern id="yellow-stripes" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#ff0" d="M 10 0 l 10 0 l -20 20 l 0 -10 z"/>
+            <path fill="#ff0" d="M 20 10 l 0 10 l -10 0 z"/>
+        </pattern>
+        <pattern id="yellow-stripes-reverse" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path fill="#ff0" d="M 0 0 l 10 0 l -10 10 z"/>
+            <path fill="#ff0" d="M 20 0 l -20 20 l 10 0 l 10 -10 z"/>
+        </pattern>
+    </defs>
+    <g>
+        <rect x="0" y="0" height="40.2985" width="900" fill="none"/>
+        <rect x="0" y="40.2985" height="97.3881" width="900" fill="url(#darkred-stripes)"/>
+        <rect x="0" y="137.6866" height="57.0895" width="900" fill="url(#orange-stripes)"/>
+        <rect x="0" y="194.7761" height="63.806" width="900" fill="url(#white-stripes)"/>
+        <rect x="0" y="258.5821" height="194.7761" width="900" fill="url(#darkred-stripes)"/>
+        <rect x="0" y="453.3582" height="26.8657" width="900" fill="url(#red-stripes)"/>
+        <rect x="0" y="480.2239" height="191.4179" width="900" fill="none"/>
+        <rect x="0" y="671.6418" height="63.806" width="900" fill="url(#darkred-stripes)"/>
+        <rect x="0" y="735.4478" height="63.8059" width="900" fill="url(#red-stripes)"/>
+        <rect x="0" y="799.2537" height="100.7463" width="900" fill="url(#orange-stripes)"/>
+    </g>
+    <g>
+        <rect y="0" x="0" width="69.5455" height="900" fill="url(#white-stripes-reverse)"/>
+        <rect y="0" x="69.5455" width="53.1818" height="900" fill="url(#orange-stripes-reverse)"/>
+        <rect y="0" x="122.7273" width="65.4545" height="900" fill="none"/>
+        <rect y="0" x="188.1818" width="57.2727" height="900" fill="url(#red-stripes-reverse)"/>
+        <rect y="0" x="245.4545" width="204.5455" height="900" fill="none"/>
+        <rect y="0" x="450" width="32.7273" height="900" fill="url(#darkred-stripes-reverse)"/>
+        <rect y="0" x="482.7273" width="204.5454" height="900" fill="none"/>
+        <rect y="0" x="687.2727" width="40.9091" height="900" fill="url(#orange-stripes-reverse)"/>
+        <rect y="0" x="728.1818" width="65.4546" height="900" fill="url(#darkred-stripes-reverse)"/>
+        <rect y="0" x="793.6364" width="106.3636" height="900" fill="url(#yellow-stripes-reverse)"/>
+    </g>
+    <g>
+        <rect x="0" y="194.7761" width="69.5455" height="63.806" fill="white"/>
+        <rect x="69.5455" y="137.6866" width="53.1818" height="57.0895" fill="orange"/>
+        <rect x="69.5455" y="799.2537" width="53.1818" height="100.7463" fill="orange"/>
+        <rect x="188.1818" y="453.3582" width="57.2727" height="26.8657" fill="red"/>
+        <rect x="188.1818" y="735.4478" width="57.2727" height="63.8059" fill="red"/>
+        <rect x="450" y="40.2985" width="32.7273" height="97.3881" fill="darkred"/>
+        <rect x="450" y="258.5821" width="32.7273" height="194.7761" fill="darkred"/>
+        <rect x="450" y="671.6418" width="32.7273" height="63.806" fill="darkred"/>
+        <rect x="687.2727" y="137.6866" width="40.9091" height="57.0895" fill="orange"/>
+        <rect x="687.2727" y="799.2537" width="40.9091" height="100.7463" fill="orange"/>
+        <rect x="728.1818" y="40.2985" width="65.4546" height="97.3881" fill="darkred"/>
+        <rect x="728.1818" y="258.5821" width="65.4546" height="194.7761" fill="darkred"/>
+        <rect x="728.1818" y="671.6418" width="65.4546" height="63.806" fill="darkred"/>
+    </g>
+</svg>

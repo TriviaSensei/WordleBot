@@ -132,7 +132,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const dataArea = document.querySelector('#data-area');
 	let data = JSON.parse(dataArea.getAttribute('data'));
 	timezone = data.timezone || 'America/New_York';
-	console.log(data);
 	dataArea.remove();
 	//populate the month selector
 	const months = [
@@ -155,12 +154,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		.split('-')
 		.slice(0, 2)
 		.map((x) => parseInt(x));
-	const createdDate = moment
-		.tz(new Date(data.serverData.created), timezone)
-		.format()
-		.split('-')
-		.slice(0, 2)
-		.map((x) => parseInt(x));
+	const createdDate = data?.serverData?.created
+		? moment
+				.tz(new Date(data.serverData.created), timezone)
+				.format()
+				.split('-')
+				.slice(0, 2)
+				.map((x) => parseInt(x))
+		: [...currentDateET];
 
 	do {
 		const opt = createElement('option');
@@ -274,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					const pc = createElement('.picture-cell');
 					const pcInner = createElement('.w-100.h-100.d-flex');
 					const picLink = createElement('a.m-auto');
-					const href = `/wordle/player/${player.userId}`;
+					const href = `/player/${player.userId}`;
 					picLink.setAttribute('href', href);
 					picLink.setAttribute('target', '_blank');
 					const pic = createElement('img.m-auto', {

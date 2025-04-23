@@ -6,6 +6,11 @@ const Results = require('../models/resultModel');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../../utils/appError');
 const games = require('../../utils/gameList');
+const achievements = require('../../utils/achievements');
+const getNextDate = require('../../utils/getNextDate');
+const { matchers } = require('../../utils/parseResult');
+const { promises } = require('fs');
+const path = require('path');
 
 const timezone = process.env.DEFAULT_TIMEZONE;
 
@@ -58,8 +63,10 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 		month = currentMonth;
 	}
 
-	const loc = req.url.split('/').filter((x) => x.length !== 0)[0];
-	console.log(req.url);
+	const loc = req.url
+		.split('/')
+		.filter((x) => x.length !== 0)
+		.find((str) => ['server', 'player'].includes(str.toLowerCase()));
 	let result;
 	if (loc.toLowerCase() === 'server')
 		result = await getServerStats(req.params.id, year, month);
@@ -83,7 +90,113 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 	});
 	res.status(200).render(`${loc.toLowerCase()}`, {
 		status: 'success',
-		data: { ...result.data, dataItems, timezone: process.env.DEFAULT_TIMEZONE },
+		data: {
+			...result.data,
+			dataItems,
+			achievements:
+				loc.toLowerCase() === 'player'
+					? await Promise.all(
+							achievements.map(async (a, i) => {
+								const completedAchievement =
+									result.data.playerData.achievements.completed.find(
+										(ca) => ca.id === a.id
+									);
+								let progress;
+								if (!completedAchievement) {
+									const di = result.data.playerData.achievements.progress.find(
+										(p) => p.name === a.dataItem
+									);
+									if (di) {
+										//it's not a streak achievement, so just get the progress
+										if (!a.streak) progress = a.getProgress(di.progress);
+										//for streak achievements, we need to see if the streak is continuable (otherwise we need to show progress is 0)
+										else {
+											//here's the list of dates for which some puzzle is currently live
+											let currentPuzzleDates = matchers
+												.map((matcher) => matcher.data.getCurrentPuzzles())
+												.reduce((p, c) => {
+													return [...p, ...c];
+												}, []);
+											currentPuzzleDates = currentPuzzleDates.filter((d, i) => {
+												return currentPuzzleDates.every((d2, j) => {
+													return d !== d2 || j >= i;
+												});
+											});
+											//is the streak-continuing date in the list?
+											const lastPostDate = di.progress?.lastPost;
+											if (!lastPostDate) {
+												console.log(a);
+												progress = a.getProgress(0);
+											} else {
+												const nextDate = getNextDate(lastPostDate);
+												if (currentPuzzleDates.includes(nextDate))
+													progress = a.getProgress(
+														Math.max(
+															di.progress.current,
+															di.progress.other?.length
+														)
+													);
+												else
+													progress = a.getProgress({
+														current: Math.max(
+															di.progress.current,
+															di.progress.other?.length
+														),
+													});
+											}
+										}
+									} else progress = a.getProgress(null);
+								}
+								return (async ({
+									id,
+									name,
+									description,
+									games,
+									color,
+									alt,
+								}) => {
+									const subfolder =
+										games.length !== 1
+											? 'all'
+											: games[0].toLowerCase().split(' ').join('-');
+									const folder = path.join(
+										__dirname,
+										`../../public/img/achievements/${subfolder}`
+									);
+									let file = path.join(folder, `/${id}.svg`);
+									let fname = '';
+									let ext = '';
+									try {
+										const f = await promises.open(file, 'r');
+										fname = `${id}`;
+										ext = 'svg';
+										f.close();
+									} catch (err) {
+										try {
+											file = path.join(folder, `/${id}.png`);
+											const f = await promises.open(file, 'r');
+											fname = `${id}`;
+											ext = 'png';
+											f.close();
+										} catch (err2) {}
+									}
+									return {
+										id,
+										name,
+										fname,
+										alt: alt || false,
+										ext,
+										description,
+										progress,
+										games,
+										color,
+									};
+								})(a);
+							})
+					  )
+					: null,
+			timezone: process.env.DEFAULT_TIMEZONE,
+		},
 		title: `${
 			result.data.serverData
 				? 'Server Standings - ' + result.data.serverData.name
@@ -91,7 +204,9 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 		}`,
 	});
 });
-
+exports.getTest = (req, res, next) => {
+	res.status(200).render('test');
+};
 exports.getSettingsPage = catchAsync(async (req, res, next) => {
 	if (!Servers)
 		return res.status(200).render(`404`, {
