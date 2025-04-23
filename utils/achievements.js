@@ -71,32 +71,8 @@ const getCountRetroFunction = (id, filter, n) => {
 			.sort({ date: 1 })
 			.lean();
 		const u = await Users.findById(user);
-		if (!u.achievements) u.achievements = [];
-		if (res.length >= n) {
-			if (!u.achievements.some(findAndSetComplete(id, res[n - 1].date))) {
-				u.achievements.push({
-					id,
-					complete: true,
-					completedDate: res[n - 1].date,
-					progress: null,
-				});
-			}
-		} else {
-			if (
-				!u.achievements.some((a) => {
-					if (a.id === id) a.progress = res.length;
-				})
-			) {
-				u.achievements.push({
-					id,
-					complete: false,
-					completedDate: null,
-					progress: res.length,
-				});
-			}
-		}
-		u.markModified('achievements');
-		await u.save();
+		if (res.length >= n) return res[n - 1].date;
+		return null;
 	};
 };
 
@@ -439,7 +415,7 @@ const allPlayStreaks = [
 			(n) => Math.max(n.current, n.other?.length || 0) || 0
 		),
 		isComplete: checkPlayCount(el.count),
-		retro: getCountRetroFunction(id, {}, el.count),
+		retro: null,
 	};
 });
 
@@ -474,7 +450,7 @@ const wordleAchievements = [
 			updateProgress: returnData,
 			getProgress: printProgress(1, () => 0),
 			isComplete: (data) => data.score === el.score,
-			retro: null,
+			retro: getAnyRes('Wordle', (data) => data.score === el.score),
 		};
 	}),
 	{
@@ -516,6 +492,8 @@ const wordleAchievements = [
 const quordleColors = ['#00cf85', '#fdcc04', '#ff0000'];
 const quordleAchievements = (game) => {
 	const gameName = game.toLowerCase().split(' ').join('-');
+	const maxGuesses =
+		game === 'Quordle' ? 9 : game === 'Sequence Quordle' ? 10 : 8;
 	const descs =
 		game === 'Quordle'
 			? ['Quordelicious', 'Quordelightful', 'Quordetastic']
@@ -537,7 +515,10 @@ const quordleAchievements = (game) => {
 				getProgress: printProgress(1, () => 0),
 				isComplete: (data) =>
 					data.scores.reduce((p, c) => Math.max(p, c)) === n,
-				retro: null,
+				retro: getAnyRes(
+					game,
+					(data) => data.scores.reduce((p, c) => Math.max(p, c)) === n
+				),
 			};
 		}),
 		...[21, 18, 16].map((n, i) => {
@@ -551,7 +532,12 @@ const quordleAchievements = (game) => {
 				updateProgress: returnData,
 				getProgress: printProgress(1, () => 0),
 				isComplete: (data) => data.scores.reduce((p, c) => p + c, 0) <= n,
-				retro: null,
+				retro: getAnyRes(
+					game,
+					(data) =>
+						data.scores.reduce((p, c) => Math.max(p, c)) <= maxGuesses &&
+						data.scores.reduce((p, c) => p + c) === n
+				),
 			};
 		}),
 	];
@@ -582,7 +568,7 @@ const nytXWordAchievements = [
 			updateProgress: returnData,
 			getProgress: printProgress(1, () => 0),
 			isComplete: (data) => data.time <= el.time * 60,
-			retro: null,
+			retro: getAnyRes('NYT Crossword', (data) => data.time <= el.time * 60),
 		};
 	}),
 	...new Array(7)
@@ -602,7 +588,14 @@ const nytXWordAchievements = [
 				},
 				getProgress: printProgress(1, () => 0),
 				isComplete: (data) => data.getDay() === i,
-				retro: null,
+				retro: async (user) => {
+					const res = await Results.find({ user, game: 'NYT Crossword' })
+						.sort({ date: 1 })
+						.lean();
+					const dRes = res.find((r) => r.date.getDay() === dow);
+					if (dRes) return dRes.date;
+					return null;
+				},
 			};
 		}),
 ];
@@ -627,7 +620,7 @@ const nytMiniAchievements = [
 			updateProgress: returnData,
 			getProgress: printProgress(1, () => 0),
 			isComplete: (data) => data.time <= el.time,
-			retro: null,
+			retro: getAnyRes('NYT Mini', (data) => data.time <= el.time),
 		};
 	}),
 	...new Array(7)
@@ -647,7 +640,14 @@ const nytMiniAchievements = [
 				},
 				getProgress: printProgress(1, () => 0),
 				isComplete: (data) => data.getDay() === i,
-				retro: null,
+				retro: async (user) => {
+					const res = await Results.find({ user, game: 'NYT Mini' })
+						.sort({ date: 1 })
+						.lean();
+					const dRes = res.find((r) => r.date.getDay() === dow);
+					if (dRes) return dRes.date;
+					return null;
+				},
 			};
 		}),
 ];
@@ -662,7 +662,7 @@ const tightropeAchievements = [
 		updateProgress: returnData,
 		getProgress: printProgress(1, () => 0),
 		isComplete: (data) => data.misses >= 3,
-		retro: null,
+		retro: getAnyRes('Tightrope', (data) => data.misses >= 3),
 	},
 	{
 		id: 'tightrope-8-right',
@@ -673,7 +673,7 @@ const tightropeAchievements = [
 		updateProgress: returnData,
 		getProgress: printProgress(1, () => 0),
 		isComplete: (data) => data.correctAnswers >= 8,
-		retro: null,
+		retro: getAnyRes('Tightrope', (data) => data.correctAnswers >= 8),
 	},
 	{
 		id: 'tightrope-9-right',
@@ -684,7 +684,7 @@ const tightropeAchievements = [
 		updateProgress: returnData,
 		getProgress: printProgress(1, () => 0),
 		isComplete: (data) => data.correctAnswers === 9,
-		retro: null,
+		retro: getAnyRes('Tightrope', (data) => data.correctAnswers === 9),
 	},
 	...[
 		{ time: 20, desc: 'Light' },
@@ -702,7 +702,11 @@ const tightropeAchievements = [
 			updateProgress: returnData,
 			getProgress: printProgress(1, () => 0),
 			isComplete: (data) => data.correctAnswers === 9 && data.time <= el.time,
-			retro: null,
+			retro: getAnyRes(
+				'Tightrope',
+				(data) =>
+					data.time !== null && !isNaN(data.time) && data.time <= el.time
+			),
 		};
 	}),
 ];
@@ -720,7 +724,7 @@ const digitsAchievements = [
 		updateProgress: returnData,
 		getProgress: printProgress(1, () => 0),
 		isComplete: (data) => data.score >= el.stars,
-		retro: null,
+		retro: getAnyRes('Digits', (data) => data.score >= el.stars),
 	};
 });
 
@@ -761,7 +765,7 @@ const immaculateGridAchievements = [
 		updateProgress: returnData,
 		getProgress: printProgress(1, () => 0),
 		isComplete: (data) => data.correct === 9,
-		retro: null,
+		retro: getAnyRes('Immaculate Grid', (data) => data.correct === 9),
 	},
 	...[
 		{
@@ -799,7 +803,10 @@ const immaculateGridAchievements = [
 			updateProgress: returnData,
 			getProgress: printProgress(1, () => 0),
 			isComplete: (data) => data.correct === 9 && data.rarity <= el.rarity,
-			retro: null,
+			retro: getAnyRes(
+				'Immaculate Grid',
+				(data) => data.correct === 9 && data.rarity <= el.rarity
+			),
 		};
 	}),
 ];
@@ -822,13 +829,22 @@ const achievements = [
 	{
 		id: `quordle-ace`,
 		name: `Master of Four-Play`,
-		description: `Solve a word on your first guess in Quordle, Quordle Extreme, or Quordle Sequence`,
+		description: `Solve a word on your first guess in Quordle, Quordle Extreme, or Sequence Quordle`,
 		color: `#da07fa`,
 		games: ['Quordle', 'Quordle Extreme', 'Sequence Quordle'],
 		updateProgress: returnData,
 		getProgress: printProgress(1, () => 0),
 		isComplete: (data) => data.scores.some((s) => s === 1),
-		retro: null,
+		retro: (user) => {
+			const res = ['Quordle', 'Quordle Extreme', 'Sequence Quordle']
+				.map((g) => {
+					return getAnyRes(g, (data) => data.scores.some((s) => s === 1));
+				})
+				.map((fn) => fn(user))
+				.find((r) => r !== null);
+			if (!res) return null;
+			return res;
+		},
 	},
 	...[
 		{
@@ -856,7 +872,7 @@ const achievements = [
 				const res = await Results.find({
 					user: data.user,
 					date: data.date,
-					game: ['Quordle', 'Sequence Quordle', 'Quordle Extreme'],
+					game: { $in: ['Quordle', 'Sequence Quordle', 'Quordle Extreme'] },
 				}).lean();
 				return res.map((r) => {
 					return {
@@ -868,12 +884,33 @@ const achievements = [
 			getProgress: printProgress(1, () => 0),
 			isComplete: async (data) =>
 				data.length === 3 && data.every((r) => r.score === el.n),
+			retro: async (user) => {
+				const res = await Results.find({
+					user,
+					game: { $in: ['Quordle', 'Sequence Quordle', 'Quordle Extreme'] },
+				})
+					.sort({ date: 1 })
+					.lean();
+				let count = 0;
+				let toReturn = null;
+				res.some((r, i) => {
+					if (i === 0 || r.date !== res[i - 1].date) count = 0;
+					if (r.scores.reduce((p, c) => Math.max(p, c) === el.n)) count++;
+					if (count === 3) {
+						toReturn = r.date;
+						return true;
+					}
+					return false;
+				});
+				if (count === 3) return toReturn;
+				return null;
+			},
 		};
 	}),
 	{
 		id: 'jack',
 		name: `Jack of All Trades`,
-		description: `Submit results for all available games in a single day`,
+		description: `Submit current results for at least 10 available games in a single day`,
 		color: `#fd80ff`,
 		games: [],
 		updateProgress: async (old, data) => {
@@ -884,7 +921,26 @@ const achievements = [
 			return res.length;
 		},
 		getProgress: printProgress(1, () => 0),
-		isComplete: (data) => data === gameList.length,
+		isComplete: (data) => data >= 10,
+		retro: async (user) => {
+			const res = await Results.find({
+				user: user,
+			})
+				.sort({ date: 1 })
+				.lean();
+			let count = 0;
+			let toReturn = null;
+			res.some((r, i) => {
+				if (i === 0 || r.date !== res[i - 1].date) count = 1;
+				else count++;
+				if (count >= 10) {
+					toReturn = r.date;
+					return true;
+				}
+				return false;
+			});
+			return toReturn;
+		},
 	},
 ];
 // achievements.forEach((a) =>
