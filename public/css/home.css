@@ -11,6 +11,11 @@
 	overflow-y: auto;
 	scrollbar-width: thin;
 }
+
+.body-container {
+	padding: 0 1em;
+}
+
 .sticky-bottom > a {
 	opacity: 0.8;
 	background-color: var(--light-green);

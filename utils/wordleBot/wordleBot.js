@@ -633,13 +633,44 @@ client.on('interactionCreate', async (data) => {
 	const { commandName } = data;
 
 	let content;
-	if (commandName === 'i')
+	if (commandName.toLowerCase() === 'i')
 		content = `Here is your personal stats page: https://${hostname}/player/${data.user.id}`;
-	else if (commandName === 'we')
-		content = `Here is your server stats page: https://${hostname}/wordle/server/${data.guildId}`;
-	else if (commandName === 'faq')
-		content = `Here is the FAQ page: https://${hostname}/wordle/`;
-	else {
+	else if (commandName.toLowerCase() === 'we')
+		content = `Here is your server stats page: https://${hostname}/server/${data.guildId}`;
+	else if (commandName.toLowerCase() === 'faq')
+		content = `Here is the FAQ page: https://${hostname}/faq/`;
+	else if (commandName.toLowerCase() === 'docs')
+		content = `Here is the documentation page: https://${hostname}/docs`;
+	else if (commandName.toLowerCase() === 'addme') {
+		const srvr = await Servers.find({ guildId: data.guildId });
+		const usr = await Users.find({ userId: data.user.id });
+		let serverAdded = false;
+		let userAdded = false;
+		if (!usr.servers.some((s) => s === srvr._id)) {
+			usr.servers.push(srvr._id);
+			serverAdded = true;
+			usr.markModified('servers');
+			await usr.save();
+		}
+		if (!srvr.users.some((u) => u === usr._id)) {
+			srvr.users.push(usr._id);
+			userAdded = true;
+			srvr.markModified('users');
+			await srvr.save();
+		}
+		if (serverAdded || userAdded) content = `Data saved.`;
+		else content = `You are already associated with this server.`;
+	} else if (commandName.toLowerCase() === 'myservers') {
+		const usr = await (
+			await Users.find({ userId: data.user.id })
+		).populate('servers');
+		const serverData = usr.servers.map((s) => {
+			return s.name;
+		});
+		content = `You are registered on the following servers:\n${serverData.join(
+			'\n'
+		)}`;
+	} else {
 		//these commands all require admin to run them
 		const srvr = await Servers.findOne({ guildId: data.guildId });
 		if (!srvr) {

@@ -26,6 +26,19 @@ const commands = [
 		description: "Get a link to this server's stats page",
 	},
 	{
+		name: 'addme',
+		description: 'Tell WordleBot that I am part of this server.',
+	},
+	{
+		name: 'myservers',
+		description:
+			'Get a list of the servers that WordleBot knows that I am a part of',
+	},
+	{
+		name: 'docs',
+		description: 'Get a link to WordleBot documentation',
+	},
+	{
 		name: 'faq',
 		description: "Get a link to this bot's FAQ page",
 	},

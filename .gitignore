@@ -2,4 +2,5 @@ config.env
 node_modules/
 _sandbox*
 _sandbox/*
+data_export.txt
 .gitignore

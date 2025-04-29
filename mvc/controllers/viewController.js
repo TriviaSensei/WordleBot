@@ -14,6 +14,16 @@ const path = require('path');
 
 const timezone = process.env.DEFAULT_TIMEZONE;
 
+let resultCount = null;
+const getResultCount = async () => {
+	if (resultCount === null) {
+		let res = await Results.find({}).lean();
+		resultCount = res.length;
+	}
+	return resultCount;
+};
+getResultCount();
+
 const {
 	getServerStats,
 	getPlayerStats,
@@ -35,6 +45,8 @@ exports.httpsRedirect = (req, res, next) => {
 exports.getWordle = catchAsync(async (req, res, next) => {
 	res.status(200).render('faq', {
 		games,
+		invite: process.env.DISCORD_LINK,
+		install: process.env.DISCORD_INSTALL_LINK,
 	});
 });
 
@@ -204,9 +216,9 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 		}`,
 	});
 });
-exports.getTest = (req, res, next) => {
-	res.status(200).render('test');
-};
+// exports.getTest = (req, res, next) => {
+// 	res.status(200).render('test');
+// };
 exports.getSettingsPage = catchAsync(async (req, res, next) => {
 	if (!Servers)
 		return res.status(200).render(`404`, {
@@ -305,6 +317,30 @@ exports.getSettingsPage = catchAsync(async (req, res, next) => {
 			serverData,
 			dataItems,
 		},
+	});
+});
+
+exports.getHome = catchAsync(async (req, res, next) => {
+	res.status(200).render('home', {
+		resultCount,
+		invite: process.env.DISCORD_LINK,
+		install: process.env.DISCORD_INSTALL_LINK,
+		games: games.map((g) => {
+			return { name: g.name, url: g.url };
+		}),
+		title: 'WordleBot - Home',
+	});
+});
+
+exports.getDocs = catchAsync(async (req, res, next) => {
+	res.status(200).render('docs', {
+		resultCount,
+		invite: process.env.DISCORD_LINK,
+		install: process.env.DISCORD_INSTALL_LINK,
+		games: games.map((g) => {
+			return { name: g.name, url: g.url };
+		}),
+		title: 'WordleBot - Documentation',
 	});
 });
 

@@ -1,0 +1,480 @@
+extends _base_min
+
+block styles 
+    link(rel="stylesheet" href="/css/index.css")
+    link(rel="stylesheet" href="/css/docs.css")
+
+block navmenu
+    button.navbar-toggler(role="button" data-bs-toggle="offcanvas" href="#contents" aria-controls="contents" aria-label="Open contents")
+        span.navbar-toggler-icon
+    .collapse.navbar-collapse 
+        ul.navbar-nav 
+            li.nav-item 
+                a.contents-toggle(data-bs-toggle="offcanvas" href="#contents" role="button" aria-controls="contents") Contents
+
+block content 
+    #contents.offcanvas.offcanvas-end.text-bg-dark(data-bs-scroll="true" data-bs-backdrop="true" tabindex="-1" aria-labelledby="contents-label")
+        .offcanvas-header 
+            h5#contents-label.offcanvas-title Contents 
+            button.btn-close(type="button" data-bs-dismiss="offcanvas" aria-label="Close")
+        .offcanvas-body
+            ol.fs-5
+                li 
+                    a(data-target="overview") Overview
+                li                    
+                    a(data-target="install") Install/Signup
+                li
+                    a(data-target="results") Submitting results 
+                    ul.fs-6.list-unstyled 
+                        each game in games 
+                            - var gameSlug = game.name.toLowerCase().split(' ');
+                            li
+                                a(data-target=`results-${gameSlug.join('-')}`)
+                                    img.game-icon.me-2(src=`/img/icons/${gameSlug.join('_')}.svg` data-target=`results-${gameSlug.join('-')}`)
+                                    span(data-target=`results-${gameSlug.join('-')}`)= game.name
+                        li 
+                            a(data-target="responses") WordleBot responses 
+                        li
+                            a(data-target="edit") Editing messages
+                        li 
+                            a(data-target="crosspost") Crossposting
+                li 
+                    a(data-target="leaderboards") Leaderboards
+                li 
+                    a(data-target="achievements") Achievements  
+                li 
+                    a(data-target="commands") Commands
+                li 
+                    a(data-target="custom") Customization
+                    ul.fs-6
+                        li 
+                            a(data-target="settings") Settings 
+                        li 
+                            a(data-target="custom-stats") Custom stats
+                            ul.fs-6 
+                                li
+                                    a(data-target="filters") Filtering data
+                                li 
+                                    a(data-target="calculations") Custom calculations
+                li 
+                    a(data-target="privacy") Data/Privacy
+                li 
+                    a(data-target="help") Additional Help
+    .content-container.f-1 
+        .content-inner
+            #page-title.d-flex.flex-column.align-items-center
+                .d-flex.flex-row.justify-content-center.mt-5.mb-3
+                    each letter,index in ('WORDLEBOT').split('')
+                        .letter-box(style=`animation-delay:${(index+1)/10}s`)
+                            .m-auto= letter
+                h1.m-auto.mb-5 Documentation
+            section#overview 
+                h2 Overview
+                p WordleBot is a new Discord bot that automatically tracks results from your daily games and compiles them into an easy-to-read format. If you and your friends like to compete at Wordle, Quordle, Connections, and more, then WordleBot can make your competition a lot easier for players and admins alike.
+            section#install 
+                h2 Install/Signup
+                p Use the following link to install WordleBot on your server. You must have "manage server" permissions on the server in order to install it. If you own or administer the server, it is likely that you have this permission. Clicking on the link will open Discord and prompt you to select a server on which to install WordleBot. You may also copy and paste the link into the chat on the server where you wish to install:
+                .copy-text.w-100.d-flex.flex-row.align-items-center.justify-content-center
+                    span.input-group-text.text-truncate
+                        a#install-link.text-truncate(href=`${install}` target="_blank")= install
+                    button.btn.btn-primary.copy-link(data-copy-target="#install-link") Copy
+                p Upon successful install, you should see WordleBot added as a user in your server.
+                img(src="/img/docs/02_install_bot.png")
+                p WordleBot successfully installed
+                p Once WordleBot is installed and has joined the server, "signup" can happen. There is no form to fill out, and no personal information is needed. 
+                p Your server is registered as soon as anyone pastes a result in the Discord server. By default, the first channel where a valid result is pasted will be set as the "home" channel, which may be changed later. Only this home channel will be monitored for results. See #[a.command(data-target="command-sethome") sethome] for more detail. 
+                p Each user is registered and associated with a server as soon as they do either of the following in a server where WordleBot is installed: 
+                ul 
+                    li Paste a valid result
+                    li Use the command #[a.command(data-target="command-addme") addme]
+                p A user may be associated with more than one server. See #[a(data-target="crosspost") crossposting] for details.
+            section#results
+                h2 Pasting Results 
+                p WordleBot will, by default, accept the default copy-paste from the mobile versions of each supported game. Many of these pastes, however include information that is not important for statkeeping and may include links that Discord will turn into a link preview. In the interest of saving space and avoiding clutter in the chat, shortened versions of most pastes will be accepted, and these are detailed in this section. For each game, an example of the default copied text is given. Required text is highlighted in green, while non-required text is highlighted in red:
+                .example-result 
+                    .r This line is required 
+                    .nr(data-bs-toggle="tooltip" data-bs-title="This line is blank and optional")
+                    .nr This line is optional
+                p In general, if you leave the pasted text alone, WordleBot will accept it, and it will not force you to add or remove any text, especially from the middle of the paste.
+                section#results-wordle 
+                    h3
+                        img.game-icon(src="/img/icons/wordle.svg")
+                        span Wordle
+                    p Wordle results must include the first line of the default copy, indicating the puzzle number, score, and whether it was completed in hard mode. The colored squares are optional.
+                    .example-result 
+                        .r Wordle 1,406 4/6*
+                        .nr
+                        .nr.ls ⬛⬛⬛⬛🟩
+                        .nr.ls ⬛⬛⬛🟨🟩
+                        .nr.ls ⬛🟨⬛⬛🟩
+                        .nr.ls 🟩🟩🟩🟩🟩
+                section#results-quordle
+                    #results-quordle-extreme
+                    #results-sequence-quordle 
+                    h3 
+                        img.game-icon(src="/img/icons/quordle.svg")
+                        span Quordle
+                    h3
+                        img.game-icon(src="/img/icons/quordle_extreme.svg")
+                        span Quordle Extreme
+                    h3
+                        img.game-icon(src="/img/icons/sequence_quordle.svg")
+                        span Sequence Quordle
+                    p In variants of Quordle (other than the unsupported Quordle Chill), the first line (except for the emoji at the beginning, if any) must be copied completely, along with the keycap emojis showing the result of the game. The colored squares are optional.
+                    #quordle-carousel.carousel.slide(data-bs-ride="false")
+                        .carousel-inner 
+                            .carousel-item.active(data-bs-interval="false")
+                                .slide-inner
+                                    .example-result 
+                                        h6 Quordle:
+                                        .mixed-line
+                                            span.nr 🙂
+                                            span.r Daily Quordle 1190
+                                        .r 🟥8️⃣
+                                        .r 4️⃣5️⃣
+                                        .nr m-w.com/games/quordle/
+                                        .nr.ls ⬜⬜🟨⬜⬜ ⬜⬜🟨⬜⬜
+                                        .nr.ls ⬜⬜⬜🟨🟩 ⬜🟩🟨⬜⬜
+                                        .nr.ls ⬜⬜🟩🟩🟩 ⬜⬜⬜⬜⬜
+                                        .nr.ls ⬜⬜🟩⬜🟩 ⬜⬜⬜⬜⬜
+                                        .nr.ls ⬜🟨⬜🟩🟩 ⬜⬜⬜⬜⬜
+                                        .nr.ls 🟨⬜⬜⬜⬜ 🟩🟩⬜⬜🟨
+                                        .nr.ls 🟨⬜⬜⬜⬜ 🟩🟩🟩🟩⬜
+                                        .nr.ls 🟨⬜⬜⬜⬜ 🟩🟩🟩🟩🟩
+                                        .nr.ls ⬜🟩🟩🟩🟩 ⬛⬛⬛⬛⬛
+                                        .nr.ls
+                                        .nr.ls ⬜⬜⬜🟨⬜ ⬜⬜⬜🟨⬜
+                                        .nr.ls ⬜⬜⬜🟨🟩 ⬜⬜⬜🟨🟩
+                                        .nr.ls ⬜🟩🟩⬜🟩 ⬜🟨🟨🟩🟩
+                                        .nr.ls 🟩🟩🟩🟩🟩 ⬜🟨🟨⬜🟩
+                                        .nr.ls ⬛⬛⬛⬛⬛ 🟩🟩🟩🟩🟩
+                            .carousel-item(data-bs-interval="false")
+                                .slide-inner
+                                    .example-result
+                                        h6 Quordle Extreme: 
+                                        .mixed-line 
+                                            span.nr 🥵
+                                            span.r Daily Extreme 273
+                                        .r  7️⃣4️⃣
+                                        .r  5️⃣6️⃣
+                                        .nr m-w.com/games/quordle/
+                                        .nr.ls ⬜🟩⬜⬜🟩 ⬜⬜🟩🟨🟩
+                                        .nr.ls ⬜⬜⬜⬜🟨 🟩⬜⬜⬜⬜
+                                        .nr.ls ⬜⬜⬜⬜⬜ ⬜⬜⬜⬜⬜
+                                        .nr.ls ⬜⬜⬜⬜🟩 🟩🟩🟩🟩🟩
+                                        .nr.ls ⬜⬜⬜⬜🟨 ⬛⬛⬛⬛⬛
+                                        .nr.ls ⬜⬜⬜⬜⬜ ⬛⬛⬛⬛⬛
+                                        .nr.ls 🟩🟩🟩🟩🟩 ⬛⬛⬛⬛⬛
+                                        .nr
+                                        .nr.ls ⬜⬜🟩⬜⬜ ⬜⬜🟩🟩⬜
+                                        .nr.ls 🟩🟩⬜⬜⬜ ⬜⬜⬜⬜⬜
+                                        .nr.ls ⬜🟨⬜⬜⬜ 🟨⬜⬜⬜⬜
+                                        .nr.ls 🟩⬜🟩⬜⬜ ⬜🟨🟩⬜⬜
+                                        .nr.ls 🟩🟩🟩🟩🟩 ⬜⬜🟩⬜⬜
+                                        .nr.ls ⬛⬛⬛⬛⬛ 🟩🟩🟩🟩🟩
+                            .carousel-item(data-bs-interval="false")
+                                .slide-inner
+                                    .example-result 
+                                        h6 Sequence Quordle: 
+                                        .r Daily Sequence Quordle 1190
+                                        .r  4️⃣5️⃣
+                                        .r  6️⃣7️⃣
+                                        .nr m-w.com/games/quordle/
+                                        .nr.ls ⬜⬜⬜🟩⬜ ⬜🟩⬜⬜⬜
+                                        .nr.ls ⬜⬜🟨🟨⬜ ⬜⬜⬜⬜⬜
+                                        .nr.ls ⬜⬜🟨⬜⬜ ⬜🟨🟨⬜🟩
+                                        .nr.ls 🟩🟩🟩🟩🟩 ⬜⬜⬜⬜🟨
+                                        .nr.ls ⬛⬛⬛⬛⬛ 🟩🟩🟩🟩🟩
+                                        .nr.ls 
+                                        .nr.ls ⬜⬜🟨⬜⬜ ⬜⬜🟨🟨🟨
+                                        .nr.ls ⬜🟨⬜🟨⬜ ⬜⬜⬜⬜🟨
+                                        .nr.ls ⬜⬜⬜⬜⬜ ⬜⬜⬜⬜⬜
+                                        .nr.ls ⬜⬜🟨⬜⬜ 🟨⬜⬜🟨⬜
+                                        .nr.ls ⬜⬜⬜⬜⬜ ⬜⬜⬜⬜⬜
+                                        .nr.ls 🟩🟩🟩🟩🟩 ⬜⬜⬜🟨⬜
+                                        .nr.ls ⬛⬛⬛⬛⬛ 🟩🟩🟩🟩🟩
+                        button.carousel-control-prev(type="button" data-bs-target="#quordle-carousel" data-bs-slide="prev")
+                            span.carousel-control-prev-icon(aria-hidden="true")
+                            span.visually-hidden Previous 
+                        button.carousel-control-next(type="button" data-bs-target="#quordle-carousel" data-bs-slide="next")
+                            span.carousel-control-next-icon(aria-hidden="true")
+                            span.visually-hidden Next
+                section#results-tightrope
+                    h3 
+                        img.game-icon(src="/img/icons/tightrope.svg")
+                        span Tightrope
+                    p The tightrope paste requires the word "Tightrope" at the top, plus the date, the emojis indicating the result, and the score line. The URL, and most of the title line is optional.
+                    .example-result 
+                        .mixed-line 
+                            span.r Tightrope
+                            span.nr , a daily trivia game | Britannica
+                        .r
+                        .r Apr. 28, 2025
+                        .r
+                        .r T I G H T R O P E
+                        .r.ls ✅ ✅ ✅ ✅ ✅ ✅ ✅ 💔 ✅ 🎉
+                        .r
+                        .r My Score: 2150
+                        .nr https://www.britannica.com/quiz/tightrope
+                section#results-nyt-crossword 
+                    #results-nyt-mini 
+                    h3 
+                        img.game-icon(src="/img/icons/nyt_crossword.svg")
+                        span NYT Crossword
+                    h3
+                        img.game-icon(src="/img/icons/nyt_mini.svg")
+                        span NYT Mini
+                    p The copy/paste function only seems to work on the mobile NYT Games app at this time - if you use the "share" function on your desktop browser, it seems to copy a picture of some sort, which will not be parsed by WordleBot. From the mobile app, you must paste the entire line of text, except for the link at the end:
+                    .example-result.mb-3
+                        h6 NYT Crossword 
+                        .r I solved the Monday 4/28/2025 New York 
+                        .r Times Daily Crossword in 3:17! 
+                        .nr https://www.nytimes.com/crosswords/game/by-id/22699
+                    .example-result
+                        h6 NYT Mini 
+                        .r I solved the 4/28/2025 New York Times 
+                        .r Mini Crossword in 0:22! 
+                        .nr https://www.nytimes.com/crosswords/game/mini
+                section#results-nyt-connections 
+                    h3 
+                        img.game-icon(src="/img/icons/nyt_connections.svg")
+                        span NYT Connections
+                    p WordleBot requires the entire NYT Connections paste: 
+                    .example-result 
+                        .r Connections
+                        .r Puzzle #687
+                        .r 🟩🟦🟩🟩
+                        .r 🟪🟪🟪🟪
+                        .r 🟦🟦🟦🟦
+                        .r 🟨🟨🟨🟨
+                        .r 🟩🟩🟩🟩
+                section#results-digits 
+                    h3 
+                        img.game-icon(src="/img/icons/digits.svg")
+                        span Digits
+                    p Only the first line of the digits paste, where the puzzle number and score are indicated, is required: 
+                    .example-result 
+                        .r Digits #750 (20/20⭐)
+                        .nr 52 (52) ➕➖➖✖️✖️
+                        .nr 152 (152) ✖️➖➗➖➖
+                        .nr 216 (216) ➕✖️➗✖️➕
+                        .nr 391 (391) ✖️➗➗➖➕
+                        .nr 469 (469) ✖️➖➕➕➕
+                        .nr https://www.cyu.dev/digits
+                section#results-immaculate-grid 
+                    h3 
+                        img.game-icon(src="/img/icons/immaculate_grid.svg")
+                        span Immaculate Grid Baseball
+                    p As we are only currently parsing the results for Immaculate Grid in baseball, the emoji is unnecessary for now. The only required information is the line with the puzzle number and number correct, and the line with the rarity score. All other information is optional.
+                    .example-result 
+                        .mixed-line 
+                            span.nr ⚾️ 
+                            span.r Immaculate Grid 747 9/9:
+                        .r Rarity: 141
+                        .nr IMMACULATE!
+                        .nr 🟩🟩🟩
+                        .nr 🟩🟩🟩
+                        .nr 🟩🟩🟩
+                        .nr Play at:
+                        .nr https://immaculategrid.com/play/grid-747    
+                section#responses 
+                    h3 WordleBot Responses 
+                    p WordleBot will acknowledge your post with a reaction or a reply if it detects any results in it. The following are the reactions you may get.
+                    ul 
+                        li 🔥, ✅, 🎉 - Successfully posted result(s)
+                        li 1️⃣, 2️⃣, 3️⃣, etc. - Number of results successfully posted (if more than 1). If more than 10 results are simultaneously posted, the bot will instead reply to your message with the number of results.
+                        li 🎖️ - One or more achievements were accomplished in posting this result. See #[a(data-target="achievements") achievements] for details.
+                        li ⚠️ - One or more problems encountered while posting result. This one will typically be accompanied by a verbose error message. Pasting a result that was already recorded, or with an illegal character in it will trigger this warning.
+                        li ✏️ - message edited (and results were added). You may edit a message to add more results to it. WordleBot will also reply and indicate how many additional results were added.
+                section#edit
+                    h3 Editing Messages 
+                    p You may post new results by either posting a new message or by editing an existing one. When editing messages, WordleBot will react with a pencil emoji (✏️) and a reply, indicating if any results were added. At this time, WordleBot will not delete any results that you have posted.
+                section#crosspost 
+                    h3 Crossposting 
+                    p If you happen to belong to multiple servers where WordleBot is installed, you may post your results to all of them with a single post to any of them - WordleBot will post on your behalf everywhere else! You must associate yourself with each server by either posting a valid result or running #[a.command(data-target="command-addme") addme] for this to work - see #[a(data-target="install") install/signup] for details. If you leave a server, WordleBot will no longer post there on your behalf.
+                    img(src="/img/docs/03_crosspost.png")
+                    p WordleBot crossposts on your behalf to your other servers 
+            section#leaderboards
+                h3 Leaderboards 
+                p WordleBot creates monthly leaderboards for your server in each game that you choose to track. See #[a.command(data-target="command-setgames") setgames] for details on choosing which games to track. You can access your server leaderboard or your personal stats page by issuing the #[a.command(data-target="command-we") we] or the #[a.command(data-target="command-i") i] commands, respectively. The addresses of these pages do not change, so you may bookmark them for easy access.
+                p Each game comes with a basic set of stats, viewable by default on the leaderboard. Most of the column headers are clickable, which will sort the table by that column. The column headers also come with tooltips, so you may click or mouse-over them to see a short explanation of what they represent.
+                img(src="/img/docs/04_leaderboards.png")
+                p A section of a leaderboard, sorted by "Avg"
+                p Finally, you may click on any user's avatar or name to go to their personal stats page. 
+            section#achievements
+                h3 Achievements 
+                p WordleBot keeps a list of achievements in each game (and some that span multiple games). WordleBot will react to your post with the medal (🎖️) emoji if you unlock an achievement. 
+                img(src="/img/docs/05_achievement_get.png")
+                p Achievement unlocked!
+                p To view your achievements, go to your personal page (linked with the #[a.command(data-target="command-i") i] command) and select the "Achievements" tab. Locked achievements are grayed out, while unlocked ones are colored in. You may also mouse-over or click any achievement to see a tooltip on the requirements to unlock it.
+                img(src="/img/docs/05_achievements.png")
+                p The Achievements area
+            section#commands 
+                h3 Slash Commands 
+                p WordleBot comes with a series of slash commands that allow admins and players to interact with it. Generally, WordleBot's responses to commands are ephemeral, meaning only the user issuing the command can see it. This reduces server clutter, and is a security feature, as your server's WordleBot settings are changed through a one-time-use link (see #[a(data-target="settings") settings] for details).
+                ul
+                    li #[span.command sethome] - #[span.admin-only] This command sets the home channel for the server to the channel in which the command is run. Only results posted to that channel will be acknowledged and saved. The default value for this channel will be wherever the first result is pasted after installing WordleBot. 
+                    li #[span.command setgames] - #[span.admin-only] This command returns a menu of games to track on the server. Thus, if your server only plays Wordle and Connections, you can indicate that using this command. Your server standings page will only include results from the games selected. Your home channel will only receive cross-posted results from the games selected. Players may still post their other results in your channel, and they will be acknowledged and cross-posted to other servers if applicable.
+                    li #[span.command settings] - #[span.admin-only] This command will give you flexibility in how your games are ranked. For example, you may indicate that a player must submit at least 20 Wordle results to be eligible to win the month, or that mistakes in Connections should incur a heavier penalty. Your settings page will also give you the ability to create custom stats so that you can play your own way! See #[a(data-target="settings") settings] for more details 
+                    li #[span.command i] - This command causes the bot to reply to you with a link to your personal stats page, which is https://www.wordlebot.gg/player/[your user ID]
+                    li #[span.command we] - This command causes the bot to reply to you with a link to your server's stats page, which is https://www.wordlebot.gg/wordle/server/[your guild ID]
+                    li #[span.command addme] - This command associates you with the server in which you issue it. You may be associated with multiple servers. Use this command if you are part of multiple servers with WordleBot, and you can make sure your results are properly tracked and crossposted without having to post results in every single one.
+                    li #[span.command myservers] - This command lists the servers with which you are associated. If you leave a server, WordleBot will not recognize it immediately, but if you post a result elsewhere, WordleBot will check to make sure you are still a member of any server where it might get crossposted before making a crosspost.
+                    li #[span.command help] - This command causes the bot to reply to you with a link to this page.
+                    li #[span.command faq] - This command causes the bot to reply to you with a link to the #[a(href="/faq" target="_blank") FAQ] page.
+            section#custom
+                h3 Customization 
+                p WordleBot provides settings and custom stats so that you can play the game your way! 
+                section#settings 
+                    h3 Settings
+                    p Access your settings page by issuing the #[a.command(data-target="settings") settings] command. This will give you a one-time-use link to your server settings page, usable for 5 minutes. If you close your settings page and need to edit the settings again, or if you wait too long and the link expires, you may issue the #[a.command(data-target="settings") settings] command again to get a new link.
+                    img(src="/img/docs/06_custom_settings_1.png")
+                    p The link to the settings page 
+                    p From the linked page, you may edit the settings for each game. For an explanation of each setting, you may mouse-over or click the #[span.bg-light #[img.game-icon(src="/img/help.svg")]] icon next to the setting.
+                    p In general, each game has a "fill in scores" setting, to tell WordleBot what to do about stats if a player does not submit results for a day. Select each option in the "Fill in scores" setting box to see what each one does. Some games also include a setting for scoring penalties if a player loses a game. In general, these are meant to encourage players to play and post results every day, even if they lose or get a bad score.
+                    img(src="/img/docs/06_fill_in.png")
+                    p Fill-in scores settings
+                    p A few examples of fill-in policies:
+                    ul 
+                        li None - unplayed days do not count towards any stats 
+                        li Loss - unplayed days count as a loss 
+                        li Server average - unplayed days are given a score of the server average (usually rounded to the player's detriment)
+                        li Server worst - unplayed days are given a score equal to the worst on the server that day 
+                        li Server worst+ (or Server worst -) - unplayed days are given a score equal to the worst on the server that day, with a small penalty
+                section#custom-stats 
+                    h3 Custom Stats 
+                    p WordleBot offers admins a way to create custom stats to include on their leaderboards. As stats have different attributes for different games, custom stats are created for each game individually. Thus, if you have a similar stat that you'd like to see for all three Quordle variants, you will have to recreate it for each game.
+                    p To start creating a custom stat, open the #[a.command(data-target="settings") settings] page and click the header for the game for which you want to make a custom stat, and click "New".
+                    img(src="/img/docs/06_settings_custom_stat.png")
+                    p Creating a custom stat
+                    img(Src="/img/docs/06_custom_stat_window.png")
+                    p The custom stat window
+                    p A custom stat consists of two parts: an optional set of filters that subset the data, and a calculation/aggregation to perform on the remaining data.
+                    section#stat-settings 
+                        h4 Custom Stat Settings 
+                        p Custom stats have a series of settings that you can set so that they appear as you wish. 
+                        img(src="/img/docs/06_custom_stat_settings.png")
+                        p Custom stat settings 
+                        ul
+                            li Name - an arbitrary name. Must be unique to the game (e.g. you may not create two stats called "Average").
+                            li Heading - the column heading to show on the #[a(data-target="leaderboard") leaderboard]. Maximum length of 10 characters.
+                            li Description - a description of the stat. This will show up on the tooltip for the column header on the leaderboard.
+                            li Include fill-in scores - whether to include filled-in scores in this stat. If checked, unplayed days will count towards this stat. You must also have a fill-in policy other than "None" for this game in order for this to matter.
+                            li Set as default sort - whether to sort by this column by default. You may only have one default sort column per game, and if you save a custom stat with this option checked, then that stat will no longer be the default sort.
+                            li Default sort direction - the direction to sort by default.
+                            li Decimal places - the number of decimal places to round to 
+                            li Format - whether to format the number as a number or a percent. If formatted as a percent, you do not need to multiply the result by 100 - WordleBot will automatically convert 0.5 to 50%. 
+                    section#filters 
+                        h4 Filters 
+                        p You may have any number of filters (including none at all) on the data for each custom calculation. Filters allow you to, for example, create a stat that drops the worst 2 scores of the month, or keep the best 20, or only count the number of times a player gets a 2 on Wordle. Filters are applied before any calculations are performed.
+                        p To create a filter, click the "new" button under the "Filters" section of the custom stats window.
+                        img(src="/img/docs/06_filter_button.png")
+                        p Create a new filter 
+                        p The create filter window will open and you can create your filter.
+                        img(src="/img/docs/06_filter_window.png")
+                        p The create filter window 
+                        p The following settings are available to create filters.
+                        ul 
+                            li Name - an arbitrary value for your own reference, but it must be unique within each custom stat
+                            li 
+                                p Filter type - there are two types of filters.
+                                ul 
+                                    li Rank filter (or a "keep/drop" filter) - filter the data by keeping or dropping a number of scores from either end of the data. For example, this filter can keep the best 20 scores of the month, or drop the worst 2 scores. #[strong If there is a "keep" filter applied to the data, any player who does not have enough plays to meet the requisite number of data points will have an asterisk next to this stat in the leaderboard and will appear at the bottom of any sort by this stat].
+                                    li Data filter - filter the data based on an attribute of the data itself. For example, this filter can keep only the scores that are less than 6, or equal to 2.
+                        p After clicking "Save", the filter should appear in the list of filters for this stat.
+                        img(src="/img/docs/06_filter_tile.png")
+                        p A created filter
+                        p You may edit a filter by clicking the pencil icon on its tile, or delete it by clicking the trash can icon.
+                    section#calculations
+                        h4 Calculations 
+                        p The calculations interface may have a bit of a learning curve, but with a little practice it's pretty easy to use. 
+                        img(src="/img/docs/06_custom_calc.png")
+                        p The custom calculation window
+                        p Your custom calculation not contain any unaggregated data items, or else it will not save. For example, placing just the "Score" data item in the calculation area and nothing else will not allow you to save the calculation.
+                        img(src="/img/docs/06_invalid_calc.png")
+                        p You must aggregate all data items in your calculation.
+                        img(src="/img/docs/06_valid_calc.png")
+                        p A simple valid calculation
+                        p This quick demo will walk you through a more complex calculation - the standard deviation of the score - to demonstrate the functionality of the calculation interface. Generally, on more complex calculations, we will need to work "out to in", meaning we start with the outermost operations and work our way in.
+                        p The formula for the standard deviation of score is below: 
+                        img(src="/img/docs/06_stddev.png")
+                        p Standard deviation formula 
+                        p We need to take the difference between each score and the average score, square those, and sum the resulting set. Then, divide by the count minus 1, and take the square root of that result. The steps are as follows:
+                        ol 
+                            li 
+                                p In the calculation interface, start by creating a square root. Note that the square root appears in the "preview" area, and the element inside the square root is now selected by default. Whatever we select next will appear in place of that element.
+                                img(src="/img/docs/calc_1.png")
+                            li  
+                                p Create the fraction by selecting the "a/b" button 
+                                img(src="/img/docs/calc_2.png")
+                            li
+                                p We will now create the "count - 1" in the denominator. Click the element in the denominator of the fraction to set it active. A thin blue border should appear around it.
+                                img(src="/img/docs/calc_3.png")
+                            li
+                                p Click the "a-b" button to create a subtraction 
+                                img(src="/img/docs/calc_4.png")
+                            li
+                                p Click the "count" aggregation button.
+                                img(src="/img/docs/calc_5.png") 
+                            li
+                                p Verify that the element inside the "count" aggregation is active. Select "Score" under "Data Items/Constants" and click "Add" 
+                                img(src="/img/docs/calc_6.png")
+                            li
+                                p Click the second element in the subtraction in the denominator to set it active 
+                                img(src="/img/docs/calc_7.png")
+                            li
+                                p Select "(Constant)" under "Data Items/Constants", type in "1" in the value box next to the drop down, and click "Add". The second element in the subtraction should be replaced with a 1.
+                                img(src="/img/docs/calc_8.png")
+                            li
+                                p We will now work with the numerator. Click the empty element in the numerator to set it active.
+                                img(src="/img/docs/calc_9.png")
+                            li
+                                p Click the "Sum" aggregation. An empty sum should appear in the numerator.
+                                img(src="/img/docs/calc_10.png")
+                            li
+                                p Inside the sum, select the a#[sup b] operator.
+                                img(src="/img/docs/calc_11.png")
+                            li
+                                p Click the exponent to set it active, and set its value to a constant 2, similarly as in step 8.
+                                img(src="/img/docs/calc_12.png")
+                            li
+                                p Click the base to set it active. 
+                                img(src="/img/docs/calc_13.png")
+                            li 
+                                p Click on "a-b" to place a difference there.
+                                img(src="/img/docs/calc_14.png")
+                            li
+                                p Click the first element of the difference to set it active. Select the "Score" data item again and click "Add".
+                                img(src="/img/docs/calc_15.png")
+                            li
+                                p Click the second element of the difference to set it active. Click the "Avg" aggregation.
+                                img(src="/img/docs/calc_16.png")
+                            li
+                                p Inside the AVG aggregation, select the "Score" data item again and click "Add".
+                                img(src="/img/docs/calc_17.png")
+                            li 
+                                p If we've done everything right, the "save" button should be enabled. Save the calculation. The edit calculation window should close, the formula should appear in the preview area in the "custom stat" window, and after specifying the other settings, we should be able to save our custom stat!  
+                                img(src="/img/docs/calc_18.png") 
+                            li
+                                p The new stat should appear as a tile under the custom stats area of the game. Press the pencil icon to edit it, or the trash can icon to delete it. If you have multiple custom stats, you can use the arrow icons to change the order in which they appear on your leaderboard.
+                                img(src="/img/docs/calc_19.png")
+                            li 
+                                p You must click either of the save buttons at the top or bottom of the settings page to save your custom stat, or any other settings you have changed.
+                                img(src="/img/docs/calc_20.png")
+            section#privacy 
+                h3 Privacy 
+                p No personal information (e-mail, address, phone, etc.) will ever be collected. The data I have is limited to what is available on Discord - your server's name, ID, banner (if applicable), and icon, and your users' username, display name, ID, and profile picture, all of which is publicly available on your discord pages. Only necessary data (e.g. scores, times, etc.) will be saved from pasted game results. The text of the paste and any extra text will not be saved. No data will ever be sold or given to any other party.
+            section#help
+                a(name="help")
+                h3 Additional help 
+                p If you need additional help or support, you can join the WordleBot Discord server here and talk to me: 
+                .copy-text.w-100.d-flex.flex-row.align-items-center.justify-content-center
+                    span.input-group-text.text-truncate
+                        a#community-link.text-truncate(href=`${invite}` target="_blank")= invite
+                    button.btn.btn-primary.copy-link(data-copy-target="#community-link") Copy
+                
+    
+    
+block scripts 
+    script(src="/js/docs.js" type="module" defer)
+    script(src="/js/utils/handleTargets.js" type="module" defer)

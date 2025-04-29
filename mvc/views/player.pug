@@ -91,8 +91,8 @@ block content
                                                     span= game.game
                                                 .w-100.d-flex.flex-row.flex-wrap.pe-3
                                                     -var achievements = data.achievements.filter(a=>a.games.length === 1 && a.games[0]===game.game && a.fname!== '')
-                                                    each ach in achievements 
-                                                        - var complete = data.playerData.achievements.completed.some(ca=>ca.id===ach.id)
+                                                    each ach in achievements
+                                                        - var complete = data.playerData.achievements.completed.find(ca=>ca.id===ach.id)
                                                         +achievement(ach,game.game.toLowerCase().split(' ').join('-'),complete)
                                 //- .w-100.accordion#achievements-accordion 
                                 //-     .accordion-item 

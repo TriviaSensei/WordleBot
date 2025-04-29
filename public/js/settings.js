@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			.closest('.input-container')
 			?.querySelector('.select-description');
 		const sel = e.target.closest('select');
-		const ind = sel.selectlondex;
+		const ind = sel.selectedIndex;
 		const opt = sel.options[ind];
 		if (!opt || !desc) return;
 		const description = opt.getAttribute('data-description');

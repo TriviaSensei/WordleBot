@@ -1,0 +1,106 @@
+extends _base_min
+
+mixin feature(title,desc,image)
+    .feature-tile 
+        img(src=`${image || '/img/home/ph.png'}`)
+        .feature-text 
+            .feature-title= title 
+            .feature-desc= desc
+
+
+block styles
+    link(rel="stylesheet" href="/css/index.css")
+
+block navmenu 
+    button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#nav-menu" aria-controls="nav-menu" aria-expanded="false" aria-label="Open menu")
+        span.navbar-toggler-icon
+    #nav-menu.collapse.navbar-collapse
+        ul.navbar-nav
+            li.nav-item
+                a.nav-link.active(aria-current="page" data-target="features") Features
+            li.nav-item
+                a.nav-link.active(aria-current="page" data-target="games") Games
+            li.nav-item
+                a.nav-link.active(aria-current="page" href="/docs" target="_blank") Documentation
+            li.nav-item
+                a.nav-link.active(aria-current="page" data-target="donate") Donate
+            li.nav-item
+                a.nav-link.active(aria-current="page" href="/faq#contact"  target="_blank") Contact
+
+block content                        
+    section#header
+        each game in games 
+            img.floating-icon(src=`/img/icons/${game.name.toLowerCase().split(' ').join('_')}.svg`)
+        .description
+            h1 Your daily games 
+            h2.one-tab One place
+            h2.two-tabs Your way
+            p.blurb A free, customizable Discord bot that tracks Wordle, Quordle, Crosswords, and more! Add it to your server today, paste your results, create custom stats, and play your way! 
+            .action-button-container.d-flex.my-3
+                a.btn.btn-light.btn-green(href=`${install}` target="_blank")
+                    img.me-2(src="/img/icons/discord.svg")
+                    span Add to Server 
+                a.btn.btn-light.btn-yellow(href=`${invite}` target="_blank")
+                    img.me-2(src="/img/icons/chat.svg")
+                    span Join the Community
+        img.mockup(src="/img/home/mockup.png")
+        .custom-shape-divider-bottom-1745433902
+            svg(data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none")
+                path.shape-fill(d="M0,0V6c0,21.6,291,111.46,741,110.26,445.39,3.6,459-88.3,459-110.26V0Z")
+    section#features
+        h1.mb-5 Features
+        .feature-tile 
+            img(src='/img/home/install.png')
+            .feature-text 
+                .feature-title Easy install, no sign up!
+                .feature-description If you are a server admin, you can easily install WordleBot with just a couple of clicks. #[a.a-text(href=`${install}`) Start here], follow the prompts, you're ready to go! You and your friends can start pasting their results without any sign up - everything is associated with your public Discord account, so none of your personal information will ever be collected.
+        .feature-tile 
+            img(src='/img/home/games.svg')
+            .feature-text 
+                .feature-title Support for many games
+                .feature-description WordleBot currently supports #[a(data-target="games")= `${games.length} games`]. Do you play something else and want to see it here? We can try to do that! If the game has a share feature that copies a result to the clipboard, we can probably add support for it!
+        .feature-tile 
+            img(src='/img/home/result.gif')
+            .feature-text 
+                .feature-title User-Friendly
+                .feature-description WordleBot acknowledges each pasted result with a reaction or a reply, so you know that it went through, or if something went wrong. WordleBot also supports multiple results in a single message, so you can play your games and send a single message with all of your results! Are you a member of multiple servers with WordleBot? Paste just one time and WordleBot will pass it on!
+        .feature-tile 
+            img(src='/img/home/custom.gif')
+            .feature-text 
+                .feature-title Highly Customizable
+                .feature-description Play your way with WordleBot! WordleBot allows you to customize a host of settings, including which games to track, how to treat unplayed days, and how to sort players on the leaderboard. You can even create your own custom-calculated stats using the Custom Stats feature for an endless number of ways to compete with your friends!
+        .feature-tile 
+            img(src='/img/home/stats.png')
+            .feature-text 
+                .feature-title Detailed Leaderboards
+                .feature-description WordleBot compiles a monthly leaderboard for all of your server's players with built-in basic stats plus any custom stats that you have created. Sort by any column you wish, see how your server is doing as a group, and shout out your best players!
+        .feature-tile 
+            img(src='/img/home/achievement.gif')
+            .feature-text 
+                .feature-title Achievements
+                .feature-description Get achievements in every game, whether it be for a play streak, a win streak, an exceptional or unusual score, or even for the occasional loss!
+    section#games
+        h1.mb-3 Supported Games
+        p.mb-5 WordleBot currently supports #[span= games.length] games: 
+        .games-list
+            each game in games
+                a(href=`${game.url}` target="_blank")
+                    .game-tile
+                        img.game-icon(src=`/img/icons/${game.name.toLowerCase().split(' ').join('_')}.svg`)
+                        .game-title= game.name
+    section#documentation 
+        h1.mb-3 Documentation/Help
+        p.mb-5 #[a(href="/docs" target="_blank") View the documentation here.]
+    section#donate 
+        h1.mb-3 Donate 
+        p WordleBot was my first foray into creating a Discord bot, and was developed for a server that I was invited to a few years ago, where someone was manually combing through multiple results each day and entering them into a spreadsheet that had gotten huge over several years. I decided to create this bot to make their life a little easier, and if other players can benefit from it, then that's great. 
+        p At this time, WordleBot is free to use. Should my costs for server maintenance, hosting, and data storage significantly change, I may ask for a small fee to use it. I will happily and graciously accept any donations, however, if you have enjoyed my work: 
+        p 
+            a(href="https://www.buymeacoffee.com/charlesyu4j" target="_blank") 
+                img(src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;")
+
+
+block scripts
+    script(src="/js/home.js" type="module" defer)
+    script(src="/js/utils/handleTargets.js" type="module" defer)
+    

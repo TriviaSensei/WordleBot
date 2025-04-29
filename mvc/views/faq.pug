@@ -10,11 +10,11 @@ block content
     .body-container 
         h2.page-title(data-title="WordleBot" name="top") 
         p.section-header(data-title="Intro" name="intro")
-        p WordleBot is a new Discord bot that automatically tracks results from your daily games and compiles them into an easy-to-read format. If you and your friends like to compete at Wordle, Quordle, Connections, and more, then WordleBot can make your competition a lot easier for players and admins alike.
+        p WordleBot is a new Discord bot that automatically tracks results from your daily games and compiles them into an easy-to-read format. If you and your friends like to compete at Wordle, Quordle, Connections, and more, then WordleBot can make your competition a lot easier for players and admins alike. For full documentation, go to #[a(href="/docs") the documentation page].
         p.section-header(data-title="Installation" name="install") 
         p Use the following link to install WordleBot on your server. You must have "manage server" permissions on the server in order to install it. If you own or administer the server, it is likely that you have this permission. Clicking on the link will open Discord and prompt you to select a server on which to install WordleBot. You may also copy and paste the link into the chat on the server where you wish to install: 
         .input-group.input-group-sm.mb-3 
-            span.input-group-text #[a(href="https://discord.com/oauth2/authorize?client_id=1326731868137062492") https://discord.com/oauth2/authorize?client_id=1326731868137062492]
+            span.input-group-text #[a(href=`${install}`)]= install
             button.copy-link(type="button") Copy
         p.section-header(data-title="Basic use" name="use") 
         p After installing WordleBot, start copying and pasting your game results right into your Discord server. WordleBot only monitors one channel per server for results, to avoid cluttering up the server. By default, this channel is the first one where it parses a game result, but you may set it to something else by having an administrator issue the command #[span.command #[a(href="" data-link="commands") sethome]] in the channel where you wish to track results. A warning is given if any results are pasted in a channel other than your Wordle home channel. 
@@ -49,30 +49,12 @@ block content
         p WordleBot is free to use. I will keep it that way unless I start incurring costs for data storage (which is likely a long way away, unless a lot of people start using this). However, if you enjoy using this bot, I would be honored to accept a donation #[a(href="https://www.buymeacoffee.com/charlesyu4j") here]. This is a hobby project, and not much more than that.
         p.question What data is being collected?
         p No personal information (e-mail, address, phone, etc.) will ever be collected. The data I have is limited to what is available on Discord - your server's name, ID, banner (if applicable), and icon, and your users' username, display name, ID, and profile picture, all of which is publicly available on your discord pages.
-        p.question Can you add support for [game]?
-        p Yes! Well...probably! I can add support for just about any daily game with a copy/paste share function. Send me a message below using the #[a(href="" data-link="email") e-mail form] and I can give it a shot.
-        p.question Can you add [feature]?
-        p Probably! Send me a message below using the #[a(href="" data-link="email") e-mail form] and I can give it a shot.
-        p.section-header(data-title="Contact" name="email")
-        .contact-container.mb-3
-            #form-container
-                #contact-form
-                    .mb-3
-                        label.form-label(for="name") Your name:
-                        input#name.form-control(type="text" placeholder="Your name" required)
-                    .mb-3
-                        label.form-label(for="email") E-mail address
-                        input#email.form-control(type="email" placeholder="name@example.com" required)
-                    .mb-3
-                        label.form-label(for="subject") Subject 
-                        select#subject.form-control
-                            option(value="") [Select a subject]
-                    .mb-3
-                        label.form-label(for="message") Your message
-                        textarea#message.form-control(required rows="6")
-                    .w-100.d-flex
-                        button.btn.btn-primary.send-button Send
-
+        p.question Can you add support for [game]? Can you add [feature]?
+        p Yes! Well...probably! I can add support for just about any daily game with a copy/paste share function. Send me a message on Discord and I can give it a shot: 
+        .copy-text.w-100.d-flex.flex-row.align-items-center.justify-content-center
+            span.input-group-text.text-truncate
+                a#community-link.text-truncate(href=`${invite}`)= invite
+            button.btn.btn-primary.copy-link(data-copy-target="#community-link") Copy
         .sticky-bottom.w-100.d-flex.flex-row
             a#to-top(data-link="top") Back to top
 

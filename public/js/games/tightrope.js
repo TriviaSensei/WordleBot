@@ -37,6 +37,15 @@ area.addEventListener('data-update', (e) => {
 		}
 	};
 
+	const avgTime = {
+		...average((c) => {
+			if (c.misses >= 3) return null;
+			return c.time;
+		}, 2),
+		heading: 'Avg Time',
+		tooltip: 'Average time (wins only)',
+	};
+
 	const rowOperators = [
 		gamesPlayed,
 		gamesWon(winFn),
@@ -57,6 +66,7 @@ area.addEventListener('data-update', (e) => {
 			heading: 'AvgC',
 			tooltip: 'Average correct',
 		},
+		avgTime,
 	];
 
 	const columnOperators = [
@@ -75,6 +85,7 @@ area.addEventListener('data-update', (e) => {
 			heading: 'AvgC',
 			tooltip: 'Average correct',
 		},
+		avgTime,
 	];
 
 	updateTable(

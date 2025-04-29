@@ -4,6 +4,8 @@ const wordleController = require('../controllers/wordleController');
 const router = express.Router();
 
 router.use(viewController.httpsRedirect);
+router.get('/', viewController.getHome);
+router.get('/docs', viewController.getDocs);
 router.get('/faq', viewController.getWordle);
 
 router.get(
@@ -17,5 +19,5 @@ router.get(
 	viewController.getWordleStats
 );
 router.get('/player/:id/:year?/:month?', viewController.getWordleStats);
-router.get('/test', viewController.getTest);
+// router.get('/test', viewController.getTest);
 module.exports = router;
