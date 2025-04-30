@@ -191,14 +191,33 @@ th.summary-header[data-sort-index] {
 	cursor: pointer;
 }
 
-th.rotate > .cell-container {
+/* th.rotate > .cell-container {
 	transform-origin: bottom left;
 	transform: translate(100%, 2px) rotate(315deg);
 	border-bottom: 1px solid var(--black);
 	width: 100%;
 	font-size: 1em;
+} */
+
+th.rotate > .cell-container {
+	width: 100%;
+	height: 100%;
+	position: relative;
 }
-th.rotate > div > span {
+
+.cell-container > .label-container {
+	position: absolute;
+	z-index: 10;
+	left: 100%;
+	bottom: 0%;
+	transform-origin: bottom left;
+	transform: rotate(315deg);
+	border-bottom: 1px solid var(--black);
+	width: 100%;
+	font-size: 1em;
+}
+
+th.rotate > div span {
 	padding: 0 10px 0 0;
 }
 
@@ -251,6 +270,10 @@ td.blank {
 	}
 }
 
+table.standings-table > thead {
+	background-color: var(--white);
+}
+
 .standings-row > td {
 	border-top: 1px solid var(--black);
 	border-bottom: 1px solid var(--black);
@@ -266,7 +289,7 @@ tr.header-row th:first-child,
 tr.standings-row td:first-child {
 	position: sticky;
 	background-color: var(--white);
-	z-index: 4;
+	z-index: 11;
 	left: 0;
 }
 

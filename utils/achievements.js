@@ -72,7 +72,7 @@ const getCountRetroFunction = (id, filter, n) => {
 			.lean();
 		const u = await Users.findById(user);
 		if (res.length >= n) return res[n - 1].date;
-		return null;
+		return { progress: res.length };
 	};
 };
 
@@ -895,7 +895,7 @@ const achievements = [
 				let toReturn = null;
 				res.some((r, i) => {
 					if (i === 0 || r.date !== res[i - 1].date) count = 0;
-					if (r.scores.reduce((p, c) => Math.max(p, c) === el.n)) count++;
+					if (r.data.scores.reduce((p, c) => Math.max(p, c) === el.n)) count++;
 					if (count === 3) {
 						toReturn = r.date;
 						return true;
@@ -931,7 +931,15 @@ const achievements = [
 			let count = 0;
 			let toReturn = null;
 			res.some((r, i) => {
-				if (i === 0 || r.date !== res[i - 1].date) count = 1;
+				let thisDate, lastDate;
+				if (i !== 0) {
+					thisDate = moment.tz(r.date, timezone).format().split('T')[0];
+					lastDate = moment
+						.tz(res[i - 1].date, timezone)
+						.format()
+						.split('T')[0];
+				}
+				if (i === 0 || thisDate !== lastDate) count = 1;
 				else count++;
 				if (count >= 10) {
 					toReturn = r.date;
@@ -947,5 +955,64 @@ const achievements = [
 // 	console.log(`${a.name},${a.id},"${a.description}"`)
 // );
 console.log(`${achievements.length} achievements found`);
+
+const handleRetroAchievements = async () => {
+	const allUsers = await Users.find();
+	allUsers.forEach((u) => {
+		if (!u.achievements)
+			u.achievements = {
+				progress: [],
+				completed: [],
+			};
+	});
+
+	await Promise.all(
+		allUsers.map(async (u) => {
+			await Promise.all(
+				achievements.map(async (a) => {
+					//if they already have progress saved or have completed this achievement, don't bother
+					if (u.achievements.completed.some((ua) => ua.id === a.id)) return;
+					if (
+						a.dataItem &&
+						u.achievements.progress.some((up) => up.name === a.dataItem)
+					)
+						return;
+					if (a.retro) {
+						const res = await a.retro(u._id);
+						if (res) {
+							if (res.progress && a.dataItem) {
+								if (
+									!u.achievements.progress.some((p) => {
+										if (p.name === a.dataItem) {
+											p.progress = res.progress;
+											return true;
+										}
+									})
+								) {
+									u.achievements.progress.push({
+										name: a.dataItem,
+										progress: res.progress,
+									});
+								}
+							} else if (res.progress !== 0) {
+								if (!u.achievements.completed.some((p) => p.id === a.id)) {
+									u.achievements.completed.push({
+										id: a.id,
+										name: a.name,
+										date: res,
+									});
+								}
+							}
+							u.markModified('achievements');
+						}
+					}
+				})
+			);
+			await u.save();
+		})
+	);
+	console.log('Achievements scanned');
+};
+handleRetroAchievements();
 
 module.exports = achievements;

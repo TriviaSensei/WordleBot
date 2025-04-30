@@ -235,7 +235,6 @@ export const updateTable = (
 		if (firstTotalRow >= 1) {
 			rows.forEach((r, i) => {
 				let newCell;
-				if (i === 0) console.log(r);
 				if (i !== firstTotalRow - 1) {
 					if (!r.classList.contains('include-total'))
 						newCell = createElement('td.blank-cell');
@@ -262,7 +261,9 @@ export const updateTable = (
 			}
 			const newHeader = createElement('th.rotate.summary-header', obj);
 			const cc = createElement('.cell-container');
-			cc.innerHTML = op.heading;
+			const lc = createElement('.label-container');
+			lc.innerHTML = op.heading;
+			cc.appendChild(lc);
 			newHeader.appendChild(cc);
 
 			if (op.sortable) newHeader.addEventListener('click', sortTable);
@@ -322,7 +323,17 @@ export const updateTable = (
 					'bs-placement': 'top',
 					'bs-title': cs.description.replace('\n', '<br>'),
 				},
-				children: [{ selector: '.cell-container', innerHTML: cs.heading }],
+				children: [
+					{
+						selector: '.cell-container',
+						children: [
+							{
+								selector: '.label-container',
+								innerHTML: cs.heading,
+							},
+						],
+					},
+				],
 			});
 
 			header.insertBefore(newHeader, firstHeader);

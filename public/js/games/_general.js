@@ -50,12 +50,19 @@ export const winPercent = (fn) => {
 			wins: 0,
 		},
 		finalFunction: (data) => {
-			const pct = Math.round((data.wins * 100) / data.plays);
+			let pct = Math.round((data.wins * 100) / data.plays);
+			if (pct === 100 && data.wins !== data.plays) {
+				pct = Number(((data.wins * 100) / data.plays).toFixed(1));
+			}
 			return pct;
 		},
 		displayValue: (data) => {
 			if (data.plays === 0) return '-';
-			return `${Math.round((data.wins * 100) / data.plays)}%`;
+			let pct = Math.round((data.wins * 100) / data.plays);
+			if (pct === 100 && data.wins !== data.plays) {
+				pct = Number(((data.wins * 100) / data.plays).toFixed(1));
+			}
+			return `${pct}%`;
 		},
 	};
 };

@@ -210,6 +210,9 @@ section {
 		margin-left: 0;
 		margin-right: 0;
 	}
+	section img {
+		max-width: 30%;
+	}
 	.carousel {
 		width: 30em;
 		margin: auto;

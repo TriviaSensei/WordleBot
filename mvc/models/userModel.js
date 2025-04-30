@@ -12,7 +12,6 @@ const userSchema = new mongoose.Schema({
 	globalName: String,
 	avatar: {
 		type: String,
-		required: [true, 'Username not found'],
 	},
 	banner: String,
 	banner_color: String,

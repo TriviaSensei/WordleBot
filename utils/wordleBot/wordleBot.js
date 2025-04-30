@@ -642,17 +642,18 @@ client.on('interactionCreate', async (data) => {
 	else if (commandName.toLowerCase() === 'docs')
 		content = `Here is the documentation page: https://${hostname}/docs`;
 	else if (commandName.toLowerCase() === 'addme') {
-		const srvr = await Servers.find({ guildId: data.guildId });
-		const usr = await Users.find({ userId: data.user.id });
+		const srvr = await Servers.findOne({ guildId: data.guildId });
+		const usr = await Users.findOne({ userId: data.user.id });
 		let serverAdded = false;
 		let userAdded = false;
-		if (!usr.servers.some((s) => s === srvr._id)) {
+
+		if (!usr.servers.some((s) => s.toString() === srvr._id.toString())) {
 			usr.servers.push(srvr._id);
 			serverAdded = true;
 			usr.markModified('servers');
 			await usr.save();
 		}
-		if (!srvr.users.some((u) => u === usr._id)) {
+		if (!srvr.users.some((u) => u.toString() === usr._id.toString())) {
 			srvr.users.push(usr._id);
 			userAdded = true;
 			srvr.markModified('users');
@@ -661,9 +662,9 @@ client.on('interactionCreate', async (data) => {
 		if (serverAdded || userAdded) content = `Data saved.`;
 		else content = `You are already associated with this server.`;
 	} else if (commandName.toLowerCase() === 'myservers') {
-		const usr = await (
-			await Users.find({ userId: data.user.id })
-		).populate('servers');
+		const usr = await Users.findOne({ userId: data.user.id }).populate(
+			'servers'
+		);
 		const serverData = usr.servers.map((s) => {
 			return s.name;
 		});
@@ -792,10 +793,6 @@ client.on('interactionCreate', async (data) => {
 });
 
 client.on('messageCreate', async (msg) => {
-	// const ts = msg.createdTimestamp;
-	// console.log(ts);
-	// const dt = new Date(ts);
-	// console.log(dt);
 	if (!checkCorrectServer(msg.guildId)) return;
 
 	if (msg.author.id === me.id) return;
@@ -803,19 +800,21 @@ client.on('messageCreate', async (msg) => {
 	// check the current discord server data against what we have in the DB,
 	// if it exists, and update the data accordingly
 	const srvr = await updateServerData(msg.guildId);
-	// check the current discord user data against what we have in the DB,
-	// if it exists, and update the data accordingly
-	const usr = await updateUserData(msg.author.id);
+
 	//see if it's a game result being posted, and if not, ignore the message.
 	const gameInfo = parseResult(msg.content);
 	if (!gameInfo || gameInfo.length === 0) {
 		// if (process.env.NODE_ENV === 'development') testRegex(msg.content);
 		return;
 	}
+
 	//if so, see if there is a valid home channel set, set it if not, and ignore the result if not in the home channel
 	const correctChannel = await checkCorrectChannel(srvr, msg);
 	if (!correctChannel) return;
 
+	// check the current discord user data against what we have in the DB,
+	// if it exists, and update the data accordingly
+	const usr = await updateUserData(msg.author.id);
 	//update the list of users on the server, and the list of servers on the user, if necessary
 	await updateLists(usr, srvr);
 

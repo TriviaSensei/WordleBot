@@ -249,8 +249,10 @@ document.addEventListener('DOMContentLoaded', () => {
 						'bs-placement': 'top',
 						'bs-title': dateStr,
 					});
+					const lc = createElement('.label-container');
+					lc.innerHTML = i;
+					cc.appendChild(lc);
 					newHeader.appendChild(cc);
-					cc.innerHTML = i;
 					if (d.startNumber !== null) newHeader.setAttribute('data-number', i);
 					new bootstrap.Tooltip(cc);
 					headerRow.append(newHeader);
