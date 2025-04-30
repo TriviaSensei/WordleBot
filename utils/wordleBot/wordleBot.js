@@ -647,6 +647,16 @@ client.on('interactionCreate', async (data) => {
 		let serverAdded = false;
 		let userAdded = false;
 
+		if (!srvr) {
+			content =
+				'This server has not yet been registered. Send a chat message or paste a result to register it.';
+			return;
+		} else if (!usr) {
+			content =
+				'You are not registered as a player - please past a result to register yourself.';
+			return;
+		}
+
 		if (!usr.servers.some((s) => s.toString() === srvr._id.toString())) {
 			usr.servers.push(srvr._id);
 			serverAdded = true;
