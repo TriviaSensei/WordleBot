@@ -249,19 +249,20 @@ export const updateTable = (
 		//add a header column at the beginning if it's a summarizing function
 		if (op.heading) {
 			const obj = {};
+			const lcObj = {};
 			if (op.sortable) {
 				obj['sort-index'] = i;
 				obj['default-sort'] = op.defaultSort === -1 ? -1 : 1;
 			}
 			if (op.tooltip) {
-				obj['bs-toggle'] = 'tooltip';
-				obj['bs-html'] = 'true';
-				obj['bs-placement'] = 'top';
-				obj['bs-title'] = op.tooltip;
+				lcObj['bs-toggle'] = 'tooltip';
+				lcObj['bs-html'] = 'true';
+				lcObj['bs-placement'] = 'top';
+				lcObj['bs-title'] = op.tooltip;
 			}
 			const newHeader = createElement('th.rotate.summary-header', obj);
 			const cc = createElement('.cell-container');
-			const lc = createElement('.label-container');
+			const lc = createElement('.label-container', lcObj);
 			lc.innerHTML = op.heading;
 			cc.appendChild(lc);
 			newHeader.appendChild(cc);
@@ -318,10 +319,6 @@ export const updateTable = (
 				attributes: {
 					'sort-index': sortIndex,
 					'default-sort': cs.sortOrder,
-					'bs-toggle': 'tooltip',
-					'bs-html': true,
-					'bs-placement': 'top',
-					'bs-title': cs.description.replace('\n', '<br>'),
 				},
 				children: [
 					{
@@ -329,6 +326,12 @@ export const updateTable = (
 						children: [
 							{
 								selector: '.label-container',
+								attributes: {
+									'bs-toggle': 'tooltip',
+									'bs-html': true,
+									'bs-placement': 'top',
+									'bs-title': cs.description.replace('\n', '<br>'),
+								},
 								innerHTML: cs.heading,
 							},
 						],
@@ -338,7 +341,8 @@ export const updateTable = (
 
 			header.insertBefore(newHeader, firstHeader);
 			newHeader.addEventListener('click', sortTable);
-			new bootstrap.Tooltip(newHeader);
+			const lc = newHeader.querySelector('.label-container');
+			new bootstrap.Tooltip(lc);
 			rows.forEach((r) => {
 				const firstCell = r.querySelector('.result-cell');
 				const cells = getElementArray(r, '.result-cell');

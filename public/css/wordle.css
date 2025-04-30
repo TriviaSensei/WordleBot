@@ -1,6 +1,7 @@
 #wordle-tab-pane {
 	.wordle-answer {
 		font-size: 0.8em !important;
+		min-width: 4.1em;
 	}
 
 	.reveal-button {
@@ -13,5 +14,6 @@
 
 	.header-row > th.result-header {
 		min-width: 2.75em;
+		height: 4em;
 	}
 }

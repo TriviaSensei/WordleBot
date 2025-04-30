@@ -244,17 +244,17 @@ document.addEventListener('DOMContentLoaded', () => {
 					const newHeader = createElement('th.rotate.result-header', {
 						date: dateStr,
 					});
-					const cc = createElement('.cell-container', {
+					const cc = createElement('.cell-container');
+					const lc = createElement('.label-container', {
 						'bs-toggle': 'tooltip',
 						'bs-placement': 'top',
 						'bs-title': dateStr,
 					});
-					const lc = createElement('.label-container');
 					lc.innerHTML = i;
 					cc.appendChild(lc);
 					newHeader.appendChild(cc);
 					if (d.startNumber !== null) newHeader.setAttribute('data-number', i);
-					new bootstrap.Tooltip(cc);
+					new bootstrap.Tooltip(lc);
 					headerRow.append(newHeader);
 				}
 
