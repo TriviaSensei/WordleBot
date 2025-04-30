@@ -675,6 +675,11 @@ client.on('interactionCreate', async (data) => {
 		const usr = await Users.findOne({ userId: data.user.id }).populate(
 			'servers'
 		);
+		if (!usr) {
+			content =
+				'You are not registered as a player - please past a result to register yourself.';
+			return;
+		}
 		const serverData = usr.servers.map((s) => {
 			return s.name;
 		});
