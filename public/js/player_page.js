@@ -130,7 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
 					const dt = new Date(startDt);
 					dt.setDate(dt.getDate() + i - n);
 					const dateStr = moment.tz(dt, timezone).format('YYYY-MM-DD');
-					const cc = createElement('.cell-container', {
+					const cc = createElement('.cell-container');
+					const lc = createElement('.label-container', {
 						'bs-toggle': 'tooltip',
 						'bs-placement': 'top',
 						'bs-title': dateStr,
@@ -138,10 +139,13 @@ document.addEventListener('DOMContentLoaded', () => {
 					const newHeader = createElement('th.rotate.result-header', {
 						date: dateStr,
 					});
+					lc.innerHTML = i;
+					cc.appendChild(lc);
 					newHeader.appendChild(cc);
-					cc.innerHTML = i;
+
 					if (d.startNumber !== null) newHeader.setAttribute('data-number', i);
-					new bootstrap.Tooltip(cc);
+					new bootstrap.Tooltip(lc);
+
 					headerRow.append(newHeader);
 				}
 
