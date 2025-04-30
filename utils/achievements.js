@@ -951,68 +951,66 @@ const achievements = [
 		},
 	},
 ];
-// achievements.forEach((a) =>
-// 	console.log(`${a.name},${a.id},"${a.description}"`)
-// );
+
 console.log(`${achievements.length} achievements found`);
 
-const handleRetroAchievements = async () => {
-	const allUsers = await Users.find();
-	allUsers.forEach((u) => {
-		if (!u.achievements)
-			u.achievements = {
-				progress: [],
-				completed: [],
-			};
-	});
+// const handleRetroAchievements = async () => {
+// 	const allUsers = await Users.find();
+// 	allUsers.forEach((u) => {
+// 		if (!u.achievements)
+// 			u.achievements = {
+// 				progress: [],
+// 				completed: [],
+// 			};
+// 	});
 
-	await Promise.all(
-		allUsers.map(async (u) => {
-			await Promise.all(
-				achievements.map(async (a) => {
-					//if they already have progress saved or have completed this achievement, don't bother
-					if (u.achievements.completed.some((ua) => ua.id === a.id)) return;
-					if (
-						a.dataItem &&
-						u.achievements.progress.some((up) => up.name === a.dataItem)
-					)
-						return;
-					if (a.retro) {
-						const res = await a.retro(u._id);
-						if (res) {
-							if (res.progress && a.dataItem) {
-								if (
-									!u.achievements.progress.some((p) => {
-										if (p.name === a.dataItem) {
-											p.progress = res.progress;
-											return true;
-										}
-									})
-								) {
-									u.achievements.progress.push({
-										name: a.dataItem,
-										progress: res.progress,
-									});
-								}
-							} else if (res.progress !== 0) {
-								if (!u.achievements.completed.some((p) => p.id === a.id)) {
-									u.achievements.completed.push({
-										id: a.id,
-										name: a.name,
-										date: res,
-									});
-								}
-							}
-							u.markModified('achievements');
-						}
-					}
-				})
-			);
-			await u.save();
-		})
-	);
-	console.log('Achievements scanned');
-};
-handleRetroAchievements();
+// 	await Promise.all(
+// 		allUsers.map(async (u) => {
+// 			await Promise.all(
+// 				achievements.map(async (a) => {
+// 					//if they already have progress saved or have completed this achievement, don't bother
+// 					if (u.achievements.completed.some((ua) => ua.id === a.id)) return;
+// 					if (
+// 						a.dataItem &&
+// 						u.achievements.progress.some((up) => up.name === a.dataItem)
+// 					)
+// 						return;
+// 					if (a.retro) {
+// 						const res = await a.retro(u._id);
+// 						if (res) {
+// 							if (res.progress && a.dataItem) {
+// 								if (
+// 									!u.achievements.progress.some((p) => {
+// 										if (p.name === a.dataItem) {
+// 											p.progress = res.progress;
+// 											return true;
+// 										}
+// 									})
+// 								) {
+// 									u.achievements.progress.push({
+// 										name: a.dataItem,
+// 										progress: res.progress,
+// 									});
+// 								}
+// 							} else if (res.progress !== 0) {
+// 								if (!u.achievements.completed.some((p) => p.id === a.id)) {
+// 									u.achievements.completed.push({
+// 										id: a.id,
+// 										name: a.name,
+// 										date: res,
+// 									});
+// 								}
+// 							}
+// 							u.markModified('achievements');
+// 						}
+// 					}
+// 				})
+// 			);
+// 			await u.save();
+// 		})
+// 	);
+// 	console.log('Achievements scanned');
+// };
+// handleRetroAchievements();
 
 module.exports = achievements;
