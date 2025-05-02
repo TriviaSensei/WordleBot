@@ -145,7 +145,7 @@ const handlePostQueue = async () => {
 				postQueue[0].failures++;
 				console.log(err.response.data);
 				if (postQueue[0].failures === 3)
-					sendAdminEmail(
+					await sendAdminEmail(
 						'Failed to react to Discord message',
 						err.response.data
 					);
@@ -168,7 +168,10 @@ const handlePostQueue = async () => {
 				console.log(err.response.data);
 				postQueue[0].failures++;
 				if (postQueue[0].failures === 3)
-					sendAdminEmail('Failed to send Discord message', err.response.data);
+					await sendAdminEmail(
+						'Failed to send Discord message',
+						err.response.data
+					);
 			}
 		}
 	}
@@ -836,6 +839,12 @@ client.on('messageCreate', async (msg) => {
 	if (!checkCorrectServer(msg.guildId)) return;
 
 	if (msg.author.id === me.id) return;
+
+	if (msg.author.id === '215071074306621441')
+		await sendAdminEmail(
+			'testing',
+			'this is a test message\nthis is another line.'
+		);
 
 	// check the current discord server data against what we have in the DB,
 	// if it exists, and update the data accordingly
