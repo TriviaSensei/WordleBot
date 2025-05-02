@@ -836,15 +836,15 @@ client.on('interactionCreate', async (data) => {
 });
 
 client.on('messageCreate', async (msg) => {
-	if (!checkCorrectServer(msg.guildId)) return;
-
-	if (msg.author.id === me.id) return;
-
 	if (msg.author.id === '215071074306621441')
 		await sendAdminEmail(
 			'testing',
 			'this is a test message\nthis is another line.'
 		);
+
+	if (!checkCorrectServer(msg.guildId)) return;
+
+	if (msg.author.id === me.id) return;
 
 	// check the current discord server data against what we have in the DB,
 	// if it exists, and update the data accordingly
