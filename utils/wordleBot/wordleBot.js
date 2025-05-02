@@ -836,12 +836,6 @@ client.on('interactionCreate', async (data) => {
 });
 
 client.on('messageCreate', async (msg) => {
-	if (msg.author.id === '215071074306621441')
-		await sendAdminEmail(
-			'testing',
-			'this is a test message\nthis is another line.'
-		);
-
 	if (!checkCorrectServer(msg.guildId)) return;
 
 	if (msg.author.id === me.id) return;
