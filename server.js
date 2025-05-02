@@ -35,29 +35,5 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'mvc/views'));
 
 app.use('/api/v1/wordle', wordleRouter);
-app.use('/api/v1/contact', async (req, res) => {
-	const sgMail = require('@sendgrid/mail');
-	sgMail.setApiKey(process.env.SG_API_KEY);
 
-	const msg = {
-		from: process.env.serveremail,
-		to: process.env.email,
-		reply_to: req.body.email,
-		subject: `wordlebot.gg message from ${req.body.name}: ${req.body.subject}`,
-		text: req.body.message,
-	};
-	try {
-		await sgMail.send(msg);
-	} catch (e) {
-		console.log(e);
-		console.log(e.response.body.errors[0]);
-		return res
-			.status(e.code)
-			.json({ status: 'fail', message: e.response.body.errors[0].message });
-	}
-	res.status(200).json({
-		status: 'success',
-		message: 'message sent.',
-	});
-});
 app.use('/', viewRouter);

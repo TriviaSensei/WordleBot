@@ -14,7 +14,6 @@ let timezone;
 document.addEventListener('DOMContentLoaded', () => {
 	const dataArea = document.querySelector('#data-area');
 	let data = JSON.parse(dataArea.getAttribute('data'));
-	console.log(data);
 	const tt = getElementArray(document, '[data-bs-toggle="tooltip"]');
 	tt.forEach((t) => new bootstrap.Tooltip(t));
 	timezone = data.timezone || 'America/New_York';
