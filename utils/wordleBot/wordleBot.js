@@ -12,6 +12,9 @@ const {
 const axios = require('axios');
 const moment = require('moment-timezone');
 const { parseResult } = require('../parseResult');
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SG_API_KEY);
+
 const timezone = process.env.DEFAULT_TIMEZONE;
 const hostname =
 	process.env.NODE_ENV === 'development'
@@ -60,6 +63,21 @@ const client = new Client({
 });
 
 let me;
+
+const sendAdminEmail = async (subject, text) => {
+	const msg = {
+		from: process.env.serveremail,
+		to: process.env.email,
+		reply_to: process.env.email,
+		subject,
+		text,
+	};
+	try {
+		await sgMail.send(msg);
+	} catch (e) {
+		console.log(e.response.body.errors[0]);
+	}
+};
 
 const updateData = async (doc, data) => {
 	const dataProps = Object.getOwnPropertyNames(data);
@@ -126,6 +144,11 @@ const handlePostQueue = async () => {
 			} catch (err) {
 				postQueue[0].failures++;
 				console.log(err.response.data);
+				if (postQueue[0].failures === 3)
+					sendAdminEmail(
+						'Failed to react to Discord message',
+						err.response.data
+					);
 			}
 		}
 	} else if (type === 'message') {
@@ -144,6 +167,8 @@ const handlePostQueue = async () => {
 			} catch (err) {
 				console.log(err.response.data);
 				postQueue[0].failures++;
+				if (postQueue[0].failures === 3)
+					sendAdminEmail('Failed to send Discord message', err.response.data);
 			}
 		}
 	}
