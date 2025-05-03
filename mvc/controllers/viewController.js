@@ -341,6 +341,29 @@ exports.getDocs = catchAsync(async (req, res, next) => {
 			return { name: g.name, url: g.url };
 		}),
 		title: 'WordleBot - Documentation',
+		scrollTo: req.params.scrollTo || null,
+	});
+});
+
+exports.getServers = catchAsync(async (req, res, next) => {
+	const servers = await Servers.find({ isPublic: true })
+		.select([
+			'name',
+			'guildId',
+			'icon',
+			'banner',
+			'games',
+			'description',
+			'inviteLink',
+		])
+		.lean();
+	servers.sort((a, b) => {
+		if (a.guildId === process.env.DISCORD_PUBLIC_SERVER) return -1;
+		else if (b.guildId === process.env.DISCORD_PUBLIC_SERVER) return 1;
+		else return 0;
+	});
+	res.status(200).render('servers', {
+		servers,
 	});
 });
 

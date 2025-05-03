@@ -12,7 +12,15 @@ const gameList = games.map((g) => g.name);
 const moment = require('moment-timezone');
 const msInDay = 86400000;
 const timezone = process.env.DEFAULT_TIMEZONE;
-
+const Filter = require('bad-words');
+const filter = new Filter();
+const authObj = {
+	withCredentials: true,
+	credentials: 'include',
+	headers: {
+		Authorization: `Bot ${process.env.WORDLE_BOT_TOKEN}`,
+	},
+};
 const getResults = async (year, month, users, gameFilter) => {
 	const firstOfMonthStr = `${year}-${month >= 10 ? month : `0${month}`}-01`;
 	const nextMonthStr = `${year + (month === 12 ? 1 : 0)}-${
@@ -286,7 +294,7 @@ exports.getWordlePuzzle = catchAsync(async (req, res, next) => {
 });
 
 exports.checkServerSettings = catchAsync(async (req, res, next) => {
-	if (!Servers) return next(new AppError(500, 'Could not connect to database'));
+	if (!Servers) return next(new AppError('Could not connect to database', 500));
 	const server = await Servers.findOne(
 		req.params.token
 			? { settingsToken: req.params.token }
@@ -416,9 +424,87 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 		});
 
 	const [successes, warnings, failures] = new Array(3).fill([]);
+	if (req.body.serverSettings) {
+		const ss = req.body.serverSettings;
+
+		//public server
+		if (ss.isPublic) {
+			//...must have a description
+			if (!ss.description)
+				return res.status(400).json({
+					status: 'fail',
+					message: 'You must specify a description for a public server.',
+				});
+			else if (filter.isProfane(server.name)) {
+				//check server name in discord - see if it's been changed
+				const sd = await axios.get(
+					`${process.env.DISCORD_API_URL}/guilds/${server.guildId}`,
+					authObj
+				)?.data;
+				if (!sd)
+					return res.status(404).json({
+						status: 'fail',
+						message: 'Server not found',
+					});
+				if (sd.name !== server.name) server.name = sd.name;
+				server.markModified('name');
+				await server.save();
+				if (filter.isProfane(server.name))
+					return res.status(400).json({
+						message:
+							'No vulgar language is allowed in public server names. Please change your server name through Discord before making it public here.',
+						status: 'fail',
+					});
+			}
+
+			if (filter.isProfane(ss.description))
+				return res.status(400).json({
+					message:
+						'No vulgar language is allowed in public server descriptions',
+					status: 'fail',
+				});
+			else if (!ss.inviteLink)
+				return res.status(400).json({
+					message: 'Missing invite link',
+					status: 'fail',
+				});
+			else if (ss.inviteLink.toLowerCase().indexOf('discord') < 0)
+				return res.status(400).json({
+					message: 'Invalid invite link',
+					status: 'fail',
+				});
+
+			//try the invite link and see if it's valid
+			const linkTest = await axios.get(ss.inviteLink);
+			console.log(linkTest.data.split('\n'));
+			const arr = ss.inviteLink.split('/').reverse();
+			const inviteCode = arr.find((a) => a !== '');
+			if (
+				linkTest.status !== 200 ||
+				!linkTest.data
+					.split('\n')
+					.some(
+						(d) =>
+							d.toLowerCase().indexOf('discord.com') >= 0 &&
+							d.indexOf(inviteCode) >= 0
+					)
+			)
+				return res.status(400).json({
+					message: 'Invalid invite link',
+					status: 'fail',
+				});
+		}
+
+		server.isPublic = ss.isPublic || false;
+		server.description = ss.description || '';
+		server.inviteLink = ss.inviteLink || '';
+		server.markModified('isPublic');
+		server.markModified('description');
+		server.markModified('inviteLink');
+	}
 	if (req.body.settings) {
 		if (!Array.isArray(req.body.settings))
-			return next(new AppError(400, 'Invalid settings submitted'));
+			return next(new AppError('Invalid settings submitted', 400));
 
 		req.body.settings.forEach((gameSetting) => {
 			/**

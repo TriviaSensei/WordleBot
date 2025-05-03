@@ -1070,6 +1070,10 @@ saveStat.addEventListener('click', () => {
 });
 
 const handleSaveSettings = () => {
+	const isPublic = document.querySelector('#is-public')?.checked || false;
+	const description =
+		document.querySelector('#server-description')?.value || '';
+	const inviteLink = document.querySelector('#server-invite-link')?.value || '';
 	const stats = statList.getState();
 	const settings = getElementArray(document, '.setting-container').map((c) => {
 		const name = c.getAttribute('data-name');
@@ -1081,6 +1085,11 @@ const handleSaveSettings = () => {
 		});
 		return { name, settings };
 	});
+	const serverSettings = {
+		isPublic,
+		description,
+		inviteLink,
+	};
 
 	const handler = (res) => {
 		console.log(res);
@@ -1097,6 +1106,7 @@ const handleSaveSettings = () => {
 		`/api/v1/wordle/settings/${token}`,
 		'PATCH',
 		{
+			serverSettings,
 			settings,
 			stats,
 		},

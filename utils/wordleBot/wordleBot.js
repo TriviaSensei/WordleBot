@@ -51,7 +51,7 @@ const keyCaps = [
 	'🔟',
 ];
 
-const url = 'https://discord.com/api';
+const url = process.env.DISCORD_API_URL;
 
 const client = new Client({
 	intents: [
@@ -670,21 +670,14 @@ client.on('interactionCreate', async (data) => {
 	else if (commandName.toLowerCase() === 'docs')
 		content = `Here is the documentation page: https://${hostname}/docs`;
 	else if (commandName.toLowerCase() === 'addme') {
-		const srvr = await Servers.findOne({ guildId: data.guildId });
-		const usr = await Users.findOne({ userId: data.user.id });
+		let srvr = await Servers.findOne({ guildId: data.guildId });
+		let usr = await Users.findOne({ userId: data.user.id });
+
 		let serverAdded = false;
 		let userAdded = false;
 
-		if (!srvr) {
-			content =
-				'This server has not yet been registered. Send a chat message or paste a result to register it.';
-			return;
-		} else if (!usr) {
-			content =
-				'You are not registered as a player - please past a result to register yourself.';
-			return;
-		}
-
+		if (!srvr) srvr = await updateServerData(data.guildId);
+		if (!usr) usr = await updateUserData(data.user.id);
 		if (!usr.servers.some((s) => s.toString() === srvr._id.toString())) {
 			usr.servers.push(srvr._id);
 			serverAdded = true;

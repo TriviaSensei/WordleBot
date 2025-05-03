@@ -16,8 +16,27 @@ block content
             .name-banner= data.serverData.name
     .body-container 
         h5.mt-5.mb-3 Server Settings
-        button.btn.btn-primary.w-75.mb-3.save-settings-button(type="button") Save
+        button.btn.btn-primary.w-75.mb-5.save-settings-button(type="button") Save
+        #server-info.w-100.mb-3
+            .fw-semibold.mb-2 Server Information
+            .input-group-h
+                .input-header.fw-semibold.me-3(data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="If checked, your server avatar, description, and invite link will be publicized on the /servers page.") Public 
+                .input-container
+                    .setting-toggle
+                        input#is-public.toggle-box(type="checkbox" name="is-public")
+                        label(for="is-public")
+                            .toggle-switch
+                                .switch
+            .input-group-c 
+                .input-header.fw-semibold(data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="A description for your server") Description 
+                .input-container.w-100
+                    textarea#server-description.w-100(rows="3")
+            .input-group-c 
+                .input-header.fw-semibold(data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="The invite link for your server. We recommend that you set it to have unlimited uses and never expire.") Invite link 
+                .input-container
+                    input#server-invite-link(type="text")
         #game-accordion.accordion.w-100
+            .fw-semibold.mb-2 Game Settings
             each setting,ind in data.serverData.settings
                 - const slug = setting.name.toLowerCase().split(' ').join('_')
                 div(class=`accordion-item ${data.serverData.games.includes(setting.name) ? '' : 'd-none'}` data-game=`${setting.name}`) 

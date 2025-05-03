@@ -9,7 +9,6 @@ mixin feature(title,desc,image)
 
 
 block styles
-    link(rel="stylesheet" href="/css/index.css")
 
 block navmenu 
     button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#nav-menu" aria-controls="nav-menu" aria-expanded="false" aria-label="Open menu")
@@ -20,6 +19,8 @@ block navmenu
                 a.nav-link.active(aria-current="page" data-target="features") Features
             li.nav-item
                 a.nav-link.active(aria-current="page" data-target="games") Games
+            li.nav-item
+                a.nav-link.active(aria-current="page" href="/servers" target="_blank") Servers
             li.nav-item
                 a.nav-link.active(aria-current="page" href="/docs" target="_blank") Documentation
             li.nav-item

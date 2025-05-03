@@ -1,0 +1,63 @@
+#contents {
+	width: min(600px, 100%);
+	margin: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+}
+
+.server-tile {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	position: relative;
+	margin-bottom: 2em;
+}
+
+.server-tile > .icon-container {
+	padding: 0.5em;
+	display: flex;
+	flex-direction: column;
+	width: 20%;
+}
+
+.server-tile > .icon-container > img {
+	width: 100%;
+	margin-bottom: 1em;
+	border-radius: 50%;
+}
+.game-list {
+	font-size: 0.8rem;
+}
+
+.server-tile > .icon-container > a {
+	width: 100%;
+	display: flex;
+}
+
+.server-tile > .icon-container > a::after {
+	content: 'Join';
+	margin: auto;
+}
+
+.server-tile > .server-info {
+	flex: 1;
+	padding: 0.5em;
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+}
+
+.server-info > .server-description {
+	flex: 1;
+}
+
+.server-tile::after {
+	content: '';
+	width: 80%;
+	height: 0;
+	border-bottom: 1px solid var(--white);
+	position: absolute;
+	bottom: -1em;
+	left: 10%;
+}

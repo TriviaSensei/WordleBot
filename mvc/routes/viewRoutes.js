@@ -5,9 +5,9 @@ const router = express.Router();
 
 router.use(viewController.httpsRedirect);
 router.get('/', viewController.getHome);
-router.get('/docs', viewController.getDocs);
+router.get('/docs/:scrollTo?', viewController.getDocs);
 router.get('/faq', viewController.getWordle);
-
+router.get('/servers', viewController.getServers);
 router.get(
 	'/settings/:token',
 	wordleController.checkServerSettings,

@@ -12,13 +12,20 @@ const filterType = getElementArray(
 document.addEventListener('DOMContentLoaded', () => {
 	const dataArea = document.querySelector('#data-area');
 	const data = JSON.parse(dataArea.getAttribute('data'));
-
 	const tooltipTriggerList = document.querySelectorAll(
 		'[data-bs-toggle="tooltip"]'
 	);
 	[...tooltipTriggerList].map(
 		(tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl)
 	);
+
+	const desc = document.querySelector('#server-description');
+	const isPublic = document.querySelector('#is-public');
+	const inviteLink = document.querySelector('#server-invite-link');
+
+	if (data.serverData.description) desc.value = data.serverData.description;
+	if (data.serverData.isPublic) isPublic.checked = true;
+	if (data.serverData.inviteLink) inviteLink.value = data.serverData.inviteLink;
 
 	const handleSelectChange = (e) => {
 		const desc = e.target
