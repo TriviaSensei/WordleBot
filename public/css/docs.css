@@ -203,6 +203,25 @@ section {
 	width: 100%;
 }
 
+input[type='radio'] {
+	display: none;
+}
+input[type='radio'] + label {
+	padding: 0 0.5em;
+	border: 1px solid black;
+}
+input[type='radio']:checked + label {
+	background-color: var(--yellow);
+	color: var(--bg-dark);
+}
+
+.d-flex:has(#show-desktop-revoke:checked)
+	+ .desktop-instructions
+	+ .mobile-instructions,
+.d-flex:has(#show-mobile-revoke:checked) + .desktop-instructions {
+	display: none;
+}
+
 @media (min-width: 992px) {
 	li.nav-item li.nav-item {
 		padding-right: 0;
@@ -211,7 +230,7 @@ section {
 		margin-right: 0;
 	}
 	section img {
-		max-width: 30%;
+		max-width: 40%;
 	}
 	.carousel {
 		width: 30em;

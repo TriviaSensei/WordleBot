@@ -40,7 +40,7 @@ block content
                 li 
                     a(data-target="leaderboards") Leaderboards
                 li 
-                    a(data-target="achievements") Achievements  
+                    a(data-target="achievements") Achievements
                 li 
                     a(data-target="commands") Commands
                 li 
@@ -48,6 +48,8 @@ block content
                     ul.fs-6
                         li 
                             a(data-target="settings") Settings 
+                        li 
+                            a(data-target="public-servers") Public Servers 
                         li 
                             a(data-target="custom-stats") Custom stats
                             ul.fs-6 
@@ -307,7 +309,7 @@ block content
                 p Achievement unlocked!
                 p To view your achievements, go to your personal page (linked with the #[a.command(data-target="command-i") i] command) and select the "Achievements" tab. Locked achievements are grayed out, while unlocked ones are colored in. You may also mouse-over or click any achievement to see a tooltip on the requirements to unlock it.
                 img(src="/img/docs/05_achievements.png")
-                p The Achievements area
+                p The Achievements area                
             section#commands 
                 h3 Slash Commands 
                 p WordleBot comes with a series of slash commands that allow admins and players to interact with it. Generally, WordleBot's responses to commands are ephemeral, meaning only the user issuing the command can see it. This reduces server clutter, and is a security feature, as your server's WordleBot settings are changed through a one-time-use link (see #[a(data-target="settings") settings] for details).
@@ -340,6 +342,47 @@ block content
                         li Server average - unplayed days are given a score of the server average (usually rounded to the player's detriment)
                         li Server worst - unplayed days are given a score equal to the worst on the server that day 
                         li Server worst+ (or Server worst -) - unplayed days are given a score equal to the worst on the server that day, with a small penalty
+                section#public-servers 
+                    h3 Public servers 
+                    p WordleBot allows you to set your server to be discoverable by fellow daily game players. An admin needs to open your server settings (see #[a.command(data-target="command-settings") settings]) and set the server to public. Your server must have a description and an invite link (recommended to be set to never expire with unlimited uses). Furthermore, your server description and name cannot have any vulgar language.
+                    img(src="/img/docs/06_public.png")
+                    p Setting your server to public
+                    p When you set your server to public, it can be found at #[a(href="/servers") https://www.wordlebot.gg/servers], and anyone can join it.
+                    img(src="/img/docs/06_servers.png")
+                    p List of public servers with join buttons
+                    p To revoke an invite link, should it become necessary, follow the steps below. This cannot be undone and you must generate a new invite link and save it to your server #[a.command(data-target="command-settings") settings] to allow people to join again.  
+                    .d-flex.flex-row 
+                        input#show-desktop-revoke(type="radio" name="revoke-show" checked)
+                        label(for="show-desktop-revoke") Desktop 
+                        input#show-mobile-revoke(type="radio" name="revoke-show")
+                        label(for="show-mobile-revoke") Mobile
+                    .desktop-instructions.pt-2.w-100
+                        ol 
+                            li 
+                                p Right-click on your server's icon in your Discord app, and go to Server Settings > Invites
+                                img(src="/img/docs/06_revoke_d_01.png")
+                            li 
+                                p Mouse-over the invite link and click the red X at the top-right corner. The link will be revoked.
+                                img(src="/img/docs/06_revoke_d_02.png")
+
+                    .mobile-instructions.pt-2.w-100
+                        ol 
+                            li
+                                p Select your server's icon in the Discord app, and go to the server settings 
+                                img(src="/img/docs/06_revoke_m_01.png")
+                            li
+                                p Select the "Settings" icon
+                                img(src="/img/docs/06_revoke_m_02.png")
+                            li
+                                p Scroll to the "User Management" section (near the bottom) and select "Invites"
+                                img(src="/img/docs/06_revoke_m_03.png")
+                            li
+                                p Find the invite link that you wish to revoke, and select the "..." icon on it.
+                                img(src="/img/docs/06_revoke_m_04.png")
+                            li
+                                p Select "Revoke" and the link will be revoked.
+                                img(src="/img/docs/06_revoke_m_05.png")
+                            
                 section#custom-stats 
                     h3 Custom Stats 
                     p WordleBot offers admins a way to create custom stats to include on their leaderboards. As stats have different attributes for different games, custom stats are created for each game individually. Thus, if you have a similar stat that you'd like to see for all three Quordle variants, you will have to recreate it for each game.
