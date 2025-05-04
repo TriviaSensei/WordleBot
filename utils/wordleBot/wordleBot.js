@@ -117,7 +117,7 @@ const handlePostQueue = async () => {
 
 	const { type, action } = postQueue[0];
 	console.log(`Type: ${type}; Action: ${action}`);
-	console.log(postQueue.data);
+	console.log(postQueue[0].data);
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
 		const re = /^(\%[0-9A-F]{2})+$/;
@@ -938,18 +938,23 @@ client.on('messageCreate', async (msg) => {
 
 	const serversToRemove = [];
 	const devGuilds = process.env.WORDLE_DEV_GUILD.split(',');
-	if (!devGuilds.includes(srvr.guildId)) {
+	if (checkCorrectServer(srvr.guildId)) {
 		usr.servers.forEach(async (s) => {
 			if (s._id.toString() !== srvr._id.toString()) {
 				const otherServer = await Servers.findById(s._id);
-				if (devGuilds.includes(otherServer.guildId)) return;
+				if (!checkCorrectServer(otherServer.guildId)) return;
 				if (otherServer && otherServer.channelId) {
 					//make sure the member is still a part of that server (in discord's record)
 					const members = await axios.get(
 						`${url}/guilds/${otherServer.guildId}/members`,
 						authObj
 					);
-					if (members && !members.some((m) => m.user.id === msg.author.id)) {
+					console.log(members);
+					if (
+						members &&
+						!members.data &&
+						members.data.some((m) => m.user.id === msg.author.id)
+					) {
 						serversToRemove.push(s._id);
 						return;
 					}
