@@ -116,13 +116,16 @@ const handlePostQueue = async () => {
 	}
 
 	const { type, action } = postQueue[0];
+	console.log(`Type: ${type}; Action: ${action}`);
+	console.log(postQueue.data);
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
 		const re = /^(\%[0-9A-F]{2})+$/;
 		let encoded;
 		if (emoji.match(re)) encoded = emoji;
 		else encoded = encodeURIComponent(emoji);
-		const channelId = msg.channelId ? msg.channelId : message.channel_id;
+		const channelId = msg.channelId ? msg.channelId : msg.channel_id;
+		console.log(`Channel: ${channelId}`);
 		if (channelId) {
 			try {
 				if (action === 'add')
@@ -185,7 +188,7 @@ const handlePostQueue = async () => {
 };
 
 const addReaction = (msg, emoji) => {
-	console.log(`Adding reaction to message ${msg.id} (user: ${msg.user.id})`);
+	console.log(`Adding reaction to message ${msg.id}`);
 	if (Array.isArray(emoji)) {
 		return emoji.forEach((e, i) => {
 			addReaction(msg, e);
