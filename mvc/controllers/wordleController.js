@@ -476,7 +476,6 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 
 			//try the invite link and see if it's valid
 			const linkTest = await axios.get(ss.inviteLink);
-			console.log(linkTest.data.split('\n'));
 			const arr = ss.inviteLink.split('/').reverse();
 			const inviteCode = arr.find((a) => a !== '');
 			if (
