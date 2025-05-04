@@ -37,3 +37,14 @@ app.set('views', path.join(__dirname, 'mvc/views'));
 app.use('/api/v1/wordle', wordleRouter);
 
 app.use('/', viewRouter);
+
+const dt = new Date();
+console.log(`Server started at ${dt}`);
+const logInterval = 30 * 60 * 1000;
+const timeLeft = logInterval - (Date.parse(dt) % logInterval);
+
+setTimeout(() => {
+	setInterval(() => {
+		console.log(new Date());
+	}, logInterval);
+}, timeLeft);

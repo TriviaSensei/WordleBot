@@ -185,6 +185,7 @@ const handlePostQueue = async () => {
 };
 
 const addReaction = (msg, emoji) => {
+	console.log(`Adding reaction to message ${msg.id} (user: ${msg.user.id})`);
 	if (Array.isArray(emoji)) {
 		return emoji.forEach((e, i) => {
 			addReaction(msg, e);
