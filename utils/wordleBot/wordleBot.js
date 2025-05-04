@@ -116,8 +116,6 @@ const handlePostQueue = async () => {
 	}
 
 	const { type, action } = postQueue[0];
-	console.log(`Type: ${type}; Action: ${action}`);
-	console.log(postQueue[0].data);
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
 		const re = /^(\%[0-9A-F]{2})+$/;
@@ -125,7 +123,6 @@ const handlePostQueue = async () => {
 		if (emoji.match(re)) encoded = emoji;
 		else encoded = encodeURIComponent(emoji);
 		const channelId = msg.channelId ? msg.channelId : msg.channel_id;
-		console.log(`Channel: ${channelId}`);
 		if (channelId) {
 			try {
 				if (action === 'add')
@@ -188,7 +185,6 @@ const handlePostQueue = async () => {
 };
 
 const addReaction = (msg, emoji) => {
-	console.log(`Adding reaction to message ${msg.id}`);
 	if (Array.isArray(emoji)) {
 		return emoji.forEach((e, i) => {
 			addReaction(msg, e);
@@ -937,7 +933,6 @@ client.on('messageCreate', async (msg) => {
 	}
 
 	const serversToRemove = [];
-	const devGuilds = process.env.WORDLE_DEV_GUILD.split(',');
 	if (checkCorrectServer(srvr.guildId)) {
 		usr.servers.forEach(async (s) => {
 			if (s._id.toString() !== srvr._id.toString()) {
@@ -949,7 +944,6 @@ client.on('messageCreate', async (msg) => {
 						`${url}/guilds/${otherServer.guildId}/members`,
 						authObj
 					);
-					console.log(members);
 					if (
 						members &&
 						!members.data &&
