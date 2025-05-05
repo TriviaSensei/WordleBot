@@ -385,6 +385,7 @@ img.mockup {
 		bottom: 5%;
 		left: 55%;
 		max-height: 65vh;
+		max-width: 30vw;
 		transform: rotate(25deg);
 	}
 
