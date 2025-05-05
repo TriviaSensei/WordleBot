@@ -29,7 +29,7 @@ const serverSchema = new mongoose.Schema({
 		default: '',
 		maxlength: [40, 'Your invite link is too long.'],
 	},
-	description: {
+	serverDescription: {
 		type: String,
 		default: '',
 		maxlength: [300, 'The maximum length is 300 characters'],

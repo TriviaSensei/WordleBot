@@ -495,10 +495,10 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 		}
 
 		server.isPublic = ss.isPublic || false;
-		server.description = ss.description || '';
+		server.serverDescription = ss.description || '';
 		server.inviteLink = ss.inviteLink || '';
 		server.markModified('isPublic');
-		server.markModified('description');
+		server.markModified('serverDescription');
 		server.markModified('inviteLink');
 	}
 	if (req.body.settings) {

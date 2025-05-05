@@ -353,7 +353,7 @@ exports.getServers = catchAsync(async (req, res, next) => {
 			'icon',
 			'banner',
 			'games',
-			'description',
+			'serverDescription',
 			'inviteLink',
 		])
 		.lean();

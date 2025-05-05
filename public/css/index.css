@@ -112,6 +112,7 @@ li.nav-item {
 	border: 1px solid var(--yellow);
 	padding-right: 1em;
 	padding-left: 1em;
+	font-size: 0.8em;
 	a.nav-link {
 		padding-right: 1em;
 		padding-left: 1em;
@@ -413,5 +414,11 @@ img.mockup {
 	}
 	.two-tabs {
 		margin-left: 4em;
+	}
+}
+
+@media (min-width: 1152px) {
+	li.nav-item {
+		font-size: 1em;
 	}
 }

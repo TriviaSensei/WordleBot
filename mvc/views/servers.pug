@@ -20,5 +20,5 @@ block content
         h1.my-5 Public Servers 
         p.mb-5 This is a list of servers where WordleBot has been invited, and the server administrators have set to public on the settings page. To have your server listed here, open your settings page (refer to the #[a(href="/docs/settings") documentation] for more information), set your server to public, and add a description and invite link. 
         each server in servers
-            +serverTile(server.name,server.guildId,server.icon,server.inviteLink,server.description, server.games)
+            +serverTile(server.name,server.guildId,server.icon,server.inviteLink,server.serverDescription, server.games)
             

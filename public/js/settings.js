@@ -12,6 +12,7 @@ const filterType = getElementArray(
 document.addEventListener('DOMContentLoaded', () => {
 	const dataArea = document.querySelector('#data-area');
 	const data = JSON.parse(dataArea.getAttribute('data'));
+	console.log(data);
 	const tooltipTriggerList = document.querySelectorAll(
 		'[data-bs-toggle="tooltip"]'
 	);
@@ -23,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	const isPublic = document.querySelector('#is-public');
 	const inviteLink = document.querySelector('#server-invite-link');
 
-	if (data.serverData.description) desc.value = data.serverData.description;
+	if (data.serverData.serverDescription)
+		desc.value = data.serverData.serverDescription;
 	if (data.serverData.isPublic) isPublic.checked = true;
 	if (data.serverData.inviteLink) inviteLink.value = data.serverData.inviteLink;
 

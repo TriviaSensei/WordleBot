@@ -91,6 +91,11 @@ const updateData = async (doc, data) => {
 			})
 		);
 	});
+	console.log(doc._doc);
+	console.log('-------------');
+	console.log(dataProps);
+	console.log('-------------');
+	console.log(props);
 	props.forEach((p) => {
 		if (data[p] !== doc._doc[p]) {
 			doc.markModified(p);
@@ -98,6 +103,8 @@ const updateData = async (doc, data) => {
 		}
 	});
 	const toReturn = await doc.save();
+	console.log('-------------');
+	console.log(toReturn);
 	return toReturn;
 };
 
