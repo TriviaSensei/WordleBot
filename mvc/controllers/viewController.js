@@ -136,23 +136,22 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 											});
 											//is the streak-continuing date in the list?
 											const lastPostDate = di.progress?.lastPost;
-											if (!lastPostDate) {
-												console.log(a);
-												progress = a.getProgress(0);
-											} else {
+											if (!lastPostDate) progress = a.getProgress(0);
+											else {
 												const nextDate = getNextDate(lastPostDate);
+
 												if (currentPuzzleDates.includes(nextDate))
 													progress = a.getProgress(
 														Math.max(
 															di.progress.current,
-															di.progress.other?.length
+															di.progress.other?.length || 0
 														)
 													);
 												else
 													progress = a.getProgress({
 														current: Math.max(
 															di.progress.current,
-															di.progress.other?.length
+															di.progress.other?.length || 0
 														),
 													});
 											}

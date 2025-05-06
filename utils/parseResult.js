@@ -547,8 +547,7 @@ const matchers = [
 					}) && a.mistakes === b.mistakes
 				);
 			},
-			checkWin: (data) =>
-				data.scores.every((s) => s === 1) && data.mistakes < 4,
+			checkWin: (data) => data.scores.every((s) => s >= 1) && data.mistakes < 4,
 			getReaction: (data) => {
 				const emojis = ['🔥', '✅', '✅', '😅', '😢'];
 				return emojis[data.mistakes];

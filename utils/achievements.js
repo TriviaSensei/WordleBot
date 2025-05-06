@@ -27,7 +27,9 @@ const countPlays = (old, data) => {
 	return 1;
 };
 const checkPlayCount = (n) => {
-	return (data) => data >= n;
+	return (data) => {
+		return data >= n;
+	};
 };
 const anyRes = (data) => true;
 const getAnyRes = (game, filterFunction) => {
@@ -105,7 +107,10 @@ const playAchievements = [
 		games: [],
 		updateProgress: countPlays,
 		getProgress: printProgress(el.count, (n) => n),
-		isComplete: checkPlayCount(el.count),
+		isComplete: (data) => {
+			const fn = checkPlayCount(el.count);
+			return fn(data);
+		},
 		retro: getCountRetroFunction(id, {}, el.count),
 	};
 });
@@ -303,9 +308,13 @@ gameList.forEach((el, i) => {
 			description: `Play ${el.name} for ${n} consecutive days`,
 			color: streakColors[i],
 			games: [el.name],
+			streak: true,
 			updateProgress: streakUpdater(el.name),
-			getProgress: printProgress(n, (data) => data.current),
-			isComplete: checkPlayCount(n),
+			getProgress: printProgress(n, (data) => data),
+			isComplete: (data) => {
+				const fn = checkPlayCount(n);
+				return fn(data.current);
+			},
 			retro: null,
 		});
 	});
@@ -338,11 +347,13 @@ gameList.forEach((el, i) => {
 				const fn = streakUpdater(el.name);
 				return fn(old, data);
 			},
-			getProgress: printProgress(
-				n,
-				(data) => Math.max(data.current, data.other?.length) || 0
-			),
-			isComplete: checkPlayCount(n),
+			getProgress: printProgress(n, (data) => {
+				return data || 0;
+			}),
+			isComplete: (data) => {
+				const fn = checkPlayCount(n);
+				return fn(data.current);
+			},
 			retro: null,
 		});
 	});
@@ -414,7 +425,10 @@ const allPlayStreaks = [
 			el.count,
 			(n) => Math.max(n.current, n.other?.length || 0) || 0
 		),
-		isComplete: checkPlayCount(el.count),
+		isComplete: (data) => {
+			const fn = checkPlayCount(el.count);
+			return fn(data.current);
+		},
 		retro: null,
 	};
 });
@@ -483,7 +497,10 @@ const wordleAchievements = [
 				return old;
 			},
 			getProgress: printProgress(3, (data) => data.current),
-			isComplete: checkPlayCount(3),
+			isComplete: (data) => {
+				const fn = checkPlayCount(3);
+				return fn(data.current);
+			},
 			retro: null,
 		};
 	}),
@@ -952,6 +969,9 @@ const achievements = [
 	},
 ];
 
+// const achievements = streakAchievements.filter(
+// 	(a) => a.games.includes('Wordle') && a.description.indexOf('25') >= 0
+// );
 console.log(`${achievements.length} achievements found`);
 
 // const handleRetroAchievements = async () => {
