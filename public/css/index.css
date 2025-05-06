@@ -236,7 +236,7 @@ a.nav-link:has(a.nav-link:hover) {
 img.mockup {
 	position: relative;
 	max-width: 50vw;
-	max-height: 75vh;
+	max-height: 50vh;
 	z-index: 3;
 }
 
@@ -356,7 +356,7 @@ img.mockup {
 		flex-direction: row;
 		align-items: center;
 		position: relative;
-		height: 75vh;
+		height: 60vh;
 		background-color: var(--bg-dark);
 		overflow-y: hidden;
 		overflow-x: hidden;
@@ -384,9 +384,9 @@ img.mockup {
 		position: absolute;
 		bottom: 5%;
 		left: 55%;
-		max-height: 65vh;
+		max-height: 55vh;
 		max-width: 30vw;
-		transform: rotate(25deg);
+		transform: rotate(15deg);
 	}
 
 	.feature-tile:nth-child(2n) {
@@ -416,6 +416,12 @@ img.mockup {
 	.two-tabs {
 		margin-left: 4em;
 	}
+
+	/* @media (orientation: portrait) {
+		#header {
+
+		}
+	} */
 }
 
 @media (min-width: 1152px) {
