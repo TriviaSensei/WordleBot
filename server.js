@@ -43,8 +43,10 @@ console.log(`Server started at ${dt}`);
 const logInterval = 30 * 60 * 1000;
 const timeLeft = logInterval - (Date.parse(dt) % logInterval);
 
-setTimeout(() => {
-	setInterval(() => {
-		console.log(new Date());
-	}, logInterval);
-}, timeLeft);
+if (process.env.NODE_ENV === 'production') {
+	setTimeout(() => {
+		setInterval(() => {
+			console.log(new Date());
+		}, logInterval);
+	}, timeLeft);
+}
