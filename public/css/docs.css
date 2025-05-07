@@ -20,11 +20,12 @@ body {
 .content-container {
 	display: flex;
 	flex-direction: column;
-	overflow-y: hidden;
+	overflow: hidden;
 }
 .content-inner {
 	max-height: 100%;
 	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 a.contents-toggle {
