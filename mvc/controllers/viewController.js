@@ -45,6 +45,7 @@ exports.httpsRedirect = (req, res, next) => {
 exports.getWordle = catchAsync(async (req, res, next) => {
 	res.status(200).render('faq', {
 		games,
+		donate: process.env.DONATE_LINK,
 		invite: process.env.DISCORD_LINK,
 		install: process.env.DISCORD_INSTALL_LINK,
 	});
@@ -322,6 +323,7 @@ exports.getSettingsPage = catchAsync(async (req, res, next) => {
 exports.getHome = catchAsync(async (req, res, next) => {
 	res.status(200).render('home', {
 		resultCount,
+		donate: process.env.DONATE_LINK,
 		invite: process.env.DISCORD_LINK,
 		install: process.env.DISCORD_INSTALL_LINK,
 		games: games.map((g) => {
@@ -334,6 +336,7 @@ exports.getHome = catchAsync(async (req, res, next) => {
 exports.getDocs = catchAsync(async (req, res, next) => {
 	res.status(200).render('docs', {
 		resultCount,
+		donate: process.env.DONATE_LINK,
 		invite: process.env.DISCORD_LINK,
 		install: process.env.DISCORD_INSTALL_LINK,
 		games: games.map((g) => {
