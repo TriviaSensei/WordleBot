@@ -310,7 +310,7 @@ const handleAchievements = async (data) => {
 		}
 
 		//check for completion
-		const complete = await ga.isComplete(di.progress);
+		const complete = di?.progress ? await ga.isComplete(di.progress) : false;
 		//if complete, write to the data and add it to the toReturn array of completed achievements
 		if (complete) {
 			const { name, id, description } = ga;

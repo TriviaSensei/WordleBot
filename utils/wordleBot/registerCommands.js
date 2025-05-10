@@ -42,6 +42,11 @@ const commands = [
 		name: 'faq',
 		description: "Get a link to this bot's FAQ page",
 	},
+	{
+		name: 'xpost',
+		description:
+			'Set whether to crosspost to your results to other servers when you paste results',
+	},
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.WORDLE_BOT_TOKEN);

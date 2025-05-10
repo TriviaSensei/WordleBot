@@ -51,7 +51,7 @@ const processKeyCaps = (line) => {
 	return toReturn;
 };
 
-const processQuordle = (name) => {
+const processQuordle = (name, maxGuesses) => {
 	return (str) => {
 		const lines = str.split('\n');
 		const tokens = lines[0].split(' ');
@@ -69,7 +69,7 @@ const processQuordle = (name) => {
 					if (r !== 0) scores.push(r);
 					else {
 						failures++;
-						scores.push(9 + failures);
+						scores.push(maxGuesses + failures);
 					}
 				});
 
@@ -384,7 +384,7 @@ const matchers = [
 		regex: /(\uD83D\uDE42(\s)*)?Daily Quordle (\d)+(\n(.*)){2}/g,
 		data: {
 			name: 'Quordle',
-			getData: processQuordle('Quordle'),
+			getData: processQuordle('Quordle', 9),
 			compareData: compareQuordle,
 			checkValidDate: checkValidDateOnly,
 			getCurrentPuzzles: getAvailableDates,
@@ -409,7 +409,7 @@ const matchers = [
 			name: 'Sequence Quordle',
 			checkValidDate: checkValidDateOnly,
 			getCurrentPuzzles: getAvailableDates,
-			getData: processQuordle('Sequence Quordle'),
+			getData: processQuordle('Sequence Quordle', 10),
 			compareData: compareQuordle,
 			getLivePuzzle: (date) => {
 				return getPuzzleNumber(date.split('T')[0], 1082, '2025-01-10');
@@ -432,7 +432,7 @@ const matchers = [
 			name: 'Quordle Extreme',
 			checkValidDate: checkValidDateOnly,
 			getCurrentPuzzles: getAvailableDates,
-			getData: processQuordle('Quordle Extreme'),
+			getData: processQuordle('Quordle Extreme', 8),
 			compareData: compareQuordle,
 			getLivePuzzle: (date) => {
 				return getPuzzleNumber(date.split('T')[0], 165, '2025-01-10');

@@ -312,6 +312,7 @@ gameList.forEach((el, i) => {
 			updateProgress: streakUpdater(el.name),
 			getProgress: printProgress(n, (data) => data),
 			isComplete: (data) => {
+				if (!data) return false;
 				const fn = checkPlayCount(n);
 				return fn(data.current);
 			},
@@ -351,6 +352,7 @@ gameList.forEach((el, i) => {
 				return data || 0;
 			}),
 			isComplete: (data) => {
+				if (!data) return false;
 				const fn = checkPlayCount(n);
 				return fn(data.current);
 			},
@@ -426,6 +428,7 @@ const allPlayStreaks = [
 			(n) => Math.max(n.current, n.other?.length || 0) || 0
 		),
 		isComplete: (data) => {
+			if (!data) return false;
 			const fn = checkPlayCount(el.count);
 			return fn(data.current);
 		},
@@ -463,7 +466,7 @@ const wordleAchievements = [
 			games: ['Wordle'],
 			updateProgress: returnData,
 			getProgress: printProgress(1, () => 0),
-			isComplete: (data) => data.score === el.score,
+			isComplete: (data) => (data ? data.score === el.score : false),
 			retro: getAnyRes('Wordle', (data) => data.score === el.score),
 		};
 	}),
@@ -475,7 +478,7 @@ const wordleAchievements = [
 		games: ['Wordle'],
 		updateProgress: returnData,
 		getProgress: printProgress(1, () => 0),
-		isComplete: (data) => data.hardMode,
+		isComplete: (data) => (data ? data.hardMode : false),
 		retro: getAnyRes('Wordle', (data) => data.hardMode),
 	},
 	...[2, 3].map((n) => {
@@ -498,6 +501,7 @@ const wordleAchievements = [
 			},
 			getProgress: printProgress(3, (data) => data.current),
 			isComplete: (data) => {
+				if (!data) return false;
 				const fn = checkPlayCount(3);
 				return fn(data.current);
 			},
@@ -531,7 +535,7 @@ const quordleAchievements = (game) => {
 				updateProgress: returnData,
 				getProgress: printProgress(1, () => 0),
 				isComplete: (data) =>
-					data.scores.reduce((p, c) => Math.max(p, c)) === n,
+					data ? data.scores.reduce((p, c) => Math.max(p, c)) === n : false,
 				retro: getAnyRes(
 					game,
 					(data) => data.scores.reduce((p, c) => Math.max(p, c)) === n
@@ -548,7 +552,8 @@ const quordleAchievements = (game) => {
 				games: [game],
 				updateProgress: returnData,
 				getProgress: printProgress(1, () => 0),
-				isComplete: (data) => data.scores.reduce((p, c) => p + c, 0) <= n,
+				isComplete: (data) =>
+					data ? data.scores.reduce((p, c) => p + c, 0) <= n : false,
 				retro: getAnyRes(
 					game,
 					(data) =>
@@ -584,7 +589,7 @@ const nytXWordAchievements = [
 			games: ['NYT Crossword'],
 			updateProgress: returnData,
 			getProgress: printProgress(1, () => 0),
-			isComplete: (data) => data.time <= el.time * 60,
+			isComplete: (data) => (data ? data.time <= el.time * 60 : false),
 			retro: getAnyRes('NYT Crossword', (data) => data.time <= el.time * 60),
 		};
 	}),
