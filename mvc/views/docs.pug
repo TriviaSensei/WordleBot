@@ -89,7 +89,7 @@ block content
                         a#install-link.text-truncate(href=`${install}` target="_blank")= install
                     button.btn.btn-primary.copy-link(data-copy-target="#install-link") Copy
                 p Upon successful install, you should see WordleBot added as a user in your server.
-                img(src="/img/docs/02_install_bot.png")
+                img.doc-screenshot(src="/img/docs/02_install_bot.png")
                 p WordleBot successfully installed
                 p Once WordleBot is installed and has joined the server, "signup" can happen. There is no form to fill out, and no personal information is needed. 
                 p Your server is registered as soon as anyone pastes a result in the Discord server. By default, the first channel where a valid result is pasted will be set as the "home" channel, which may be changed later. Only this home channel will be monitored for results. See #[a.command(data-target="command-sethome") sethome] for more detail. 
@@ -302,22 +302,22 @@ block content
                 section#crosspost 
                     h3 Crossposting 
                     p If you happen to belong to multiple servers where WordleBot is installed, you may post your results to all of them with a single post to any of them - WordleBot will post on your behalf everywhere else! You must associate yourself with each server by either posting a valid result or running #[a.command(data-target="command-addme") addme] for this to work - see #[a(data-target="install") install/signup] for details. If you leave a server, WordleBot will no longer post there on your behalf.
-                    img(src="/img/docs/03_crosspost.png")
+                    img.doc-screenshot(src="/img/docs/03_crosspost.png")
                     p WordleBot crossposts on your behalf to your other servers 
             section#leaderboards
                 h3 Leaderboards 
                 p WordleBot creates monthly leaderboards for your server in each game that you choose to track. See #[a.command(data-target="command-setgames") setgames] for details on choosing which games to track. You can access your server leaderboard or your personal stats page by issuing the #[a.command(data-target="command-we") we] or the #[a.command(data-target="command-i") i] commands, respectively. The addresses of these pages do not change, so you may bookmark them for easy access.
                 p Each game comes with a basic set of stats, viewable by default on the leaderboard. Most of the column headers are clickable, which will sort the table by that column. The column headers also come with tooltips, so you may click or mouse-over them to see a short explanation of what they represent.
-                img(src="/img/docs/04_leaderboards.png")
+                img.doc-screenshot(src="/img/docs/04_leaderboards.png")
                 p A section of a leaderboard, sorted by "Avg"
                 p Finally, you may click on any user's avatar or name to go to their personal stats page. 
             section#achievements
                 h3 Achievements 
                 p WordleBot keeps a list of achievements in each game (and some that span multiple games). WordleBot will react to your post with the medal (🎖️) emoji if you unlock an achievement. 
-                img(src="/img/docs/05_achievement_get.png")
+                img.doc-screenshot(src="/img/docs/05_achievement_get.png")
                 p Achievement unlocked!
                 p To view your achievements, go to your personal page (linked with the #[a.command(data-target="command-i") i] command) and select the "Achievements" tab. Locked achievements are grayed out, while unlocked ones are colored in. You may also mouse-over or click any achievement to see a tooltip on the requirements to unlock it.
-                img(src="/img/docs/05_achievements.png")
+                img.doc-screenshot(src="/img/docs/05_achievements.png")
                 p The Achievements area                
             section#commands 
                 h3 Slash Commands 
@@ -338,11 +338,11 @@ block content
                 section#settings 
                     h3 Settings
                     p Access your settings page by issuing the #[a.command(data-target="settings") settings] command. This will give you a one-time-use link to your server settings page, usable for 5 minutes. If you close your settings page and need to edit the settings again, or if you wait too long and the link expires, you may issue the #[a.command(data-target="settings") settings] command again to get a new link.
-                    img(src="/img/docs/06_custom_settings_1.png")
+                    img.doc-screenshot(src="/img/docs/06_custom_settings_1.png")
                     p The link to the settings page 
                     p From the linked page, you may edit the settings for each game. For an explanation of each setting, you may mouse-over or click the #[span.bg-light #[img.game-icon(src="/img/help.svg")]] icon next to the setting.
                     p In general, each game has a "fill in scores" setting, to tell WordleBot what to do about stats if a player does not submit results for a day. Select each option in the "Fill in scores" setting box to see what each one does. Some games also include a setting for scoring penalties if a player loses a game. In general, these are meant to encourage players to play and post results every day, even if they lose or get a bad score.
-                    img(src="/img/docs/06_fill_in.png")
+                    img.doc-screenshot(src="/img/docs/06_fill_in.png")
                     p Fill-in scores settings
                     p A few examples of fill-in policies:
                     ul 
@@ -354,10 +354,10 @@ block content
                 section#public-servers 
                     h3 Public servers 
                     p WordleBot allows you to set your server to be discoverable by fellow daily game players. An admin needs to open your server settings (see #[a.command(data-target="command-settings") settings]) and set the server to public. Your server must have a description and an invite link (recommended to be set to never expire with unlimited uses). Furthermore, your server description and name cannot have any vulgar language.
-                    img(src="/img/docs/06_public.png")
+                    img.doc-screenshot(src="/img/docs/06_public.png")
                     p Setting your server to public
                     p When you set your server to public, it can be found at #[a(href="/servers") https://www.wordlebot.gg/servers], and anyone can join it.
-                    img(src="/img/docs/06_servers.png")
+                    img.doc-screenshot(src="/img/docs/06_servers.png")
                     p List of public servers with join buttons
                     p To revoke an invite link, should it become necessary, follow the steps below. This cannot be undone and you must generate a new invite link and save it to your server #[a.command(data-target="command-settings") settings] to allow people to join again.  
                     .d-flex.flex-row 
@@ -369,42 +369,42 @@ block content
                         ol 
                             li 
                                 p Right-click on your server's icon in your Discord app, and go to Server Settings > Invites
-                                img(src="/img/docs/06_revoke_d_01.png")
+                                img.doc-screenshot(src="/img/docs/06_revoke_d_01.png")
                             li 
                                 p Mouse-over the invite link and click the red X at the top-right corner. The link will be revoked.
-                                img(src="/img/docs/06_revoke_d_02.png")
+                                img.doc-screenshot(src="/img/docs/06_revoke_d_02.png")
 
                     .mobile-instructions.pt-2.w-100
                         ol 
                             li
                                 p Select your server's icon in the Discord app, and go to the server settings 
-                                img(src="/img/docs/06_revoke_m_01.png")
+                                img.doc-screenshot(src="/img/docs/06_revoke_m_01.png")
                             li
                                 p Select the "Settings" icon
-                                img(src="/img/docs/06_revoke_m_02.png")
+                                img.doc-screenshot(src="/img/docs/06_revoke_m_02.png")
                             li
                                 p Scroll to the "User Management" section (near the bottom) and select "Invites"
-                                img(src="/img/docs/06_revoke_m_03.png")
+                                img.doc-screenshot(src="/img/docs/06_revoke_m_03.png")
                             li
                                 p Find the invite link that you wish to revoke, and select the "..." icon on it.
-                                img(src="/img/docs/06_revoke_m_04.png")
+                                img.doc-screenshot(src="/img/docs/06_revoke_m_04.png")
                             li
                                 p Select "Revoke" and the link will be revoked.
-                                img(src="/img/docs/06_revoke_m_05.png")
+                                img.doc-screenshot(src="/img/docs/06_revoke_m_05.png")
                             
                 section#custom-stats 
                     h3 Custom Stats 
                     p WordleBot offers admins a way to create custom stats to include on their leaderboards. As stats have different attributes for different games, custom stats are created for each game individually. Thus, if you have a similar stat that you'd like to see for all three Quordle variants, you will have to recreate it for each game.
                     p To start creating a custom stat, open the #[a.command(data-target="settings") settings] page and click the header for the game for which you want to make a custom stat, and click "New".
-                    img(src="/img/docs/06_settings_custom_stat.png")
+                    img.doc-screenshot(src="/img/docs/06_settings_custom_stat.png")
                     p Creating a custom stat
-                    img(Src="/img/docs/06_custom_stat_window.png")
+                    img.doc-screenshot(src="/img/docs/06_custom_stat_window.png")
                     p The custom stat window
                     p A custom stat consists of two parts: an optional set of filters that subset the data, and a calculation/aggregation to perform on the remaining data.
                     section#stat-settings 
                         h4 Custom Stat Settings 
                         p Custom stats have a series of settings that you can set so that they appear as you wish. 
-                        img(src="/img/docs/06_custom_stat_settings.png")
+                        img.doc-screenshot(src="/img/docs/06_custom_stat_settings.png")
                         p Custom stat settings 
                         ul
                             li Name - an arbitrary name. Must be unique to the game (e.g. you may not create two stats called "Average").
@@ -419,10 +419,10 @@ block content
                         h4 Filters 
                         p You may have any number of filters (including none at all) on the data for each custom calculation. Filters allow you to, for example, create a stat that drops the worst 2 scores of the month, or keep the best 20, or only count the number of times a player gets a 2 on Wordle. Filters are applied before any calculations are performed.
                         p To create a filter, click the "new" button under the "Filters" section of the custom stats window.
-                        img(src="/img/docs/06_filter_button.png")
+                        img.doc-screenshot(src="/img/docs/06_filter_button.png")
                         p Create a new filter 
                         p The create filter window will open and you can create your filter.
-                        img(src="/img/docs/06_filter_window.png")
+                        img.doc-screenshot(src="/img/docs/06_filter_window.png")
                         p The create filter window 
                         p The following settings are available to create filters.
                         ul 
@@ -433,85 +433,85 @@ block content
                                     li Rank filter (or a "keep/drop" filter) - filter the data by keeping or dropping a number of scores from either end of the data. For example, this filter can keep the best 20 scores of the month, or drop the worst 2 scores. #[strong If there is a "keep" filter applied to the data, any player who does not have enough plays to meet the requisite number of data points will have an asterisk next to this stat in the leaderboard and will appear at the bottom of any sort by this stat].
                                     li Data filter - filter the data based on an attribute of the data itself. For example, this filter can keep only the scores that are less than 6, or equal to 2.
                         p After clicking "Save", the filter should appear in the list of filters for this stat.
-                        img(src="/img/docs/06_filter_tile.png")
+                        img.doc-screenshot(src="/img/docs/06_filter_tile.png")
                         p A created filter
                         p You may edit a filter by clicking the pencil icon on its tile, or delete it by clicking the trash can icon.
                     section#calculations
                         h4 Calculations 
                         p The calculations interface may have a bit of a learning curve, but with a little practice it's pretty easy to use. 
-                        img(src="/img/docs/06_custom_calc.png")
+                        img.doc-screenshot(src="/img/docs/06_custom_calc.png")
                         p The custom calculation window
                         p Your custom calculation not contain any unaggregated data items, or else it will not save. For example, placing just the "Score" data item in the calculation area and nothing else will not allow you to save the calculation.
-                        img(src="/img/docs/06_invalid_calc.png")
+                        img.doc-screenshot(src="/img/docs/06_invalid_calc.png")
                         p You must aggregate all data items in your calculation.
-                        img(src="/img/docs/06_valid_calc.png")
+                        img.doc-screenshot(src="/img/docs/06_valid_calc.png")
                         p A simple valid calculation
                         p This quick demo will walk you through a more complex calculation - the standard deviation of the score - to demonstrate the functionality of the calculation interface. Generally, on more complex calculations, we will need to work "out to in", meaning we start with the outermost operations and work our way in.
                         p The formula for the standard deviation of score is below: 
-                        img(src="/img/docs/06_stddev.png")
+                        img.doc-screenshot(src="/img/docs/06_stddev.png")
                         p Standard deviation formula 
                         p We need to take the difference between each score and the average score, square those, and sum the resulting set. Then, divide by the count minus 1, and take the square root of that result. The steps are as follows:
                         ol 
                             li 
                                 p In the calculation interface, start by creating a square root. Note that the square root appears in the "preview" area, and the element inside the square root is now selected by default. Whatever we select next will appear in place of that element.
-                                img(src="/img/docs/calc_1.png")
+                                img.doc-screenshot(src="/img/docs/calc_1.png")
                             li  
                                 p Create the fraction by selecting the "a/b" button 
-                                img(src="/img/docs/calc_2.png")
+                                img.doc-screenshot(src="/img/docs/calc_2.png")
                             li
                                 p We will now create the "count - 1" in the denominator. Click the element in the denominator of the fraction to set it active. A thin blue border should appear around it.
-                                img(src="/img/docs/calc_3.png")
+                                img.doc-screenshot(src="/img/docs/calc_3.png")
                             li
                                 p Click the "a-b" button to create a subtraction 
-                                img(src="/img/docs/calc_4.png")
+                                img.doc-screenshot(src="/img/docs/calc_4.png")
                             li
                                 p Click the "count" aggregation button.
-                                img(src="/img/docs/calc_5.png") 
+                                img.doc-screenshot(src="/img/docs/calc_5.png") 
                             li
                                 p Verify that the element inside the "count" aggregation is active. Select "Score" under "Data Items/Constants" and click "Add" 
-                                img(src="/img/docs/calc_6.png")
+                                img.doc-screenshot(src="/img/docs/calc_6.png")
                             li
                                 p Click the second element in the subtraction in the denominator to set it active 
-                                img(src="/img/docs/calc_7.png")
+                                img.doc-screenshot(src="/img/docs/calc_7.png")
                             li
                                 p Select "(Constant)" under "Data Items/Constants", type in "1" in the value box next to the drop down, and click "Add". The second element in the subtraction should be replaced with a 1.
-                                img(src="/img/docs/calc_8.png")
+                                img.doc-screenshot(src="/img/docs/calc_8.png")
                             li
                                 p We will now work with the numerator. Click the empty element in the numerator to set it active.
-                                img(src="/img/docs/calc_9.png")
+                                img.doc-screenshot(src="/img/docs/calc_9.png")
                             li
                                 p Click the "Sum" aggregation. An empty sum should appear in the numerator.
-                                img(src="/img/docs/calc_10.png")
+                                img.doc-screenshot(src="/img/docs/calc_10.png")
                             li
                                 p Inside the sum, select the a#[sup b] operator.
-                                img(src="/img/docs/calc_11.png")
+                                img.doc-screenshot(src="/img/docs/calc_11.png")
                             li
                                 p Click the exponent to set it active, and set its value to a constant 2, similarly as in step 8.
-                                img(src="/img/docs/calc_12.png")
+                                img.doc-screenshot(src="/img/docs/calc_12.png")
                             li
                                 p Click the base to set it active. 
-                                img(src="/img/docs/calc_13.png")
+                                img.doc-screenshot(src="/img/docs/calc_13.png")
                             li 
                                 p Click on "a-b" to place a difference there.
-                                img(src="/img/docs/calc_14.png")
+                                img.doc-screenshot(src="/img/docs/calc_14.png")
                             li
                                 p Click the first element of the difference to set it active. Select the "Score" data item again and click "Add".
-                                img(src="/img/docs/calc_15.png")
+                                img.doc-screenshot(src="/img/docs/calc_15.png")
                             li
                                 p Click the second element of the difference to set it active. Click the "Avg" aggregation.
-                                img(src="/img/docs/calc_16.png")
+                                img.doc-screenshot(src="/img/docs/calc_16.png")
                             li
                                 p Inside the AVG aggregation, select the "Score" data item again and click "Add".
-                                img(src="/img/docs/calc_17.png")
+                                img.doc-screenshot(src="/img/docs/calc_17.png")
                             li 
                                 p If we've done everything right, the "save" button should be enabled. Save the calculation. The edit calculation window should close, the formula should appear in the preview area in the "custom stat" window, and after specifying the other settings, we should be able to save our custom stat!  
-                                img(src="/img/docs/calc_18.png") 
+                                img.doc-screenshot(src="/img/docs/calc_18.png") 
                             li
                                 p The new stat should appear as a tile under the custom stats area of the game. Press the pencil icon to edit it, or the trash can icon to delete it. If you have multiple custom stats, you can use the arrow icons to change the order in which they appear on your leaderboard.
-                                img(src="/img/docs/calc_19.png")
+                                img.doc-screenshot(src="/img/docs/calc_19.png")
                             li 
                                 p You must click either of the save buttons at the top or bottom of the settings page to save your custom stat, or any other settings you have changed.
-                                img(src="/img/docs/calc_20.png")
+                                img.doc-screenshot(src="/img/docs/calc_20.png")
             section#privacy 
                 h3 Privacy 
                 p No personal information (e-mail, address, phone, etc.) will ever be collected. The data I have is limited to what is available on Discord - your server's name, ID, banner (if applicable), and icon, and your users' username, display name, ID, and profile picture, all of which is publicly available on your discord pages. Only necessary data (e.g. scores, times, etc.) will be saved from pasted game results. The text of the paste and any extra text will not be saved. No data will ever be sold or given to any other party.

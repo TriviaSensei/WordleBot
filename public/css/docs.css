@@ -190,7 +190,7 @@ section img + p {
 	font-size: 0.8em;
 	margin: auto;
 }
-section img {
+section img.doc-screenshot {
 	max-width: 90%;
 }
 section img + p {
@@ -230,7 +230,7 @@ input[type='radio']:checked + label {
 		margin-left: 0;
 		margin-right: 0;
 	}
-	section img {
+	section img.doc-screenshot {
 		max-width: 40%;
 	}
 	.carousel {

@@ -14,7 +14,7 @@ block content
         p.section-header(data-title="Installation" name="install") 
         p Use the following link to install WordleBot on your server. You must have "manage server" permissions on the server in order to install it. If you own or administer the server, it is likely that you have this permission. Clicking on the link will open Discord and prompt you to select a server on which to install WordleBot. You may also copy and paste the link into the chat on the server where you wish to install: 
         .input-group.input-group-sm.mb-3 
-            span.input-group-text #[a(href=`${install}`)]= install
+            span.input-group-text #[a(href=`${install}`)= install]
             button.copy-link(type="button") Copy
         p.section-header(data-title="Basic use" name="use") 
         p After installing WordleBot, start copying and pasting your game results right into your Discord server. WordleBot only monitors one channel per server for results, to avoid cluttering up the server. By default, this channel is the first one where it parses a game result, but you may set it to something else by having an administrator issue the command #[span.command #[a(href="" data-link="commands") sethome]] in the channel where you wish to track results. A warning is given if any results are pasted in a channel other than your Wordle home channel. 
