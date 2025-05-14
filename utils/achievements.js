@@ -14,7 +14,8 @@ const singleActionProgress = (p) => '0/1';
 const printProgress = (n, dataFn) => {
 	return (data) => {
 		try {
-			return `${dataFn(data)}/${n}`;
+			const num = dataFn(data) || 0;
+			return `${num}/${n}`;
 		} catch (err) {
 			return `0/${n}`;
 		}
@@ -132,9 +133,7 @@ const gamePlayColors = ['#a8d4ff', '#a8ffc1', '#ffdc82', '#ffa6a6'];
 			color: gamePlayColors[i],
 			games: [g.name],
 			updateProgress: countPlays,
-			getProgress: printProgress(n, (n) => {
-				return n || 0;
-			}),
+			getProgress: printProgress(n, (n) => n),
 			isComplete: checkPlayCount(n),
 			retro: getCountRetroFunction(id, { game: g.name }, n),
 		});
@@ -348,9 +347,7 @@ gameList.forEach((el, i) => {
 				const fn = streakUpdater(el.name);
 				return fn(old, data);
 			},
-			getProgress: printProgress(n, (data) => {
-				return data || 0;
-			}),
+			getProgress: printProgress(n, (data) => data),
 			isComplete: (data) => {
 				if (!data) return false;
 				const fn = checkPlayCount(n);
