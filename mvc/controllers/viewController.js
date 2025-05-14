@@ -160,7 +160,7 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 										}
 									} else progress = a.getProgress(null);
 								}
-								console.log('hello');
+								console.log(a.name);
 								return (async ({
 									id,
 									name,
