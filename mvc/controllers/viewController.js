@@ -116,9 +116,10 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 									);
 								let progress;
 								if (!completedAchievement) {
-									const di = result.data.playerData.achievements.progress?.find(
-										(p) => p.name === a.dataItem
-									);
+									const di =
+										result?.data?.playerData?.achievements?.progress?.find(
+											(p) => p.name === a.dataItem
+										);
 									if (di) {
 										//it's not a streak achievement, so just get the progress
 										if (!a.streak) progress = a.getProgress(di.progress);
