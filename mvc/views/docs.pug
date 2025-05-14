@@ -12,7 +12,7 @@ block navmenu
                 a.contents-toggle(data-bs-toggle="offcanvas" href="#contents" role="button" aria-controls="contents") Contents
 
 block content 
-    #contents.offcanvas.offcanvas-end.text-bg-dark(data-bs-scroll="true" data-bs-backdrop="true" tabindex="-1" aria-labelledby="contents-label")
+    #contents.offcanvas.offcanvas-end.text-bg-dark(data-bs-scroll="true" tabindex="-1" aria-labelledby="contents-label")
         .offcanvas-header 
             h5#contents-label.offcanvas-title Contents 
             button.btn-close(type="button" data-bs-dismiss="offcanvas" aria-label="Close")
@@ -84,7 +84,7 @@ block content
             section#install 
                 h2 Install/Signup
                 p Use the following link to install WordleBot on your server. You must have "manage server" permissions on the server in order to install it. If you own or administer the server, it is likely that you have this permission. Clicking on the link will open Discord and prompt you to select a server on which to install WordleBot. You may also copy and paste the link into the chat on the server where you wish to install:
-                .copy-text.w-100.d-flex.flex-row.align-items-center.justify-content-center
+                .copy-text.d-flex.flex-row.align-items-center.justify-content-center
                     span.input-group-text.text-truncate
                         a#install-link.text-truncate(href=`${install}` target="_blank")= install
                     button.btn.btn-primary.copy-link(data-copy-target="#install-link") Copy
@@ -452,66 +452,86 @@ block content
                         p Standard deviation formula 
                         p We need to take the difference between each score and the average score, square those, and sum the resulting set. Then, divide by the count minus 1, and take the square root of that result. The steps are as follows:
                         ol 
-                            li 
-                                p In the calculation interface, start by creating a square root. Note that the square root appears in the "preview" area, and the element inside the square root is now selected by default. Whatever we select next will appear in place of that element.
-                                img.doc-screenshot(src="/img/docs/calc_1.png")
+                            li
+                                .list-item-inner
+                                    p In the calculation interface, start by creating a square root. Note that the square root appears in the "preview" area, and the element inside the square root is now selected by default. Whatever we select next will appear in place of that element.
+                                    img.doc-screenshot(src="/img/docs/calc_1.png")
                             li  
-                                p Create the fraction by selecting the "a/b" button 
-                                img.doc-screenshot(src="/img/docs/calc_2.png")
+                                .list-item-inner
+                                    p Create the fraction by selecting the "a/b" button 
+                                    img.doc-screenshot(src="/img/docs/calc_2.png")
                             li
-                                p We will now create the "count - 1" in the denominator. Click the element in the denominator of the fraction to set it active. A thin blue border should appear around it.
-                                img.doc-screenshot(src="/img/docs/calc_3.png")
+                                .list-item-inner
+                                    p We will now create the "count - 1" in the denominator. Click the element in the denominator of the fraction to set it active. A thin blue border should appear around it.
+                                    img.doc-screenshot(src="/img/docs/calc_3.png")
                             li
-                                p Click the "a-b" button to create a subtraction 
-                                img.doc-screenshot(src="/img/docs/calc_4.png")
+                                .list-item-inner
+                                    p Click the "a-b" button to create a subtraction 
+                                    img.doc-screenshot(src="/img/docs/calc_4.png")
                             li
-                                p Click the "count" aggregation button.
-                                img.doc-screenshot(src="/img/docs/calc_5.png") 
+                                .list-item-inner
+                                    p Click the "count" aggregation button.
+                                    img.doc-screenshot(src="/img/docs/calc_5.png") 
                             li
-                                p Verify that the element inside the "count" aggregation is active. Select "Score" under "Data Items/Constants" and click "Add" 
-                                img.doc-screenshot(src="/img/docs/calc_6.png")
+                                .list-item-inner
+                                    p Verify that the element inside the "count" aggregation is active. Select "Score" under "Data Items/Constants" and click "Add" 
+                                    img.doc-screenshot(src="/img/docs/calc_6.png")
                             li
-                                p Click the second element in the subtraction in the denominator to set it active 
-                                img.doc-screenshot(src="/img/docs/calc_7.png")
+                                .list-item-inner
+                                    p Click the second element in the subtraction in the denominator to set it active 
+                                    img.doc-screenshot(src="/img/docs/calc_7.png")
                             li
-                                p Select "(Constant)" under "Data Items/Constants", type in "1" in the value box next to the drop down, and click "Add". The second element in the subtraction should be replaced with a 1.
-                                img.doc-screenshot(src="/img/docs/calc_8.png")
+                                .list-item-inner
+                                    p Select "(Constant)" under "Data Items/Constants", type in "1" in the value box next to the drop down, and click "Add". The second element in the subtraction should be replaced with a 1.
+                                    img.doc-screenshot(src="/img/docs/calc_8.png")
                             li
-                                p We will now work with the numerator. Click the empty element in the numerator to set it active.
-                                img.doc-screenshot(src="/img/docs/calc_9.png")
+                                .list-item-inner
+                                    p We will now work with the numerator. Click the empty element in the numerator to set it active.
+                                    img.doc-screenshot(src="/img/docs/calc_9.png")
                             li
-                                p Click the "Sum" aggregation. An empty sum should appear in the numerator.
-                                img.doc-screenshot(src="/img/docs/calc_10.png")
+                                .list-item-inner
+                                    p Click the "Sum" aggregation. An empty sum should appear in the numerator.
+                                    img.doc-screenshot(src="/img/docs/calc_10.png")
                             li
-                                p Inside the sum, select the a#[sup b] operator.
-                                img.doc-screenshot(src="/img/docs/calc_11.png")
+                                .list-item-inner
+                                    p Inside the sum, select the a#[sup b] operator.
+                                    img.doc-screenshot(src="/img/docs/calc_11.png")
                             li
-                                p Click the exponent to set it active, and set its value to a constant 2, similarly as in step 8.
-                                img.doc-screenshot(src="/img/docs/calc_12.png")
+                                .list-item-inner
+                                    p Click the exponent to set it active, and set its value to a constant 2, similarly as in step 8.
+                                    img.doc-screenshot(src="/img/docs/calc_12.png")
                             li
-                                p Click the base to set it active. 
-                                img.doc-screenshot(src="/img/docs/calc_13.png")
+                                .list-item-inner
+                                    p Click the base to set it active. 
+                                    img.doc-screenshot(src="/img/docs/calc_13.png")
                             li 
-                                p Click on "a-b" to place a difference there.
-                                img.doc-screenshot(src="/img/docs/calc_14.png")
+                                .list-item-inner
+                                    p Click on "a-b" to place a difference there.
+                                    img.doc-screenshot(src="/img/docs/calc_14.png")
                             li
-                                p Click the first element of the difference to set it active. Select the "Score" data item again and click "Add".
-                                img.doc-screenshot(src="/img/docs/calc_15.png")
+                                .list-item-inner
+                                    p Click the first element of the difference to set it active. Select the "Score" data item again and click "Add".
+                                    img.doc-screenshot(src="/img/docs/calc_15.png")
                             li
-                                p Click the second element of the difference to set it active. Click the "Avg" aggregation.
-                                img.doc-screenshot(src="/img/docs/calc_16.png")
+                                .list-item-inner
+                                    p Click the second element of the difference to set it active. Click the "Avg" aggregation.
+                                    img.doc-screenshot(src="/img/docs/calc_16.png")
                             li
-                                p Inside the AVG aggregation, select the "Score" data item again and click "Add".
-                                img.doc-screenshot(src="/img/docs/calc_17.png")
+                                .list-item-inner
+                                    p Inside the AVG aggregation, select the "Score" data item again and click "Add".
+                                    img.doc-screenshot(src="/img/docs/calc_17.png")
                             li 
-                                p If we've done everything right, the "save" button should be enabled. Save the calculation. The edit calculation window should close, the formula should appear in the preview area in the "custom stat" window, and after specifying the other settings, we should be able to save our custom stat!  
-                                img.doc-screenshot(src="/img/docs/calc_18.png") 
+                                .list-item-inner
+                                    p If we've done everything right, the "save" button should be enabled. Save the calculation. The edit calculation window should close, the formula should appear in the preview area in the "custom stat" window, and after specifying the other settings, we should be able to save our custom stat!  
+                                    img.doc-screenshot(src="/img/docs/calc_18.png") 
                             li
-                                p The new stat should appear as a tile under the custom stats area of the game. Press the pencil icon to edit it, or the trash can icon to delete it. If you have multiple custom stats, you can use the arrow icons to change the order in which they appear on your leaderboard.
-                                img.doc-screenshot(src="/img/docs/calc_19.png")
+                                .list-item-inner
+                                    p The new stat should appear as a tile under the custom stats area of the game. Press the pencil icon to edit it, or the trash can icon to delete it. If you have multiple custom stats, you can use the arrow icons to change the order in which they appear on your leaderboard.
+                                    img.doc-screenshot(src="/img/docs/calc_19.png")
                             li 
-                                p You must click either of the save buttons at the top or bottom of the settings page to save your custom stat, or any other settings you have changed.
-                                img.doc-screenshot(src="/img/docs/calc_20.png")
+                                .list-item-inner
+                                    p You must click either of the save buttons at the top or bottom of the settings page to save your custom stat, or any other settings you have changed.
+                                    img.doc-screenshot(src="/img/docs/calc_20.png")
             section#privacy 
                 h3 Privacy 
                 p No personal information (e-mail, address, phone, etc.) will ever be collected. The data I have is limited to what is available on Discord - your server's name, ID, banner (if applicable), and icon, and your users' username, display name, ID, and profile picture, all of which is publicly available on your discord pages. Only necessary data (e.g. scores, times, etc.) will be saved from pasted game results. The text of the paste and any extra text will not be saved. No data will ever be sold or given to any other party.

@@ -26,6 +26,9 @@ body {
 	max-height: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
 }
 
 a.contents-toggle {
@@ -192,16 +195,21 @@ section img + p {
 }
 section img.doc-screenshot {
 	max-width: 90%;
+	margin-bottom: 2em;
 }
 section img + p {
 	font-weight: bold;
 	margin-bottom: 1em;
 }
+.list-item-inner {
+	display: flex;
+	flex-direction: column;
+}
 section li > img {
 	margin-bottom: 0.5em;
 }
 section {
-	width: 100%;
+	width: min(100%, 992px);
 }
 
 input[type='radio'] {
