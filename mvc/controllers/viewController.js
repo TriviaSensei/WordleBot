@@ -111,12 +111,12 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 					? await Promise.all(
 							achievements.map(async (a, i) => {
 								const completedAchievement =
-									result.data.playerData.achievements.completed.find(
+									result?.data?.playerData?.achievements?.completed?.find(
 										(ca) => ca.id === a.id
 									);
 								let progress;
 								if (!completedAchievement) {
-									const di = result.data.playerData.achievements.progress.find(
+									const di = result.data.playerData.achievements.progress?.find(
 										(p) => p.name === a.dataItem
 									);
 									if (di) {
