@@ -420,10 +420,9 @@ const allPlayStreaks = [
 				} else return newData;
 			}
 		},
-		getProgress: printProgress(
-			el.count,
-			(n) => Math.max(n.current, n.other?.length || 0) || 0
-		),
+		getProgress: printProgress(el.count, (n) => {
+			return Math.max(n.current, n.other?.length || 0) || 0;
+		}),
 		isComplete: (data) => {
 			if (!data) return false;
 			const fn = checkPlayCount(el.count);
