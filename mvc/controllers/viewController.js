@@ -143,14 +143,15 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 											if (!lastPostDate) progress = a.getProgress(0);
 											else {
 												const nextDate = getNextDate(lastPostDate);
-												if (a.name === 'A start')
+												if (a.name === 'A start') {
 													console.log(nextDate, currentPuzzleDates);
-
+													console.log(di);
+												}
 												if (currentPuzzleDates.includes(nextDate))
 													progress = a.getProgress(
 														Math.max(
 															di.progress.current,
-															di.progress.other?.length || 0
+															di.progress.other ? di.progress.other.length : 0
 														)
 													);
 												else
