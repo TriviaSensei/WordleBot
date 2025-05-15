@@ -301,7 +301,7 @@ exports.checkServerSettings = catchAsync(async (req, res, next) => {
 			: { guildId: req.params.id }
 	);
 	if (!server)
-		return res.status(200).render(`wordle/404`, {
+		return res.status(200).render(`404`, {
 			data: { code: 404, message: 'Server not found' },
 		});
 	const defaultSettings = games
