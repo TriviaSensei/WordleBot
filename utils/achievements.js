@@ -4,8 +4,6 @@ const gameList = require('./gameList');
 const moment = require('moment-timezone');
 const { matchers } = require('./parseResult');
 const getNextDate = require('./getNextDate');
-const { connections } = require('mongoose');
-const { jsx } = require('react/jsx-runtime');
 const timezone = process.env.DEFAULT_TIMEZONE;
 //just sets the progress to the last thing submitted - usually for single-action achievements
 const returnData = (old, result) => result.data;
