@@ -5,6 +5,7 @@ const moment = require('moment-timezone');
 const { matchers } = require('./parseResult');
 const getNextDate = require('./getNextDate');
 const { connections } = require('mongoose');
+const { jsx } = require('react/jsx-runtime');
 const timezone = process.env.DEFAULT_TIMEZONE;
 //just sets the progress to the last thing submitted - usually for single-action achievements
 const returnData = (old, result) => result.data;
@@ -297,7 +298,7 @@ const streakColors = [
 	'#fa93ee',
 ];
 gameList.forEach((el, i) => {
-	[10, 25, 50, 100, 365, 1000].forEach((n) => {
+	[10, 25, 50, 100, 365, 1000].forEach((n, j) => {
 		const name = el.name.toLowerCase().split(' ').join('-');
 		const id = `${name}-streak-${n}`;
 		streakAchievements.push({
@@ -305,7 +306,7 @@ gameList.forEach((el, i) => {
 			name: `${el.name} streak - ${n}`,
 			dataItem: `streak-${name}`,
 			description: `Play ${el.name} for ${n} consecutive days`,
-			color: streakColors[i],
+			color: streakColors[j],
 			games: [el.name],
 			streak: true,
 			updateProgress: streakUpdater(el.name),
@@ -329,7 +330,7 @@ gameList.forEach((el, i) => {
 			: el.name === 'Digits'
 			? 'Get 20 stars on Digits'
 			: `Win at ${el.name}`;
-	[10, 25, 50, 100, 365].forEach((n) => {
+	[10, 25, 50, 100, 365].forEach((n, j) => {
 		const name = el.name.toLowerCase().split(' ').join('-');
 		const id = `${name}-win-streak-${n}`;
 		streakAchievements.push({
@@ -337,7 +338,7 @@ gameList.forEach((el, i) => {
 			name: `${el.name} win streak - ${n}`,
 			dataItem: `win-streak-${name}`,
 			description: `${desc} for ${n} consecutive days`,
-			color: streakColors[i],
+			color: streakColors[j],
 			games: [el.name],
 			streak: true,
 			updateProgress: (old, data) => {
