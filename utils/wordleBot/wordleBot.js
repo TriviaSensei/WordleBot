@@ -56,7 +56,7 @@ const url = process.env.DISCORD_API_URL;
 const client = new Client({
 	intents: [
 		IntentsBitField.Flags.Guilds,
-		IntentsBitField.Flags.GuildMembers,
+		// IntentsBitField.Flags.GuildMembers,
 		IntentsBitField.Flags.GuildMessages,
 		IntentsBitField.Flags.MessageContent,
 	],
