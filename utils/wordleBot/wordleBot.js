@@ -464,28 +464,32 @@ const checkCorrectChannel = async (srvr, msg, ...suppressWarnings) => {
 	if (suppressWarnings.length === 0) suppressWarnings = false;
 	else suppressWarnings = suppressWarnings[0];
 	if (srvr.channelId && srvr.channelId !== msg.channelId) {
-		const correctChannel = await axios.get(
-			`${url}/channels/${srvr.channelId}`,
-			authObj
-		);
-		if (correctChannel) {
-			if (!suppressWarnings)
-				addMessage({
-					channelId: msg.channelId,
-					data: {
-						content: `<@${msg.author.id}> This channel is not being monitored for game results. Please post them in <#${correctChannel.data.id}>, or have an administrator run "/sethome" here.`,
-						message_reference: {
-							type: 0,
-							message_id: msg.id,
+		try {
+			const correctChannel = await axios.get(
+				`${url}/channels/${srvr.channelId}`,
+				authObj
+			);
+			if (correctChannel) {
+				if (!suppressWarnings)
+					addMessage({
+						channelId: msg.channelId,
+						data: {
+							content: `<@${msg.author.id}> This channel is not being monitored for game results. Please post them in <#${correctChannel.data.id}>, or have an administrator run "/sethome" here.`,
+							message_reference: {
+								type: 0,
+								message_id: msg.id,
+							},
 						},
-					},
-					flags: MessageFlags.Ephemeral,
-				});
+						flags: MessageFlags.Ephemeral,
+					});
+				return false;
+			} else {
+				srvr.channelId = msg.channelId;
+				srvr.markModified('channelId');
+				await srvr.save();
+			}
+		} catch (err) {
 			return false;
-		} else {
-			srvr.channelId = msg.channelId;
-			srvr.markModified('channelId');
-			await srvr.save();
 		}
 	} else if (!srvr.channelId) {
 		srvr.channelId = msg.channelId;
