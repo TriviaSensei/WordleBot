@@ -30,8 +30,6 @@ const {
 } = require('../controllers/wordleController');
 
 exports.httpsRedirect = (req, res, next) => {
-	console.log(req.header('host'));
-	console.log(req.headers.host);
 	if (
 		process.env.NODE_ENV === 'production' &&
 		req.headers.host !== `localhost:${process.env.PORT}`
