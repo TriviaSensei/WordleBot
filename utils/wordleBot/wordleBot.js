@@ -1020,13 +1020,6 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 	const correctChannel = await checkCorrectChannel(srvr, newMessage);
 	if (!correctChannel) return;
 
-	// check the current discord user data against what we have in the DB,
-	// if it exists, and update the data accordingly
-	const usr = await updateUserData(newMessage.author.id);
-
-	//update the list of users on the server, and the list of servers on the user, if necessary
-	await updateLists(usr, srvr);
-
 	//3 categories of things can happen: adding, removing, or editing entries
 	// we could just delete the original info from the DB and re-add whatever is in the edited message,
 	// but that would take longer and we would not have the necessary information to acknowledge the request
@@ -1059,6 +1052,13 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 	});
 
 	if (added.length > 0) {
+		// check the current discord user data against what we have in the DB,
+		// if it exists, and update the data accordingly
+		const usr = await updateUserData(newMessage.author.id);
+
+		//update the list of users on the server, and the list of servers on the user, if necessary
+		await updateLists(usr, srvr);
+
 		const { failures, successes } = await processResults(usr, added);
 
 		if (failures.length !== 0) {
