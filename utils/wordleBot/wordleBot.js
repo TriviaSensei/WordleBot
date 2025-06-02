@@ -940,38 +940,35 @@ client.on('messageCreate', async (msg) => {
 
 	//handle crossposting message if user is part of multiple servers
 	const serversToRemove = [];
-	if (false && checkCorrectServer(srvr.guildId)) {
+
+	if (checkCorrectServer(srvr.guildId)) {
 		usr.servers.forEach(async (s) => {
 			if (s._id.toString() !== srvr._id.toString()) {
 				const otherServer = await Servers.findById(s._id);
 				if (!checkCorrectServer(otherServer.guildId)) return;
 				if (otherServer && otherServer.channelId) {
 					//make sure the member is still a part of that server (in discord's record)
-					const members = await axios.get(
-						`${url}/guilds/${otherServer.guildId}/members`,
-						authObj
-					);
-					if (
-						members &&
-						!members.data &&
-						members.data.some((m) => m.user.id === msg.author.id)
-					) {
-						serversToRemove.push(s._id);
-						return;
-					}
-					const toSend = successes.filter((su) => {
-						return otherServer.games.includes(su.name);
-					});
-
-					if (toSend.length > 0)
-						return addMessage({
-							channelId: otherServer.channelId,
-							data: {
-								content: `On behalf of <@${msg.author.id}>:\n${toSend
-									.map((su) => su.match)
-									.join('\n\n')}`,
-							},
+					try {
+						await axios.get(
+							`${url}/guilds/${otherServer.guildId}/members/${msg.author.id}`,
+							authObj
+						);
+						const toSend = successes.filter((su) => {
+							return otherServer.games.includes(su.name);
 						});
+
+						if (toSend.length > 0)
+							return addMessage({
+								channelId: otherServer.channelId,
+								data: {
+									content: `On behalf of <@${msg.author.id}>:\n${toSend
+										.map((su) => su.match)
+										.join('\n\n')}`,
+								},
+							});
+					} catch (err) {
+						serversToRemove.push(s._id);
+					}
 				}
 			}
 			return null;
