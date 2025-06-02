@@ -938,8 +938,9 @@ client.on('messageCreate', async (msg) => {
 		});
 	}
 
+	//handle crossposting message if user is part of multiple servers
 	const serversToRemove = [];
-	if (checkCorrectServer(srvr.guildId)) {
+	if (false && checkCorrectServer(srvr.guildId)) {
 		usr.servers.forEach(async (s) => {
 			if (s._id.toString() !== srvr._id.toString()) {
 				const otherServer = await Servers.findById(s._id);
