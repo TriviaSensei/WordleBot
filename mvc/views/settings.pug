@@ -51,10 +51,10 @@ block content
                                     .input-header.fw-semibold 
                                         span= item.label
                                         img.help(src=`/img/help.svg` data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title=`${item.description}`)
-                                    .input-container 
+                                    .input-container.w-100
                                         - if (item.type==="number")
                                             input(type="number" min=`${item.min}` max=`${item.max}` name=`${item.name}` value=`${item.value}`)
-                                        - else 
+                                        - else if (item.enum)
                                             select(name=`${item.name}`)
                                                 each e in item.enum 
                                                     - if (e.label && e.description)
@@ -68,6 +68,20 @@ block content
                                                         - else
                                                             option(value=`${e}` data-description=`${e}`)= e
                                             .select-description
+                                        - else if (item.name === 'sort')
+                                            .sort-container
+                                                .f-1.d-flex.flex-column.sorts-outer
+                                                    .sc-header.fw-semibold Used
+                                                    .sort-item-container.selected-sorts
+                                                .f-1.d-flex.flex-column.sorts-outer
+                                                    .sc-header.fw-semibold Unused
+                                                    .sort-item-container.unselected-sorts
+                                                .sort-control-container
+                                                    .sc-header
+                                                    button.move-up 
+                                                    button.move-over 
+                                                    button.move-down
+
                        
                         .input-header.fw-semibold.px-2 Custom Stats
                         .custom-stats-container.px-2.pb-2

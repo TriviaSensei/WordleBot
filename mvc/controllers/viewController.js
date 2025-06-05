@@ -266,6 +266,7 @@ exports.getSettingsPage = catchAsync(async (req, res, next) => {
 				}),
 			};
 		});
+
 	// defaultSettings.forEach((ds) => {
 	// 	console.log(ds.name);
 	// 	ds.settings.forEach((item) => console.log(item));
@@ -308,6 +309,7 @@ exports.getSettingsPage = catchAsync(async (req, res, next) => {
 					display: d.display,
 				};
 			}),
+			sortItems: g.sortItems,
 		};
 	});
 

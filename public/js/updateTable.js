@@ -34,7 +34,8 @@ export const updateTable = (
 	formatCell,
 	rowOperators,
 	columnOperators,
-	customStats
+	customStats,
+	sortOrder
 ) => {
 	//run each row operator, adding a summary column for each one
 	const header = table.querySelector('tr.header-row');
@@ -267,7 +268,10 @@ export const updateTable = (
 			cc.appendChild(lc);
 			newHeader.appendChild(cc);
 
-			if (op.sortable) newHeader.addEventListener('click', sortTable);
+			if (op.sortable) {
+				newHeader.addEventListener('click', sortTable);
+				if (op.id) newHeader.setAttribute('data-column-id', op.id);
+			}
 			if (op.tooltip) new bootstrap.Tooltip(newHeader);
 
 			header.insertBefore(newHeader, firstHeader);
@@ -305,7 +309,11 @@ export const updateTable = (
 			});
 			if (op.sortable) sortIndex++;
 
-			if (op.initialSort && customStats?.every((cs) => !cs.defaultSort))
+			if (
+				!sortOrder &&
+				op.initialSort &&
+				customStats?.every((cs) => !cs.defaultSort)
+			)
 				sortTable({ target: newHeader });
 		}
 	});
@@ -319,6 +327,7 @@ export const updateTable = (
 				attributes: {
 					'sort-index': sortIndex,
 					'default-sort': cs.sortOrder,
+					'column-id': cs.id,
 				},
 				children: [
 					{
@@ -409,7 +418,17 @@ export const updateTable = (
 				r.insertBefore(cell, firstCell);
 			});
 			sortIndex++;
-			if (cs.defaultSort) sortTable({ target: newHeader });
+			if (!sortOrder && cs.defaultSort) sortTable({ target: newHeader });
+		});
+	}
+
+	//handle sorting the table
+	if (sortOrder) {
+		sortOrder.reverse().forEach((id) => {
+			const header = table.querySelector(
+				`.summary-header[data-column-id="${id}"]`
+			);
+			if (header) sortTable({ target: header });
 		});
 	}
 };

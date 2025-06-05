@@ -34,14 +34,30 @@ area.addEventListener('data-update', (e) => {
 	};
 	const operators = [
 		gamesPlayed,
-		{ ...average((data) => data.rarity), defaultSort: -1, initialSort: true },
+		{
+			...average((data) => data.rarity),
+			id: 'avg-rarity',
+			heading: 'AvgR',
+			defaultSort: -1,
+			initialSort: true,
+		},
+		{
+			...average((data) => data.correct),
+			id: 'avg-correct',
+			heading: 'AvgC',
+			defaultSort: 1,
+			initialSort: false,
+		},
 	];
-
+	const sortOrder = e.detail.serverData?.settings
+		?.find((s) => s.name === area.getAttribute('data-game'))
+		?.settings?.find((s) => s.name === 'sort')?.value;
 	updateTable(
 		table,
 		getCellValue,
 		operators,
 		page === 'server' ? operators : [],
-		e.detail.serverData?.customStats
+		e.detail.serverData?.customStats,
+		sortOrder
 	);
 });

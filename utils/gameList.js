@@ -44,6 +44,44 @@ const defaultFillIn = {
 	description:
 		'What to do if a player does not post results for a day - only affects average scores, and will never count as a "played" game.',
 };
+
+const defaultSortOrder = (defaultValues) => {
+	return {
+		name: 'sort',
+		label: 'Sort order',
+		default: defaultValues,
+		description:
+			'The order by which to sort the columns. Each column will be sorted in its default direction.',
+	};
+};
+
+const sortItems = {
+	played: {
+		id: 'games-played',
+		label: 'Games Played',
+	},
+	won: {
+		id: 'games-won',
+		label: 'Games Won',
+	},
+	pct: {
+		id: 'win-pct',
+		label: 'Win %',
+	},
+	avg: {
+		id: 'avg',
+		label: 'Avg',
+	},
+	avgScore: {
+		id: 'avg-score',
+		label: 'Average Score',
+	},
+	avgSum: {
+		id: 'avg-sum',
+		label: 'Average Sum',
+	},
+};
+
 const quordleSettings = [
 	{
 		...defaultFillIn,
@@ -79,6 +117,7 @@ const quordleSettings = [
 		description:
 			'The penalty for each unguessed word. An unfinished game will have a score of 9 + [N] x (number of unguessed words)',
 	},
+	defaultSortOrder(['avg-sum', 'avg-score']),
 ];
 const quordleDataItems = [
 	{
@@ -93,6 +132,13 @@ const quordleDataItems = [
 		getData: (data) => data.scores.reduce((p, c) => p + c),
 		sortOrder: 1,
 	},
+];
+const quordleSortItems = [
+	sortItems.played,
+	sortItems.won,
+	sortItems.pct,
+	sortItems.avgScore,
+	sortItems.avgSum,
 ];
 
 const crosswordSettings = {
@@ -122,6 +168,7 @@ const crosswordSettings = {
 			],
 			default: 'Server worst+',
 		},
+		defaultSortOrder(['avg-time']),
 	],
 	dataItems: [
 		{
@@ -129,6 +176,16 @@ const crosswordSettings = {
 			display: 'Time',
 			getData: (data) => data.time,
 			sortOrder: 1,
+		},
+	],
+	sortItems: [
+		{
+			id: 'played',
+			label: 'Completed',
+		},
+		{
+			id: 'avg-time',
+			label: 'Average Time',
 		},
 	],
 };
@@ -149,6 +206,7 @@ const gameList = [
 							'Unplayed days are counted as the same as the worst played score on the server that day, plus 1 (no worse than the score for a loss)',
 					},
 				],
+				default: 'Loss',
 			},
 			{
 				name: 'failureScore',
@@ -159,6 +217,7 @@ const gameList = [
 				description:
 					'The score given to a player if they lose a game of Wordle',
 			},
+			defaultSortOrder(['avg']),
 		],
 		dataItems: [
 			{
@@ -168,12 +227,14 @@ const gameList = [
 				sortOrder: 1,
 			},
 		],
+		sortItems: [sortItems.avg, sortItems.played, sortItems.won, sortItems.pct],
 	},
 	{
 		name: 'Quordle',
 		script: true,
 		url: 'https://www.merriam-webster.com/games/quordle/',
 		settings: quordleSettings,
+		sortItems: quordleSortItems,
 		dataItems: quordleDataItems,
 	},
 	{
@@ -182,6 +243,7 @@ const gameList = [
 		url: 'https://www.merriam-webster.com/games/quordle/#/sequence',
 		settings: quordleSettings,
 		dataItems: quordleDataItems,
+		sortItems: quordleSortItems,
 	},
 	{
 		name: 'Quordle Extreme',
@@ -189,6 +251,7 @@ const gameList = [
 		url: 'https://www.merriam-webster.com/games/quordle/#/extreme',
 		settings: quordleSettings,
 		dataItems: quordleDataItems,
+		sortItems: quordleSortItems,
 	},
 	{
 		name: 'Tightrope',
@@ -224,6 +287,12 @@ const gameList = [
 				default: '0',
 				description: 'What to do if a player does not post results for a day.',
 			},
+			defaultSortOrder([
+				'avg-score',
+				'avg-time',
+				'avg-correct',
+				'games-played',
+			]),
 		],
 		dataItems: [
 			{
@@ -249,6 +318,20 @@ const gameList = [
 				display: 'Time',
 				getData: (data) => data.time,
 				sortOrder: 1,
+			},
+		],
+		sortItems: [
+			sortItems.played,
+			sortItems.won,
+			sortItems.pct,
+			sortItems.avgScore,
+			{
+				id: 'avg-correct',
+				label: 'Average Correct',
+			},
+			{
+				id: 'avg-time',
+				label: 'Average Time (wins)',
 			},
 		],
 	},
@@ -296,6 +379,7 @@ const gameList = [
 				],
 				default: 'Server worst +1',
 			},
+			defaultSortOrder(['avg-score', 'win-pct']),
 		],
 		dataItems: [
 			{
@@ -311,6 +395,7 @@ const gameList = [
 				sortOrder: 1,
 			},
 		],
+		sortItems: [sortItems.played, sortItems.won, sortItems.pct, sortItems.avg],
 	},
 	{
 		name: 'Digits',
@@ -344,6 +429,7 @@ const gameList = [
 				],
 				default: '0',
 			},
+			defaultSortOrder(['avg']),
 		],
 		dataItems: [
 			{
@@ -353,6 +439,7 @@ const gameList = [
 				sortOrder: -1,
 			},
 		],
+		sortItems: [sortItems.played, sortItems.avg],
 	},
 	{
 		name: 'Immaculate Grid',
@@ -386,6 +473,7 @@ const gameList = [
 				],
 				default: '900',
 			},
+			defaultSortOrder(['avg-rarity', 'avg-correct']),
 		],
 		dataItems: [
 			{
@@ -399,6 +487,14 @@ const gameList = [
 				display: 'Rarity',
 				getData: (data) => data.rarity,
 				sortOrder: 1,
+			},
+		],
+		sortItems: [
+			sortItems.played,
+			sortItems.avg,
+			{
+				id: 'avg-correct',
+				label: 'Average Correct',
 			},
 		],
 	},

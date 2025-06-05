@@ -49,6 +49,7 @@ const handleDataUpdate = (e) => {
 		},
 		{
 			...average((d) => d.time, 0),
+			id: 'avg-time',
 			displayValue: (data) => {
 				if (data.plays === 0) return '-';
 				const avg = Math.round(data.total / data.plays);
@@ -56,13 +57,16 @@ const handleDataUpdate = (e) => {
 			},
 		},
 	];
-
+	const sortOrder = e.detail.serverData?.settings
+		?.find((s) => s.name === area.getAttribute('data-game'))
+		?.settings?.find((s) => s.name === 'sort')?.value;
 	updateTable(
 		table,
 		getCellValue,
 		operators,
 		page === 'server' ? operators : [],
-		e.detail.serverData?.customStats
+		e.detail.serverData?.customStats,
+		sortOrder
 	);
 };
 

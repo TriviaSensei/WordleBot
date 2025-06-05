@@ -40,6 +40,86 @@ body {
 	align-items: center;
 }
 
+.sort-container {
+	display: flex;
+	flex-direction: row;
+	height: 8em;
+	width: 100%;
+}
+
+.sort-item-container {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid black;
+	padding: 0.2em;
+	flex: 1;
+	position: relative;
+	.sort-tag {
+		width: 100%;
+		input[type='radio'] {
+			display: none;
+		}
+		label {
+			width: 100%;
+		}
+		input[type='radio']:checked + label {
+			font-weight: bold;
+			background-color: var(--light-green);
+		}
+	}
+	overflow-y: auto;
+}
+
+.sc-header {
+	height: 1.5em;
+	font-size: 0.8em;
+}
+
+.sort-container > div:has(.sort-item-container.selected-sorts) {
+	order: 1;
+}
+
+.sort-container > div:has(.sort-item-container.unselected-sorts) {
+	order: 3;
+}
+
+.sort-control-container {
+	order: 2;
+	display: flex;
+	flex-direction: column;
+	width: min(20%, 3em);
+	button {
+		width: 1.5em;
+		height: 1.5em;
+		display: flex;
+		padding: 0;
+		margin: auto;
+	}
+	button::after {
+		content: '';
+		margin: auto;
+		background-image: url('/img/move-down.svg');
+		background-repeat: no-repeat;
+		background-size: contain;
+		width: 100%;
+		height: 100%;
+	}
+	.move-up {
+		transform: rotate(180deg);
+	}
+}
+
+.move-over {
+	transform: rotate(270deg);
+}
+
+.sort-container
+	div:has(.unselected-sorts input[type='radio']:checked)
+	+ .sort-control-container
+	> .move-over {
+	transform: rotate(90deg);
+}
+
 img.help {
 	height: 1em;
 	width: 1em;

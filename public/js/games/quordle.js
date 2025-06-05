@@ -64,6 +64,7 @@ const handleDataUpdate = (maxGuesses) => {
 				...average((data) => {
 					return data.scores.reduce((p, c) => Math.max(p, c), 0);
 				}, 2),
+				id: 'avg-score',
 				heading: 'Avg',
 				initialSort: true,
 				tooltip: `Average guesses to complete the puzzle (failures count as ${maxGuesses} + the number of failed quadrants)`,
@@ -72,19 +73,23 @@ const handleDataUpdate = (maxGuesses) => {
 				...average((data) => {
 					return data.scores.reduce((p, c) => p + c);
 				}, 2),
+				id: 'avg-sum',
 				heading: 'Avg Σ',
 				tooltip: `Average total of all 4 quadrants. Failed quadrants count as ${
 					maxGuesses + 1
 				}, ${maxGuesses + 2}, etc.`,
 			},
 		];
-
+		const sortOrder = e.detail.serverData?.settings
+			?.find((s) => s.name === area.getAttribute('data-game'))
+			?.settings?.find((s) => s.name === 'sort')?.value;
 		updateTable(
 			table,
 			getCellValue,
 			[gamesPlayed, gamesWon(winFn), ...operators],
 			page === 'server' ? [gamesWon(winFn), gamesPlayed, ...operators] : [],
-			e.detail.serverData?.customStats
+			e.detail.serverData?.customStats,
+			sortOrder
 		);
 	};
 };

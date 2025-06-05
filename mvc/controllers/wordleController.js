@@ -333,7 +333,8 @@ exports.checkServerSettings = catchAsync(async (req, res, next) => {
 		await server.save();
 	} else {
 		defaultSettings.forEach((ds) => {
-			if (!server.settings.find((s) => s.name === ds.name)) {
+			const setting = server.settings.find((s) => s.name === ds.name);
+			if (!setting) {
 				server.settings.push({
 					name: ds.name,
 					settings: ds.settings.map((setting) => {
@@ -342,6 +343,18 @@ exports.checkServerSettings = catchAsync(async (req, res, next) => {
 							value: setting.default,
 						};
 					}),
+				});
+			} else {
+				ds.settings.forEach((s) => {
+					const existingSetting = setting.settings.find(
+						(s2) => s2.name === s.name
+					);
+					if (!existingSetting) {
+						setting.settings.push({
+							name: s.name,
+							value: s.default,
+						});
+					}
 				});
 			}
 		});
@@ -505,6 +518,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 		if (!Array.isArray(req.body.settings))
 			return next(new AppError('Invalid settings submitted', 400));
 
+		// console.log(req.body.settings);
 		req.body.settings.forEach((gameSetting) => {
 			/**
 			 * data: {
@@ -527,6 +541,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 			gameSetting.settings.forEach((gs) => {
 				//verify the setting is one of the named ones on the server
 				const serverSetting = data.settings.find((d) => d.name === gs.name);
+				if (gameSetting.name === 'Wordle') console.log(serverSetting);
 				if (!serverSetting)
 					return failures.push(
 						`Setting ${gs.name} not found for game ${data.name}`

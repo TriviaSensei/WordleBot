@@ -2,7 +2,6 @@ const area = document.querySelector('#tightrope-tab-pane');
 import { updateTable } from '../updateTable.js';
 import { createElement } from '../utils/createElementFromSelector.js';
 import { getPage } from '../utils/page.js';
-import { getElementArray } from '../utils/getElementArray.js';
 import { gamesPlayed, gamesWon, winPercent, average } from './_general.js';
 
 area.addEventListener('data-update', (e) => {
@@ -42,6 +41,7 @@ area.addEventListener('data-update', (e) => {
 			if (c.misses >= 3) return null;
 			return c.time;
 		}, 2),
+		id: 'avg-time',
 		heading: 'Avg Time',
 		tooltip: 'Average time (wins only)',
 	};
@@ -55,6 +55,7 @@ area.addEventListener('data-update', (e) => {
 				return c.score;
 			}, 0),
 			heading: 'Avg',
+			id: 'avg-score',
 			tooltip: 'Average score',
 			initialSort: true,
 			defaultSort: -1,
@@ -63,6 +64,7 @@ area.addEventListener('data-update', (e) => {
 			...average((c) => {
 				return c.correctAnswers;
 			}, 2),
+			id: 'avg-correct',
 			heading: 'AvgC',
 			tooltip: 'Average correct',
 		},
@@ -87,12 +89,15 @@ area.addEventListener('data-update', (e) => {
 		},
 		avgTime,
 	];
-
+	const sortOrder = e.detail.serverData?.settings
+		?.find((s) => s.name === area.getAttribute('data-game'))
+		?.settings?.find((s) => s.name === 'sort')?.value;
 	updateTable(
 		table,
 		getCellValue,
 		rowOperators,
 		page === 'server' ? columnOperators : [],
-		e.detail.serverData?.customStats
+		e.detail.serverData?.customStats,
+		sortOrder
 	);
 });

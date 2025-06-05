@@ -1,4 +1,5 @@
 export const gamesPlayed = {
+	id: 'games-played',
 	heading: 'Played',
 	sortable: true,
 	defaultSort: -1,
@@ -13,6 +14,7 @@ export const gamesPlayed = {
 
 export const gamesWon = (fn) => {
 	return {
+		id: 'games-won',
 		heading: 'Won',
 		sortable: true,
 		defaultSort: -1,
@@ -28,6 +30,7 @@ export const gamesWon = (fn) => {
 
 export const winPercent = (fn) => {
 	return {
+		id: 'win-pct',
 		heading: 'Pct',
 		sortable: true,
 		defaultSort: -1,
@@ -69,6 +72,7 @@ export const winPercent = (fn) => {
 
 export const average = (fn, ...digits) => {
 	return {
+		id: 'avg',
 		heading: 'Avg',
 		sortable: true,
 		defaultSort: 1,

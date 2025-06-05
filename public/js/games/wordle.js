@@ -10,16 +10,6 @@ const lsItem = 'wordle-solution-cache';
 
 const table = area.querySelector('.standings-table');
 
-let settings = [
-	{
-		name: 'fillIn',
-		value: 'Loss',
-	},
-	{
-		name: 'failureScore',
-		value: 7,
-	},
-];
 const bgColors = [
 	'#dad2e9',
 	'#badfcd',
@@ -30,23 +20,9 @@ const bgColors = [
 	'#000000',
 ];
 
-const setSettings = (s) => {
-	if (!Array.isArray(s)) return;
-	s.forEach((setting) => {
-		const currentSetting = settings.find((el) => el.name === setting.name);
-		if (!currentSetting) return;
-		currentSetting.value = setting.value;
-	});
-};
-
 area.addEventListener('data-update', (e) => {
 	if (!table) return;
 	if (!e.detail) return;
-	let newSettings = e.detail?.serverData?.settings?.find(
-		(s) => s.name === 'Wordle'
-	)?.settings;
-	if (newSettings) setSettings(newSettings);
-
 	// handleFillIns();
 	const getCellValue = (c) => {
 		const dataStr = c.getAttribute('data');
@@ -234,12 +210,16 @@ area.addEventListener('data-update', (e) => {
 					},
 			  ]
 			: [getWord];
+	const sortOrder = e.detail.serverData?.settings
+		?.find((s) => s.name === area.getAttribute('data-game'))
+		?.settings?.find((s) => s.name === 'sort')?.value;
 	updateTable(
 		table,
 		getCellValue,
 		rowOperators,
 		columnOperators,
-		e.detail.serverData?.customStats
+		e.detail.serverData?.customStats,
+		sortOrder
 	);
 	maxes.forEach((m, i) => {
 		const bars = getElementArray(table, `.bar.bar-${i}`);

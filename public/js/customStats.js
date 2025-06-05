@@ -3,6 +3,7 @@ import { getElementArray } from './utils/getElementArray.js';
 import { showMessage } from './utils/messages.js';
 import { createElement } from './utils/createElementFromSelector.js';
 import { handleRequest } from './utils/requestHandler.js';
+import { createSortTag } from './utils/sortTag.js';
 import { gameList } from './gameList.js';
 
 const initialFilter = {
@@ -21,7 +22,6 @@ const initialStat = {
 	heading: '',
 	description: '',
 	allowFillIn: false,
-	defaultSort: false,
 	sortOrder: 1,
 	decimalPlaces: 2,
 	format: 'number',
@@ -58,7 +58,6 @@ const statName = document.querySelector('#stat-name');
 const statHeader = document.querySelector('#stat-header');
 const statDescription = document.querySelector('#stat-description');
 const allowFillIn = document.querySelector('#allow-fill-in');
-const defaultSort = document.querySelector('#default-sort');
 const newStatButtons = getElementArray(document, 'button.new-stat');
 const sortOrder = getElementArray(
 	document,
@@ -399,6 +398,8 @@ const deleteStat = () => {
 	const statDiv = document.querySelector(
 		`.accordion-item[data-game="${game}"] .custom-stat[data-id="${id}"]`
 	);
+	const tag = document.querySelector(`.sort-tag[data-id="${id}"]`);
+	if (tag) tag.remove();
 	statDiv.remove();
 	deleteStatModal.hide();
 	hideAllTooltips();
@@ -882,7 +883,6 @@ activeStat.addWatcher(null, (state) => {
 	statHeader.value = state.heading;
 	statDescription.value = state.description;
 	allowFillIn.checked = state.allowFillIn;
-	defaultSort.checked = state.defaultSort;
 	decimalPlaces.value = Number(state.decimalPlaces) || 0;
 	if (state.sortOrder === -1) sortOrder[1].checked = true;
 	else sortOrder[0].checked = true;
@@ -912,14 +912,7 @@ allowFillIn.addEventListener('change', () => {
 		};
 	});
 });
-defaultSort.addEventListener('change', () => {
-	activeStat.setState((prev) => {
-		return {
-			...prev,
-			defaultSort: defaultSort.checked,
-		};
-	});
-});
+
 sortOrder.forEach((s) =>
 	s.addEventListener('change', handleSetState('sortOrder'))
 );
@@ -1041,6 +1034,14 @@ saveStat.addEventListener('click', () => {
 					id,
 					game: gameName.value,
 				});
+				const tag = createSortTag(g.game, {
+					id,
+					label: state.name,
+				});
+				const container = document.querySelector(
+					`.accordion-item[data-game="${g.game}"] .unselected-sorts`
+				);
+				if (container) container.appendChild(tag);
 				state.id = id;
 				return true;
 			}
@@ -1048,19 +1049,6 @@ saveStat.addEventListener('click', () => {
 		});
 	}
 
-	//if default sort was checked, set everything else for that game as not the default sort
-	if (state.defaultSort) {
-		stats.some((stat) => {
-			if (stat.game === stat.game) {
-				stat.stats.forEach((s) => {
-					if (s.id !== state.id) s.defaultSort = false;
-				});
-				return true;
-			}
-			return false;
-		});
-	}
-	//we matched something (in the if-statement above), or we pushed it (in the block). save the data either way.
 	statList.setState(stats);
 
 	//clear the active stat and calculation
@@ -1077,12 +1065,22 @@ const handleSaveSettings = () => {
 	const stats = statList.getState();
 	const settings = getElementArray(document, '.setting-container').map((c) => {
 		const name = c.getAttribute('data-name');
-		const settings = getElementArray(c, 'input, select').map((i) => {
+		const settings = getElementArray(
+			c,
+			'input:not([type="radio"]), select'
+		).map((i) => {
 			return {
 				name: i.getAttribute('name'),
 				value: i.value,
 			};
 		});
+		const sorts = {
+			name: 'sort',
+			value: getElementArray(c, '.selected-sorts > .sort-tag').map((t) =>
+				t.getAttribute('data-id')
+			),
+		};
+		settings.push(sorts);
 		return { name, settings };
 	});
 	const serverSettings = {

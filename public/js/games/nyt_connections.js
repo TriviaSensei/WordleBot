@@ -99,6 +99,7 @@ area.addEventListener('data-update', (e) => {
 		winPercent(winFn),
 		{
 			...average(avgFn),
+			id: 'avg-score',
 			defaultSort: 1,
 			initialSort: true,
 		},
@@ -112,12 +113,15 @@ area.addEventListener('data-update', (e) => {
 		average(avgFn),
 		individuals,
 	];
-
+	const sortOrder = e.detail.serverData?.settings
+		?.find((s) => s.name === area.getAttribute('data-game'))
+		?.settings?.find((s) => s.name === 'sort')?.value;
 	updateTable(
 		table,
 		getCellValue,
 		rowOperators,
 		page === 'server' ? columnOperators : [],
-		e.detail.serverData?.customStats
+		e.detail.serverData?.customStats,
+		sortOrder
 	);
 });

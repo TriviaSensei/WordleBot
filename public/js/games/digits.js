@@ -22,14 +22,22 @@ area.addEventListener('data-update', (e) => {
 
 	const operators = [
 		gamesPlayed,
-		{ ...average((data) => data.score), defaultSort: -1, initialSort: true },
+		{
+			...average((data) => data.score),
+			id: 'avg',
+			defaultSort: -1,
+			initialSort: true,
+		},
 	];
-
+	const sortOrder = e.detail.serverData?.settings
+		?.find((s) => s.name === area.getAttribute('data-game'))
+		?.settings?.find((s) => s.name === 'sort')?.value;
 	updateTable(
 		table,
 		getCellValue,
 		operators,
 		page === 'server' ? operators : [],
-		e.detail.serverData?.customStats
+		e.detail.serverData?.customStats,
+		sortOrder
 	);
 });
