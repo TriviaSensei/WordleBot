@@ -541,7 +541,6 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 			gameSetting.settings.forEach((gs) => {
 				//verify the setting is one of the named ones on the server
 				const serverSetting = data.settings.find((d) => d.name === gs.name);
-				if (gameSetting.name === 'Wordle') console.log(serverSetting);
 				if (!serverSetting)
 					return failures.push(
 						`Setting ${gs.name} not found for game ${data.name}`
