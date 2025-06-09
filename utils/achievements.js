@@ -223,7 +223,11 @@ const streakUpdater = (game) => {
 		if (!dates.includes(thisDate)) return old;
 		//it's a later date
 		//streak-continuing date is past - we need to start a new streak
-		else if (!dates.includes(nextDate)) {
+		else if (
+			dates.every((d) => {
+				return new Date(d) > new Date(nextDate);
+			})
+		) {
 			const temp = [...old.other, thisDate].sort(
 				(a, b) => new Date(a) - new Date(b)
 			);
