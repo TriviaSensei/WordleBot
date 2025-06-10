@@ -837,7 +837,12 @@ client.on('interactionCreate', async (data) => {
 client.on('messageCreate', async (msg) => {
 	if (!checkCorrectServer(msg.guildId)) return;
 
-	if (msg.author.id === me.id) return;
+	if (!msg.author) {
+		console.log('No msg author');
+		console.log(msg);
+		return;
+	} else if (!me) return console.log('Me not defined');
+	if (!msg?.author || !me || msg.author.id === me.id) return;
 
 	// check the current discord server data against what we have in the DB,
 	// if it exists, and update the data accordingly
