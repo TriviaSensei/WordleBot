@@ -667,7 +667,8 @@ client.on('interactionCreate', async (data) => {
 	const { commandName } = data;
 
 	let content;
-	if (commandName.toLowerCase() === 'i')
+	if (!commandName) return;
+	else if (commandName.toLowerCase() === 'i')
 		content = `Here is your personal stats page: https://${hostname}/player/${data.user.id}`;
 	else if (commandName.toLowerCase() === 'we')
 		content = `Here is your server stats page: https://${hostname}/server/${data.guildId}`;
