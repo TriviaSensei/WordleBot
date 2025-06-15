@@ -794,9 +794,7 @@ const matchers = [
 				if (currentHr < 6) {
 					const dt = new Date();
 					dt.setDate(dt.getDate() - 1);
-					console.log(dt);
-					const a = moment.tz(Date.parse(dt), timezone);
-					console.log(a);
+					const a = moment.tz(Date.parse(dt), timezone).format();
 					return [a.split('T')[0]];
 				}
 				return [currentDT.split('T')[0]];
