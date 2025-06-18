@@ -404,7 +404,9 @@ const allPlayStreaks = [
 						});
 					})
 					.sort((a, b) => a.localeCompare(b));
-				const stillLive = currentPuzzleDates.includes(nextDate);
+				const stillLive =
+					currentPuzzleDates.includes(nextDate) ||
+					currentPuzzleDates.every((cpd) => new Date(nextDate) > new Date(cpd));
 				//if there is no game that would continue the streak, start a new one
 				if (!stillLive) {
 					const lastPost = moment.tz(data.date, 'GMT').format().split('T')[0];
