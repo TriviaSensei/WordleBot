@@ -172,8 +172,11 @@ const streakUpdater = (game) => {
 		//if no data, check to make sure we should't break the streak
 		if (!data) {
 			if (!old) return null;
-			//if the necessary date is no longer current, we lost the streak.
-			if (!dates.includes(nextDate)) {
+			//if the necessary date is past, we lost the streak.
+			if (
+				!dates.includes(nextDate) &&
+				dates.every((dt) => new Date(dt) > new Date(nextDate))
+			) {
 				let current = 0;
 				let lastPost = null;
 				//check other saved posts to see if we should start with a new streak of 0 or something else
