@@ -70,6 +70,35 @@ document.addEventListener('DOMContentLoaded', () => {
 			b.classList.add('selected');
 		});
 	});
+	const changeLetterResult = (e) => {
+		const parent = e.target.closest('.guess-row');
+		const box = e.target.closest('.box');
+		if (!parent || !box) return;
+		const row = Number(parent.getAttribute('data-row'));
+		const col = Number(box.getAttribute('data-box'));
+		const state = sh.getState();
+		if (
+			state.guesses[row].word[col] !== '' &&
+			state.activeRow === row &&
+			state.activeBox === col
+		) {
+			return sh.setState((prev) => {
+				const newState = {
+					...prev,
+				};
+				newState.guesses[row].result[col] =
+					(newState.guesses[row].result[col] + 1) % 3;
+				return newState;
+			});
+		}
+		sh.setState((prev) => {
+			return {
+				...prev,
+				activeRow: row,
+				activeBox: col,
+			};
+		});
+	};
 	boxes.forEach((b) => {
 		sh.addWatcher(b, (e) => {
 			const inner = e.target.querySelector('div');
@@ -85,49 +114,25 @@ document.addEventListener('DOMContentLoaded', () => {
 				res === 0 ? 'gray' : res === 1 ? 'yellow' : 'green'
 			);
 		});
-		b.addEventListener('click', (e) => {
-			const parent = e.target.closest('.guess-row');
-			const box = e.target.closest('.box');
-			if (!parent || !box) return;
-			const row = Number(parent.getAttribute('data-row'));
-			const col = Number(box.getAttribute('data-box'));
-			const state = sh.getState();
-			if (
-				state.guesses[row].word[col] !== '' &&
-				state.activeRow === row &&
-				state.activeBox === col
-			) {
-				return sh.setState((prev) => {
-					const newState = {
-						...prev,
-					};
-					newState.guesses[row].result[col] =
-						(newState.guesses[row].result[col] + 1) % 3;
-					return newState;
-				});
-			}
-			sh.setState((prev) => {
-				return {
-					...prev,
-					activeRow: row,
-					activeBox: col,
-				};
-			});
-		});
+		b.addEventListener('click', changeLetterResult);
 	});
 
 	const keys = getElementArray(document, '.Key');
 	const letters = 'abcdefghijklmnopqrstuvwxyz';
 	const handleKey = (e) => {
-		let key = e.key?.toLowerCase() || e.target.getAttribute('data-key');
+		if (e.stopPropagation) e.stopPropagation();
+		let key = e.key?.toLowerCase() || e.target?.getAttribute('data-key');
+		if (!key) return false;
 
 		if (key === 'backspace' || key === 'delete') key = 'del';
 		if (key === 'return') key = 'enter';
+		if (e.key === ' ') key = 'space';
 
-		if (key.length === 1 && letters.indexOf(key) >= 0) {
+		if (key === 'tab' || (key.length === 1 && letters.indexOf(key) >= 0)) {
 			sh.setState((prev) => {
 				const newState = { ...prev };
-				newState.guesses[prev.activeRow].word[prev.activeBox] = key;
+				if (key !== 'tab')
+					newState.guesses[prev.activeRow].word[prev.activeBox] = key;
 				if (prev.activeRow !== 4 || prev.activeBox !== 4) {
 					newState.activeBox = (newState.activeBox + 1) % 5;
 					if (newState.activeBox === 0) newState.activeRow++;
@@ -169,7 +174,12 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 			}
 			sh.setState(state);
-		} else return;
+		} else if (key === 'space') {
+			const activeBox = document.querySelector('.box.selected');
+			if (activeBox) changeLetterResult({ target: activeBox });
+		}
+		if (e?.target?.blur) e.target.blur();
+		return false;
 	};
 	//highlight keys when pressed
 	const handleKeyPress = (e) => {
@@ -208,7 +218,27 @@ document.addEventListener('DOMContentLoaded', () => {
 	const incorrectFilter = (letter, position) => {
 		return (word) => word.indexOf(letter) < 0;
 	};
-	const filterFunctions = [incorrectFilter, positionFilter, correctFilter];
+	//count filter - the word has less than [count] instances of the letter
+	const countFilterLT = (letter, count) => {
+		return (word) =>
+			word.split('').reduce((p, c) => {
+				return p + (c === letter ? 1 : 0);
+			}, 0) < count;
+	};
+	//other count filter - the word has at least [count] instances of the letter
+	const countFilterGTE = (letter, count) => {
+		return (word) =>
+			word.split('').reduce((p, c) => {
+				return p + (c === letter ? 1 : 0);
+			}, 0) >= count;
+	};
+	const filterFunctions = [
+		incorrectFilter,
+		positionFilter,
+		correctFilter,
+		countFilterLT,
+		countFilterGTE,
+	];
 
 	sh.addWatcher(solutions, (e) => {
 		const state = e.detail;
@@ -220,69 +250,135 @@ document.addEventListener('DOMContentLoaded', () => {
 		)
 			return;
 
-		const filters = [[], [], []];
+		const filters = [];
 		let valid = true;
+		//first find all correctly placed letters
 		state.guesses.forEach((g) => {
 			if (!valid) return;
 			if (g.word.some((l) => l === '')) return;
-			g.word.forEach((l, i) => {
-				if (!valid || !l) return;
-				const res = g.result[i];
-				switch (res) {
-					case 0:
-						if (
-							filters[1].some((f) => f.letter === l) ||
-							filters[2].some((f) => f.letter === l)
-						) {
-							valid = false;
+			g.result.forEach((r, i) => {
+				if (!valid) return;
+				//if this was indicated as a correctly placed letter...
+				if (r === 2) {
+					//see if something else was shown to be correct here
+					let push = true;
+					filters.some((f) => {
+						//correct filter in this same position
+						if (f.type === 2 && f.position === i) {
+							//different letter indicated correct here, so this is invalid
+							if (f.letter !== g.word[i]) valid = false;
+							//same letter, so don't push it again
+							else push = false;
+							return true;
 						}
-						break;
-					case 1:
-						if (
-							filters[0].some((f) => f.letter === l) ||
-							filters[2].some((f) => f.letter === l && f.position === i)
-						) {
-							valid = false;
-						}
-						break;
-					case 2:
-						if (
-							filters[0].some((f) => f.letter === l) ||
-							filters[1].some((f) => f.letter === l && f.position === i)
-						) {
-							valid = false;
-						}
-					default:
-						break;
-				}
-				if (
-					valid &&
-					filters[res].every((f) => {
-						return f.letter !== l || f.position !== i;
-					})
-				) {
-					filters[res].push({
-						letter: l,
-						position: i,
+						return false;
+					});
+					if (valid && push)
+						filters.push({
+							type: 2,
+							letter: g.word[i],
+							position: i,
+						});
+					//count which instance this is
+					const n = g.word.reduce(
+						(p, c, j) =>
+							p + (c === g.word[i] && j <= i && g.result[j] !== 0 ? 1 : 0),
+						0
+					);
+					//there are at least [n] instances of this letter
+					filters.push({
+						type: 4,
+						letter: g.word[i],
+						position: n,
 					});
 				}
 			});
 		});
 		if (!valid) return;
-		const allFilters = [
-			...filters[0].map((f) => {
-				return filterFunctions[0](f.letter);
-			}),
-			...filters[1].map((f) => {
-				return filterFunctions[1](f.letter, f.position);
-			}),
-			...filters[2].map((f) => {
-				return filterFunctions[2](f.letter, f.position);
-			}),
-		];
+
+		//now find all yellow letters
+		state.guesses.forEach((g) => {
+			if (!valid) return;
+			if (g.word.some((l) => l === '')) return;
+			g.result.forEach((r, i) => {
+				if (!valid) return;
+				if (r === 1) {
+					//see if it was elsewhere indicated as correct here
+					if (
+						filters.some(
+							(f) => f.letter === g.word[i] && f.position === i && f.type === 2
+						)
+					) {
+						valid = false;
+						return;
+					}
+
+					//the letter is definitely present, but not in this spot
+					filters.push({
+						type: 1,
+						letter: g.word[i],
+						position: i,
+					});
+
+					//count which instance this is
+					const n = g.word.reduce(
+						(p, c, j) => p + (c === g.word[i] && j <= i ? 1 : 0),
+						0
+					);
+					//there are at least [n] instances of this letter
+					filters.push({
+						type: 4,
+						letter: g.word[i],
+						position: n,
+					});
+				}
+			});
+		});
+		if (!valid) return;
+
+		//now deal with all gray letters
+		state.guesses.forEach((g) => {
+			if (!valid) return;
+			if (g.word.some((l) => l === '')) return;
+			g.result.forEach((r, i) => {
+				if (!valid) return;
+				if (r === 0) {
+					//make sure we didn't previously indicate it to be a correct letter in this position
+					if (
+						filters.some(
+							(f) => f.type === 2 && f.letter === g.word[i] && f.position === i
+						)
+					) {
+						valid = false;
+						return;
+					}
+					//count how many correct instances of this letter we have - there are exactly this many instances of this letter
+					const n = g.word.reduce(
+						(p, c, j) => p + (c === g.word[i] && g.result[j] !== 0 ? 1 : 0),
+						0
+					);
+					//there are less than [n+1] instances of this letter
+					filters.push({
+						type: 3,
+						letter: g.word[i],
+						position: n + 1,
+					});
+				}
+			});
+		});
+
+		const allFilters = filters.map((f) =>
+			filterFunctions[f.type](f.letter, f.position)
+		);
+
+		const keyword = '';
+		if (keyword) console.log(filters);
 		let validSolutions = allFilters
-			.reduce((p, c) => {
-				return p.filter(c);
+			.reduce((p, c, i) => {
+				const next = p.filter(c);
+				if (keyword && !next.includes(keyword))
+					console.log(`${keyword} was filtered out on filter ${i}`);
+				return next;
 			}, data.answers)
 			.sort((a, b) => a.localeCompare(b));
 		validSolutions.forEach((s) => {
