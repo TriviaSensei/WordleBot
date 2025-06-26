@@ -8,6 +8,7 @@ router.get('/', viewController.getHome);
 router.get('/docs/:scrollTo?', viewController.getDocs);
 router.get('/faq', viewController.getWordle);
 router.get('/servers', viewController.getServers);
+router.get('/helper', viewController.getHelper);
 router.get(
 	'/settings/:token',
 	wordleController.checkServerSettings,

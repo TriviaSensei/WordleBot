@@ -1,0 +1,93 @@
+:root {
+	--key-bg: #444;
+	--key-pressed: blue;
+	--white: #fff;
+}
+
+.container-inner {
+	width: 100%;
+	height: 100%;
+	padding: 1em;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.grid-container {
+	display: flex;
+	flex-direction: column;
+	.guess-row {
+		margin: auto;
+		margin-bottom: 0.1em;
+		display: flex;
+		flex-direction: row;
+		.box {
+			width: 2.5rem;
+			height: 2.5rem;
+			display: flex;
+			border: 1px solid #aaa;
+			margin: 0.1em;
+			text-align: center;
+			color: white;
+			div {
+				font-size: 1.5rem;
+				text-align: center;
+				margin: auto;
+			}
+		}
+		.box.gray {
+			background-color: #787c7f;
+		}
+		.box.yellow {
+			background-color: #c9b457;
+		}
+		.box.green {
+			background-color: #6baa64;
+		}
+	}
+	.guess-row.selected {
+		border: 2px solid blue;
+		.box.selected {
+			border: 2px solid black;
+		}
+	}
+	.guess-row.invalid {
+		border: 2px solid red;
+	}
+}
+
+.solution-container {
+	label {
+		font-size: 0.8em;
+	}
+	input[type='radio'] + label {
+		border: 1px solid black;
+		padding: 0.1em 1em;
+	}
+	input[type='radio'] {
+		display: none;
+	}
+	input[type='radio']:checked + label {
+		background-color: #6baa64;
+		color: white;
+	}
+	flex: 1;
+	div:has(input[type='radio'][value='unused']:checked) + .solution-list {
+		.solution.used {
+			display: none;
+		}
+	}
+	.solution {
+		text-transform: uppercase;
+		margin-right: 0.5em;
+		margin-bottom: 0.2em;
+		border: 1px solid black;
+		border-radius: 2px;
+		padding: 0.2em;
+		height: 1.5em;
+	}
+	.solution.used {
+		border: 1px solid red;
+	}
+}

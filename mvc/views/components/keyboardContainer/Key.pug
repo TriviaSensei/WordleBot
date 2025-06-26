@@ -1,0 +1,6 @@
+mixin Key(letter)
+    - if (letter)
+        button(class=`Key${letter==='enter' || letter==='del' ? ' Wide-Key' : ''}` data-key=`${letter}`)
+            .Key-Contents(data-key=`${letter}`)= `${letter.toUpperCase()}`
+    - else 
+        .Key-Placeholder

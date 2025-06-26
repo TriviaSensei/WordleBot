@@ -1,0 +1,7 @@
+include keyboardContainer/KeyRow
+
+- var keys = [['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],[null, 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', null],['enter', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'del']];
+
+.Keyboard-Container
+    each row in keys 
+        +KeyRow(row)

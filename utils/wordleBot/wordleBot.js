@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Servers = require('../../mvc/models/serverModel');
 const Users = require('../../mvc/models/userModel');
 const Results = require('../../mvc/models/resultModel');
+const GameData = require('../../mvc/models/gameDataModel');
+
 const { v4: uuidV4 } = require('uuid');
 const {
 	Client,
@@ -14,7 +16,6 @@ const moment = require('moment-timezone');
 const { parseResult } = require('../parseResult');
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SG_API_KEY);
-
 const timezone = process.env.DEFAULT_TIMEZONE;
 const hostname =
 	process.env.NODE_ENV === 'development'

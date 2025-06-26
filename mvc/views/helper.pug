@@ -1,0 +1,32 @@
+extends _base
+
+block styles 
+    link(rel="stylesheet" href="/css/helper.css")
+    link(rel="stylesheet" href="/css/keyboardContainer.css")
+
+
+block content
+    .container-inner
+        .grid-container.fw-semibold
+            - var i = 0
+            - while (i<5)
+                .guess-row(data-row=`${i}`)
+                    - var j = 0
+                    - while (j<5)
+                        .box(data-box=`${j}`)
+                            div
+                        - j++
+                - i++
+        .solution-container.overflow-hidden
+            .w-100.h-100.f-1.overflow-hidden.d-flex.flex-column.align-items-center
+                .d-flex.flex-row.mb-1
+                    input#show-unused(type="radio" name="display-solutions" value="unused" checked) 
+                    label(for="show-unused") Unused Only
+                    input#show-all(type="radio" name="display-solutions" value="all")
+                    label.me-3(for="show-all") Show All
+                .w-100.solution-list.d-flex.flex-row.flex-wrap.overflow-auto
+
+            
+        include components/KeyboardContainer
+block scripts
+    script(src="/js/helper.js" type="module")

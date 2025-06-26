@@ -3,6 +3,7 @@ const moment = require('moment-timezone');
 
 const Servers = require('../models/serverModel');
 const Results = require('../models/resultModel');
+const GameData = require('../models/gameDataModel');
 const catchAsync = require('../../utils/catchAsync');
 const AppError = require('../../utils/appError');
 const games = require('../../utils/gameList');
@@ -13,6 +14,30 @@ const { promises } = require('fs');
 const path = require('path');
 
 const timezone = process.env.DEFAULT_TIMEZONE;
+
+console.log(`Importing dictionary...`);
+const fs = require('fs');
+
+let dict = fs
+	.readFileSync(
+		path.join(__dirname, '../../utils/wordleBot/wordlist.txt'),
+		'utf8'
+	)
+	.split('\n')
+	.map((el) => {
+		return el.trim();
+	});
+console.log(`${dict.length} valid guesses read`);
+let answers = fs
+	.readFileSync(
+		path.join(__dirname, '../../utils/wordleBot/answers.txt'),
+		'utf8'
+	)
+	.split('\n')
+	.map((el) => {
+		return el.trim();
+	});
+console.log(`${answers.length} valid answers read`);
 
 let resultCount = null;
 const getResultCount = async () => {
@@ -371,6 +396,15 @@ exports.getServers = catchAsync(async (req, res, next) => {
 		servers,
 	});
 });
+
+exports.getHelper = async (req, res, next) => {
+	const history = await GameData.find().sort({
+		date: 1,
+	});
+	res.status(200).render('helper', {
+		data: { dictionary: dict, answers, history },
+	});
+};
 
 exports.redirectToIndex = (req, res, next) => {
 	if (req.originalUrl !== '/favicon.ico') return res.redirect(`/`);
