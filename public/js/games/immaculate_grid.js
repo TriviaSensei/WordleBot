@@ -19,8 +19,11 @@ area.addEventListener('data-update', (e) => {
 				const ca = createElement('.ca');
 				inner.appendChild(ca);
 				const w = data.correct - i * 3;
-				if (w >= 3) ca.classList.add('c-3');
-				else if (w >= 0) ca.classList.add(`c-${w}`);
+				if (!data.fillIn) {
+					if (w >= 3) ca.classList.add('c-3');
+					else if (w > 0) ca.classList.add(`c-${w}`);
+					else ca.classList.add('c-0');
+				}
 			}
 			const scoreDiv = createElement('.score-container');
 			scoreDiv.innerHTML = data.rarity;
