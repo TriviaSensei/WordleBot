@@ -249,7 +249,10 @@ const testRegex = (str) => {
 const handleAchievements = async (data) => {
 	const user = await Users.findById(data.user);
 	if (!user) return;
-	if (!user.achievements) {
+	if (
+		!user.achievements ||
+		(typeof user.achievements).toLowerCase() !== 'object'
+	) {
 		user.achievements = {
 			progress: [],
 			completed: [],
@@ -546,7 +549,10 @@ const updateUserData = async (userId) => {
 			banner: userData.banner || null,
 			banner_color: userData.banner_color || null,
 			servers: [],
-			achievements: [],
+			achievements: {
+				progress: [],
+				completed: [],
+			},
 		};
 		usr = await Users.create(newUser);
 		return usr;
