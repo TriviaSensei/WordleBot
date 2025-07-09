@@ -257,8 +257,12 @@ const handleAchievements = async (data) => {
 			progress: [],
 			completed: [],
 		};
-	} else if (!user.achievements.completed) user.achievements.completed = [];
-	if (!user.achievements.progress) user.achievements.progress = [];
+	} else if (!user.achievements.completed || !user.achievements.progress) {
+		user.achievements = {
+			progress: user.achievements.progress || [],
+			completed: user.achievements.completed || [],
+		};
+	}
 	//see what achievements can be accomplished with this one,
 	//push to the user's list if not already there
 	const gameAchievements = achievements.filter(
