@@ -4,4 +4,4 @@ _sandbox*
 _sandbox/*
 data_export.txt
 .gitignore
-log.txt
+log*.txt

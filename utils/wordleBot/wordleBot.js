@@ -509,6 +509,7 @@ const checkCorrectChannel = async (srvr, msg, ...suppressWarnings) => {
 
 const updateServerData = async (guildId) => {
 	//this should not happen - if the server's guild ID was not found for some reason, just return an error
+	console.log(`Update server data ${guildId}`);
 	const serverData = (await axios.get(`${url}/guilds/${guildId}`, authObj))
 		?.data;
 	if (!serverData)
@@ -735,9 +736,11 @@ client.on('interactionCreate', async (data) => {
 				flags: MessageFlags.Ephemeral,
 			});
 		}
+		console.log('Getting server data');
 		const serverData = (
 			await axios.get(`${url}/guilds/${data.guildId}`, authObj)
 		).data;
+		console.log(serverData);
 
 		const user = await axios.get(
 			`${url}/guilds/${serverData.id}/members/${data.user.id}`,

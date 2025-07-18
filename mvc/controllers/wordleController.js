@@ -450,6 +450,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 				});
 			else if (filter.isProfane(server.name)) {
 				//check server name in discord - see if it's been changed
+				console.log('Checking server name in Discord');
 				const sd = await axios.get(
 					`${process.env.DISCORD_API_URL}/guilds/${server.guildId}`,
 					authObj
