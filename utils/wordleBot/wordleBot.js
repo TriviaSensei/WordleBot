@@ -860,16 +860,16 @@ client.on('messageCreate', async (msg) => {
 	} else if (!me) return console.log('Me not defined');
 	if (!msg?.author || !me || msg.author.id === me.id) return;
 
-	// check the current discord server data against what we have in the DB,
-	// if it exists, and update the data accordingly
-	const srvr = await updateServerData(msg.guildId);
-
 	//see if it's a game result being posted, and if not, ignore the message.
 	const gameInfo = parseResult(msg.content);
 	if (!gameInfo || gameInfo.length === 0) {
 		// if (process.env.NODE_ENV === 'development') testRegex(msg.content);
 		return;
 	}
+
+	// check the current discord server data against what we have in the DB,
+	// if it exists, and update the data accordingly
+	const srvr = await updateServerData(msg.guildId);
 
 	//if so, see if there is a valid home channel set, set it if not, and ignore the result if not in the home channel
 	const correctChannel = await checkCorrectChannel(srvr, msg);
