@@ -508,8 +508,6 @@ const checkCorrectChannel = async (srvr, msg, ...suppressWarnings) => {
 };
 
 const updateServerData = async (guildId) => {
-	console.log(`Update server data ${guildId}`);
-	console.trace();
 	//this should not happen - if the server's guild ID was not found for some reason, just return an error
 	const serverData = (await axios.get(`${url}/guilds/${guildId}`, authObj))
 		?.data;
