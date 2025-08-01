@@ -613,6 +613,33 @@ const getTimeStr = (ms) => {
 	return `${d}d ${h}h ${m}m ${s}s`;
 };
 
+const sendActualUpdate = async () => {
+	const currentDate = new Date();
+
+	const currentDT = moment.tz(currentDate, timezone).format();
+
+	const serverData = await Servers.find();
+	const sp = currentDT.split('-');
+	let currentMonth = parseInt(sp[1]) - 1;
+	let currentYear = parseInt(sp[0]);
+	if (currentMonth === 0) {
+		currentYear--;
+		currentMonth = 12;
+	}
+	serverData.forEach((s) => {
+		if (!checkCorrectServer(s.guildId))
+			return console.log(
+				`Not sending update to ${s.guildId} (env=${process.env.NODE_ENV})`
+			);
+		addMessage({
+			channelId: s.channelId,
+			data: {
+				content: `@everyone Apologies for the previously broken link! Your monthly server update is here: https://${hostname}/server/${s.guildId}/${currentYear}/${currentMonth}\nIf you enjoy this bot, please consider donating here: ${process.env.DONATE_LINK}`,
+			},
+		});
+	});
+};
+
 const sendMonthlyUpdate = async () => {
 	const currentDate = new Date();
 
@@ -1181,6 +1208,7 @@ client.on('ready', async (c) => {
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
 	await sendMonthlyUpdate();
+	await sendActualUpdate();
 });
 
 // const sandbox = require('../../sandbox');
