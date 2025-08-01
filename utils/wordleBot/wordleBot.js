@@ -613,7 +613,7 @@ const getTimeStr = (ms) => {
 	return `${d}d ${h}h ${m}m ${s}s`;
 };
 
-const sendActualUpdate = async () => {
+const sendAdHocUpdate = async () => {
 	const currentDate = new Date();
 
 	const currentDT = moment.tz(currentDate, timezone).format();
@@ -1208,7 +1208,7 @@ client.on('ready', async (c) => {
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
 	await sendMonthlyUpdate();
-	await sendActualUpdate();
+	// await sendAdHocUpdate();
 });
 
 // const sandbox = require('../../sandbox');
