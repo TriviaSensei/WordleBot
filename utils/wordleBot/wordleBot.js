@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Servers = require('../../mvc/models/serverModel');
 const Users = require('../../mvc/models/userModel');
 const Results = require('../../mvc/models/resultModel');
+const Errors = require('../../mvc/models/errorModel');
 const GameData = require('../../mvc/models/gameDataModel');
 
 const { v4: uuidV4 } = require('uuid');
@@ -79,6 +80,7 @@ const sendAdminEmail = async (subject, text) => {
 		console.log(e.response.body.errors[0]);
 	}
 };
+const logError = async (err) => {};
 
 const updateData = async (doc, data) => {
 	const dataProps = Object.getOwnPropertyNames(data);
@@ -147,12 +149,25 @@ const handlePostQueue = async () => {
 			} catch (err) {
 				postQueue[0].failures++;
 				console.log(err.response.data);
-				if (postQueue[0].failures === 3)
-					await sendAdminEmail(
-						'Failed to react to Discord message',
-						err.response.data
-					);
+				await Errors.create({
+					description: 'Reaction failed',
+					message: err.message || '',
+					data: err.response?.data || null,
+					stack: err.stack || null,
+				});
+				// if (postQueue[0].failures === 3)
+				// 	await sendAdminEmail(
+				// 		'Failed to react to Discord message',
+				// 		err.response.data
+				// 	);
 			}
+		} else {
+			await Errors.create({
+				description: 'Reaction failed',
+				message: 'Channel ID not found in message',
+				data: msg,
+				stack: null,
+			});
 		}
 	} else if (type === 'message') {
 		const { data } = postQueue[0].data;
@@ -881,8 +896,22 @@ client.on('messageCreate', async (msg) => {
 	if (!msg.author) {
 		console.log('No msg author');
 		console.log(msg);
+		await Errors.create({
+			description: 'Parse failed',
+			message: 'No message author',
+			data: msg,
+			stack: null,
+		});
 		return;
-	} else if (!me) return console.log('Me not defined');
+	} else if (!me) {
+		await Errors.create({
+			description: 'Parse failed',
+			message: 'Me not defined',
+			data: null,
+			stack: null,
+		});
+		return console.log('Me not defined');
+	}
 	if (!msg?.author || !me || msg.author.id === me.id) return;
 
 	//see if it's a game result being posted, and if not, ignore the message.
