@@ -170,14 +170,15 @@ const handlePostQueue = async () => {
 				data: msg,
 				stack: null,
 			});
+			postQueue.shift();
 		}
 	} else if (type === 'message') {
 		const { data } = postQueue[0].data;
 		const channelId = postQueue[0].data.channelId
 			? postQueue[0].data.channelId
-			: postQueue[0].channel_id;
-		console.log(`Attempting message to ${channelId}`);
-		console.log(postQueue[0].data);
+			: postQueue[0].channel_id
+			? postQueue[0].channel_id
+			: postQueue[0].channelId;
 		if (channelId) {
 			try {
 				await axios.post(
@@ -197,7 +198,7 @@ const handlePostQueue = async () => {
 					);
 				}
 			}
-		}
+		} else postQueue.shift();
 	}
 	lastPostTime = Date.now();
 	if (postQueue.length > 0) {
@@ -246,6 +247,7 @@ const removeReaction = (msg, emoji) => {
 };
 
 const addMessage = (data) => {
+	console.log(`Adding message to ${data.channelId} to queue`);
 	postQueue.push({ type: 'message', action: 'send', data, failures: 0 });
 	if (postQueue.length === 1) handlePostQueue();
 };
@@ -667,6 +669,7 @@ const sendAdHocUpdate = async () => {
 		addMessage({
 			channelId: s.channelId,
 			data: {
+				channelId: s.channelId,
 				content: `@everyone Apologies - WordleBot choked this morning while sending out monthly updates, so two things: if you submitted a result for 12/1, it may not have been picked up - please resubmit it and it should be registered. Additionally, here is your monthly server update: ${addr}`,
 			},
 		});
