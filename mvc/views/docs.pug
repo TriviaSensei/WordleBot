@@ -39,6 +39,8 @@ block content
                             a(data-target="edit") Editing messages
                         li 
                             a(data-target="crosspost") Crossposting
+                        li 
+                            a(data-target="delete") Deleting Results
                 li 
                     a(data-target="leaderboards") Leaderboards
                 li 
@@ -73,7 +75,7 @@ block content
                 h1.m-auto.mb-5 Documentation
             section#overview 
                 h2 Overview
-                p WordleBot is a new Discord bot that automatically tracks results from your daily games and compiles them into an easy-to-read format. If you and your friends like to compete at Wordle, Quordle, Connections, and more, then WordleBot can make your competition a lot easier for players and admins alike.
+                p WordleBot is a Discord bot that automatically tracks results from your daily games and compiles them into an easy-to-read format. If you and your friends like to compete at Wordle, Quordle, Connections, and more, then WordleBot can make your competition a lot easier for players and admins alike.
             section#support-wordlebot 
                 h2 Support WordleBot 
                 p WordleBot is a hobby project, and is free to use. I will keep it that way unless I start incurring major costs for hosting data storage (which is likely a long way away, unless a lot of people start using this). However, if you enjoy using this bot, I would be honored to accept a donation at the link below. 
@@ -298,12 +300,20 @@ block content
                         li ✏️ - message edited (and results were added). You may edit a message to add more results to it. WordleBot will also reply and indicate how many additional results were added.
                 section#edit
                     h3 Editing Messages 
-                    p You may post new results by either posting a new message or by editing an existing one. When editing messages, WordleBot will react with a pencil emoji (✏️) and a reply, indicating if any results were added. At this time, WordleBot will not delete any results that you have posted.
+                    p You may post new results by either posting a new message or by editing an existing one. When editing messages, WordleBot will react with a pencil emoji (✏️) and a reply, indicating if any results were added.
                 section#crosspost 
                     h3 Crossposting 
                     p If you happen to belong to multiple servers where WordleBot is installed, you may post your results to all of them with a single post to any of them - WordleBot will post on your behalf everywhere else! You must associate yourself with each server by either posting a valid result or running #[a.command(data-target="command-addme") addme] for this to work - see #[a(data-target="install") install/signup] for details. If you leave a server, WordleBot will no longer post there on your behalf.
                     img.doc-screenshot(src="/img/docs/03_crosspost.png")
                     p WordleBot crossposts on your behalf to your other servers 
+                section#delete
+                    h3 Deleting results 
+                    p If a player posts a result that needs to be deleted for any reason, an admin may issue the #[span.command delete] slash command. 
+                    p The bot will reply with a link that the admin may click. This link will only work one time.
+                    img.doc-screenshot(src="/img/docs/03_2_delete.png")
+                    p The interface for deleting results 
+                    p Click on results to mark them for deletion (click them again to unmark them for deletion), and then click the "Delete [n] result(s)" button at the bottom. #[span.fw-bold THIS ACTION CANNOT BE UNDONE!]. You may delete results from multiple games, multiple users, and multiple months at a time - simply use the month selector and tabs to navigate through your results.
+                    p Users will not be notified that their result(s) have been deleted - it is the responsibility of the admin to notify their users and explain why their results were removed. Users may repost a corrected result after an admin deletes their results.
             section#leaderboards
                 h3 Leaderboards 
                 p WordleBot creates monthly leaderboards for your server in each game that you choose to track. See #[a.command(data-target="command-setgames") setgames] for details on choosing which games to track. You can access your server leaderboard or your personal stats page by issuing the #[a.command(data-target="command-we") we] or the #[a.command(data-target="command-i") i] commands, respectively. The addresses of these pages do not change, so you may bookmark them for easy access.
@@ -326,6 +336,7 @@ block content
                     li #[span.command sethome] - #[span.admin-only] This command sets the home channel for the server to the channel in which the command is run. Only results posted to that channel will be acknowledged and saved. The default value for this channel will be wherever the first result is pasted after installing WordleBot. 
                     li #[span.command setgames] - #[span.admin-only] This command returns a menu of games to track on the server. Thus, if your server only plays Wordle and Connections, you can indicate that using this command. Your server standings page will only include results from the games selected. Your home channel will only receive cross-posted results from the games selected. Players may still post their other results in your channel, and they will be acknowledged and cross-posted to other servers if applicable.
                     li #[span.command settings] - #[span.admin-only] This command will give you flexibility in how your games are ranked. For example, you may indicate that a player must submit at least 20 Wordle results to be eligible to win the month, or that mistakes in Connections should incur a heavier penalty. Your settings page will also give you the ability to create custom stats so that you can play your own way! See #[a(data-target="settings") settings] for more details 
+                    li #[span.command delete] - #[span.admin-only] This command returns a link to allow you to delete results. See #[a(data-target="delete") deleting results] for details.
                     li #[span.command i] - This command causes the bot to reply to you with a link to your personal stats page, which is https://www.wordlebot.gg/player/[your user ID]
                     li #[span.command we] - This command causes the bot to reply to you with a link to your server's stats page, which is https://www.wordlebot.gg/wordle/server/[your guild ID]
                     li #[span.command addme] - This command associates you with the server in which you issue it. You may be associated with multiple servers. Use this command if you are part of multiple servers with WordleBot, and you can make sure your results are properly tracked and crossposted without having to post results in every single one.

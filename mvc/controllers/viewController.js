@@ -112,8 +112,8 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 			const serverData = await Servers.findOne({
 				guildId: req.params.id,
 				editToken: req.params.editToken,
-				// editTokenExpires: { $gte: Date.now() },
-				// editTokenUsed: false,
+				editTokenExpires: { $gte: Date.now() },
+				editTokenUsed: false,
 			}).select('-editToken -editTokenExpires');
 			if (serverData) {
 				const ua = req.rawHeaders.findIndex(
@@ -131,7 +131,15 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 					allowEdit = true;
 					await serverData.save();
 				}
-			} else return next(new AppError('Invalid token', 404));
+			} else
+				return res.status(200).render(`404`, {
+					status: 'success',
+					data: {
+						code: 404,
+						message:
+							'Server not found or invalid token - rerun the /delete command to generate a new token for your server',
+					},
+				});
 		}
 
 		result = await getServerStats(req.params.id, year, month);

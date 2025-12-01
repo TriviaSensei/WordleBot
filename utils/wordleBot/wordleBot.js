@@ -891,7 +891,7 @@ client.on('interactionCreate', async (data) => {
 					process.env.NODE_ENV === 'production' ? 'https' : 'http'
 				}://${hostname}/server/delete/${
 					srvr.guildId
-				}/${id}. USERS WILL BE NOTIFIED THAT THEIR RESULTS WILL BE DELETED.`;
+				}/${id}. You are responsible for telling your users that their results were deleted.`;
 			}
 		} else if (data.isStringSelectMenu()) {
 			if (data.customId === 'game_select') {

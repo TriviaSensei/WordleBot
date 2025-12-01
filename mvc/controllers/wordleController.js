@@ -722,7 +722,6 @@ exports.deleteResults = catchAsync(async (req, res, next) => {
 	const server = await Servers.findOne({
 		guildId: req.params.guildId,
 		editToken: req.params.token,
-		editTokenUsed: false,
 	});
 	if (!server)
 		return next(new AppError('Server not found or invalid edit token', 404));
