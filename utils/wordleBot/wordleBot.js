@@ -176,12 +176,14 @@ const handlePostQueue = async () => {
 			: postQueue[0].channel_id;
 		if (channelId) {
 			try {
-				await axios.post(
-					`${url}/channels/${channelId}/messages`,
-					data,
-					authObj
-				);
+				// await axios.post(
+				// 	`${url}/channels/${channelId}/messages`,
+				// 	data,
+				// 	authObj
+				// );
 				postQueue.shift();
+				console.log(data);
+				console.log(postQueue.length);
 			} catch (err) {
 				console.log(err.response.data);
 				postQueue[0].failures++;
@@ -193,7 +195,6 @@ const handlePostQueue = async () => {
 		}
 	}
 	lastPostTime = Date.now();
-
 	if (postQueue.length > 0) {
 		if (postQueue[0].failures >= 3) {
 			const item = postQueue.shift();
@@ -644,6 +645,7 @@ const sendAdHocUpdate = async () => {
 		currentYear--;
 		currentMonth = 12;
 	}
+	console.log(`${serverData.length} servers found`);
 	serverData.forEach((s) => {
 		if (!checkCorrectServer(s.guildId))
 			return console.log(
@@ -1263,7 +1265,7 @@ client.on('ready', async (c) => {
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
 	await sendMonthlyUpdate();
-	// await sendAdHocUpdate();
+	await sendAdHocUpdate();
 });
 
 // const sandbox = require('../../sandbox');
