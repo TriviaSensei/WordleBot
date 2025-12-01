@@ -201,6 +201,7 @@ const handlePostQueue = async () => {
 			const item = postQueue.shift();
 			console.log(`Failed to address post queue item:`);
 			console.log(item);
+			console.log(`Queue length: ${postQueue.length}`);
 		}
 		if (postQueue.length > 0)
 			nextPost = setTimeout(handlePostQueue, coolDownTime);
