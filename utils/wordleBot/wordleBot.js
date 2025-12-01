@@ -122,6 +122,7 @@ const handlePostQueue = async () => {
 	}
 
 	const { type, action } = postQueue[0];
+	console.log(type, action);
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
 		const re = /^(\%[0-9A-F]{2})+$/;
@@ -175,6 +176,7 @@ const handlePostQueue = async () => {
 		const channelId = postQueue[0].data.channelId
 			? postQueue[0].data.channelId
 			: postQueue[0].channel_id;
+		console.log(`Attempting message to ${channelId}`);
 		if (channelId) {
 			try {
 				await axios.post(
