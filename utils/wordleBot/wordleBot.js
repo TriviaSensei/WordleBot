@@ -176,21 +176,22 @@ const handlePostQueue = async () => {
 			: postQueue[0].channel_id;
 		if (channelId) {
 			try {
-				// await axios.post(
-				// 	`${url}/channels/${channelId}/messages`,
-				// 	data,
-				// 	authObj
-				// );
+				await axios.post(
+					`${url}/channels/${channelId}/messages`,
+					data,
+					authObj
+				);
 				postQueue.shift();
-				console.log(data);
-				console.log(postQueue.length);
+				console.log(`Sent message to channel ${channelId}`);
+				console.log(`Queue length: ${postQueue.length}`);
 			} catch (err) {
 				console.log(err.response.data);
 				postQueue[0].failures++;
-				if (postQueue[0].failures === 3)
+				if (postQueue[0].failures === 3) {
 					console.log(
 						`Failed to send discord message (channel ID: ${channelId})`
 					);
+				}
 			}
 		}
 	}
