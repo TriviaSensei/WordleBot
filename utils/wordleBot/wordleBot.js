@@ -646,10 +646,16 @@ const sendAdHocUpdate = async () => {
 			return console.log(
 				`Not sending update to ${s.guildId} (env=${process.env.NODE_ENV})`
 			);
+		const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+		const url =
+			process.env.NODE_ENV === 'production'
+				? 'www.wordlebot.gg'
+				: 'localhost:3000';
+		const addr = `${protocol}://${url}/server/${s.guildId}/${currentYear}/${currentMonth}`;
 		addMessage({
 			channelId: s.channelId,
 			data: {
-				content: `@everyone WordleBot choked this morning while sending out monthly updates - if you submitted a result for 12/1, it may not have been picked up - please resubmit it and it will be registered`,
+				content: `@everyone Apologies - WordleBot choked this morning while sending out monthly updates, so two things: if you submitted a result for 12/1, it may not have been picked up - please resubmit it and it should be registered. Additionally, here is your monthly server update: ${addr}`,
 			},
 		});
 	});
@@ -665,7 +671,7 @@ const sendMonthlyUpdate = async () => {
 			((currentDate.getMonth() + 1) % 12) + 1,
 			2
 		);
-		const year = currentDate.getFullYear() + (nextMonth === 0 ? 1 : 0);
+		const year = currentDate.getFullYear() + (nextMonth === '01' ? 1 : 0);
 
 		const nextUpdateDT = moment
 			.tz(`${year}-${nextMonth}-01 00:00`, timezone)
@@ -785,7 +791,6 @@ client.on('interactionCreate', async (data) => {
 			`${url}/guilds/${serverData.id}/members/${data.user.id}`,
 			authObj
 		);
-		console.log(user.data);
 		if (!serverData || !user)
 			return data.reply({
 				type: 4,
