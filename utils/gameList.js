@@ -1,5 +1,6 @@
 //SERVER GAME LIST
-
+const puzzleNumber = (res) => res.data.number;
+const puzzleDate = (res) => res.date;
 /**
  * Settings for all games:
  * - minimum plays/number of results (same for all games on a server-level; integer 10-28, inclusive)
@@ -188,6 +189,14 @@ const crosswordSettings = {
 			label: 'Average Time',
 		},
 	],
+	getPuzzleId: puzzleDate,
+};
+
+const quordleDefaults = {
+	settings: quordleSettings,
+	sortItems: quordleSortItems,
+	dataItems: quordleDataItems,
+	getPuzzleId: puzzleNumber,
 };
 
 const gameList = [
@@ -228,30 +237,25 @@ const gameList = [
 			},
 		],
 		sortItems: [sortItems.avg, sortItems.played, sortItems.won, sortItems.pct],
+		getPuzzleId: puzzleNumber,
 	},
 	{
 		name: 'Quordle',
 		script: true,
 		url: 'https://www.merriam-webster.com/games/quordle/',
-		settings: quordleSettings,
-		sortItems: quordleSortItems,
-		dataItems: quordleDataItems,
+		...quordleDefaults,
 	},
 	{
 		name: 'Sequence Quordle',
 		script: false,
 		url: 'https://www.merriam-webster.com/games/quordle/#/sequence',
-		settings: quordleSettings,
-		dataItems: quordleDataItems,
-		sortItems: quordleSortItems,
+		...quordleDefaults,
 	},
 	{
 		name: 'Quordle Extreme',
 		script: false,
 		url: 'https://www.merriam-webster.com/games/quordle/#/extreme',
-		settings: quordleSettings,
-		dataItems: quordleDataItems,
-		sortItems: quordleSortItems,
+		...quordleDefaults,
 	},
 	{
 		name: 'Tightrope',
@@ -334,6 +338,7 @@ const gameList = [
 				label: 'Average Time (wins)',
 			},
 		],
+		getPuzzleId: puzzleDate,
 	},
 	{
 		name: 'NYT Crossword',
@@ -396,6 +401,7 @@ const gameList = [
 			},
 		],
 		sortItems: [sortItems.played, sortItems.won, sortItems.pct, sortItems.avg],
+		getPuzzleId: puzzleNumber,
 	},
 	{
 		name: 'Digits',
@@ -440,6 +446,7 @@ const gameList = [
 			},
 		],
 		sortItems: [sortItems.played, sortItems.avg],
+		getPuzzleId: puzzleNumber,
 	},
 	{
 		name: 'Immaculate Grid',
@@ -497,6 +504,7 @@ const gameList = [
 				label: 'Average Correct',
 			},
 		],
+		getPuzzleId: puzzleNumber,
 	},
 ];
 

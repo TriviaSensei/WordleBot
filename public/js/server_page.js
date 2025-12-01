@@ -313,6 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
 					player.data.forEach((d) => {
 						const newCell = createElement('td.result-cell');
 						if (d) {
+							newCell.setAttribute('data-id', d._id);
+							delete d._id;
 							newCell.setAttribute('data', JSON.stringify(d));
 						}
 						newRow.appendChild(newCell);
@@ -352,7 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						...res.data,
 						serverData: {
 							...res.data.serverData,
-							customStats: customStats
+							customStats: Array.isArray(customStats?.stats)
 								? customStats.stats.map((s, i) => {
 										const newCalc = setDataItems(s.calc, s.game);
 										return {
@@ -367,6 +369,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				});
 
 				p.dispatchEvent(evt);
+				if (location.href.toLowerCase().indexOf('/server/delete') >= 0) {
+					const evt2 = new CustomEvent('panes-updated');
+					document.dispatchEvent(evt2);
+				}
 			});
 		};
 		if (data) {

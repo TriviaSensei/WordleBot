@@ -1,0 +1,12 @@
+.modal#delete-result-modal(tabindex="-1" aria-labelledby="delete-result-label" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false")
+    .modal-dialog.modal-dialog-centered
+        .modal-content#delete-result-modal-content
+            input#delete-game(type="hidden")
+            input#delete-id(type="hidden")
+            .modal-header
+                h5.modal-title#delete-result-label Delete Results
+            .modal-body
+                #delete-successes.mb-3.d-flex.flex-column
+                #delete-errors.d-flex.flex-column
+            .modal-footer
+                button#close-delete-result.btn.btn-primary(type="button") OK

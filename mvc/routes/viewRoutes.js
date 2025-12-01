@@ -15,10 +15,16 @@ router.get(
 	viewController.getSettingsPage
 );
 router.get(
+	'/server/delete/:id/:editToken',
+	wordleController.checkServerSettings,
+	viewController.getWordleStats
+);
+router.get(
 	'/server/:id/:year?/:month?',
 	wordleController.checkServerSettings,
 	viewController.getWordleStats
 );
+
 router.get('/player/:id/:year?/:month?', viewController.getWordleStats);
 // router.get('/test', viewController.getTest);
 module.exports = router;

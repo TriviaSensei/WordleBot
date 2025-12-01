@@ -47,15 +47,22 @@ const commands = [
 		description:
 			'Set whether to crosspost to your results to other servers when you paste results',
 	},
+	{
+		name: 'delete',
+		description: 'Delete one or more posted results. Admins only.',
+	},
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.WORDLE_BOT_TOKEN);
 
 (async () => {
 	try {
-		await rest.put(Routes.applicationCommands(process.env.WORDLE_BOT_ID), {
-			body: commands,
-		});
+		const result = await rest.put(
+			Routes.applicationCommands(process.env.WORDLE_BOT_ID),
+			{
+				body: commands,
+			}
+		);
 		console.log('Slash commands were registered');
 	} catch (err) {
 		console.log(`Error: ${err}`);

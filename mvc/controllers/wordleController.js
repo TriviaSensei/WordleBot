@@ -34,13 +34,15 @@ const getResults = async (year, month, users, gameFilter) => {
 	endDate.setDate(endDate.getDate() - 1);
 	const endDateStr = moment.tz(endDate, timezone).format().split('T')[0];
 
-	const monthResults = await Results.find({
-		user: users,
-		game: gameFilter,
-		date: { $gte: new Date(firstOfMonth), $lt: new Date(nextMonth) },
-	})
-		.sort({ game: 1, date: 1 })
-		.lean();
+	const monthResults = (
+		await Results.find({
+			user: users,
+			game: gameFilter,
+			date: { $gte: new Date(firstOfMonth), $lt: new Date(nextMonth) },
+		})
+			.sort({ game: 1, date: 1 })
+			.lean()
+	).filter((r) => !r.deletedFlag);
 
 	const monthDays = Math.round(
 		(new Date(nextMonth) - new Date(firstOfMonth)) / msInDay
@@ -122,7 +124,8 @@ const getResults = async (year, month, users, gameFilter) => {
 		if (
 			!g.results.some((res) => {
 				if (res._id.toString() === r.user.toString()) {
-					res.data[ind] = r.data;
+					res.data[ind] = { _id: r._id.toString(), ...r.data };
+
 					return true;
 				}
 				return false;
@@ -298,6 +301,12 @@ exports.checkServerSettings = catchAsync(async (req, res, next) => {
 	const server = await Servers.findOne(
 		req.params.token
 			? { settingsToken: req.params.token }
+			: req.params.editToken
+			? {
+					editToken: req.params.editToken,
+					// editTokenExpires: { $gte: Date.now() },
+					// editTokenUsed: false,
+			  }
 			: { guildId: req.params.id }
 	);
 	if (!server)
@@ -427,7 +436,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 	const server = await Servers.findOne({
 		settingsToken: req.params.token,
 		settingsTokenUsed: true,
-	});
+	}).select('-editToken -settingsToken');
 
 	if (!server)
 		return res.status(200).json({
@@ -702,5 +711,62 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 			warnings,
 			failures,
 		},
+	});
+});
+
+exports.deleteResults = catchAsync(async (req, res, next) => {
+	if (!req.params.guildId || !req.params.token)
+		return next(new AppError('Missing server ID or edit token', 400));
+
+	//make sure the server and token are a valid pair
+	const server = await Servers.findOne({
+		guildId: req.params.guildId,
+		editToken: req.params.token,
+		editTokenUsed: false,
+	});
+	if (!server)
+		return next(new AppError('Server not found or invalid edit token', 404));
+
+	//ensure the results belong to the server
+	const results = await Results.find({ _id: req.body.idList });
+
+	let successes = 0;
+	const failures = [];
+
+	await Promise.all(
+		results.map(async (r) => {
+			//see if the user associated with the result belongs to this server
+			const uid = r.user.toString();
+			let userOnServer = server.users.includes(uid);
+			if (userOnServer) {
+				const deleted = await Results.findByIdAndDelete(r._id);
+				if (deleted) successes++;
+				else {
+					failures.push(
+						`Failed to delete result ${r._id} (${r.game} ${
+							r.data?.number ||
+							moment
+								.tz(r.date, process.env.DEFAULT_TIMEZONE)
+								.format()
+								.split('T')[0]
+						})`
+					);
+				}
+			} else
+				failures.push(
+					`Failed to delete result ${r._id} - user does not belong to this server`
+				);
+		})
+	);
+
+	server.editToken = '';
+	server.editTokenUsed = true;
+	server.editTokenExpires = null;
+	await server.save();
+
+	res.status(200).json({
+		status: 'success',
+		successes,
+		failures,
 	});
 });

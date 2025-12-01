@@ -15,4 +15,5 @@ router.patch(
 	wordleController.checkServerSettings,
 	wordleController.editServerSettings
 );
+router.delete('/delete/:guildId/:token', wordleController.deleteResults);
 module.exports = router;

@@ -3,8 +3,12 @@ block styles
     each game, ind in data.gameData.data
         - if (game.script && game.results.length > 0)
             link(rel="stylesheet" href=`/css/${game.game.toLowerCase().split(' ').join('_')}.css`)
+    - if (data.allowEdit)
+        link(rel="stylesheet" href="/css/editResults.css")
             
-block content 
+block content
+    - if (data.allowEdit)
+        include modals/deleteResultModal
     .banner-container.ratio.ratio-16x9
         div
             .w-100.h-100.banner-div(style=`background-image:url('${!data.serverData.banner ? "/img/banner_default.svg" : `https://cdn.discordapp.com/banners/${data.serverData.guildId}/${data.serverData.banner}.png`}');`)
@@ -48,9 +52,15 @@ block content
                                                     tr.header-row.sticky-top
                                                         th.fw-bold(colspan="2") Player
                                                         th                                                       
+        - if (data.allowEdit)
+            .w-100.d-flex.align-items-center.justify-content-center.my-2
+                input#edit-token(type="hidden" value=`${data.editToken}`)
+                button#delete-results.w-75.btn.btn-danger.ms-1(disabled) Delete 0 results
 block scripts 
     script(src="/js/evaluator.js")
     script(src="/js/server_page.js" type="module" defer)
     each game, ind in data.gameData.data
         - if (game.script)
             script(src=`/js/games/${game.game.toLowerCase().split(' ').join('_')}.js` type="module" defer)
+    - if (data.allowEdit)
+        script(src=`/js/deleteResults.js` type="module" defer)

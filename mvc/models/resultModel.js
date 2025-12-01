@@ -26,6 +26,10 @@ const resultSchema = new mongoose.Schema(
 			type: Object,
 			required: [true, 'Result data is required'],
 		},
+		deletedFlag: {
+			type: Boolean,
+			default: false,
+		},
 	},
 	{ timestamps: true }
 );

@@ -106,9 +106,36 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 		.filter((x) => x.length !== 0)
 		.find((str) => ['server', 'player'].includes(str.toLowerCase()));
 	let result;
-	if (loc.toLowerCase() === 'server')
+	let allowEdit = false;
+	if (loc.toLowerCase() === 'server') {
+		if (req.params.editToken) {
+			const serverData = await Servers.findOne({
+				guildId: req.params.id,
+				editToken: req.params.editToken,
+				// editTokenExpires: { $gte: Date.now() },
+				// editTokenUsed: false,
+			}).select('-editToken -editTokenExpires');
+			if (serverData) {
+				const ua = req.rawHeaders.findIndex(
+					(h) => h.toLowerCase() === 'user-agent'
+				);
+				let isDiscord = true;
+				if (ua >= 0 && ua < req.rawHeaders.length) {
+					if (req.rawHeaders[ua + 1].toLowerCase().indexOf('discordapp') < 0) {
+						isDiscord = false;
+					}
+				}
+				//discord seems to visit the link before posting it, so it will trigger this if we don't check if it's discord
+				if (!isDiscord) {
+					serverData.editTokenUsed = true;
+					allowEdit = true;
+					await serverData.save();
+				}
+			} else return next(new AppError('Invalid token', 404));
+		}
+
 		result = await getServerStats(req.params.id, year, month);
-	else {
+	} else {
 		result = await getPlayerStats(req.params.id, year, month);
 	}
 	if (result.status !== 'success') {
@@ -131,6 +158,8 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 		data: {
 			...result.data,
 			dataItems,
+			allowEdit,
+			editToken: req.params.editToken,
 			achievements:
 				loc.toLowerCase() === 'player'
 					? await Promise.all(
@@ -260,7 +289,7 @@ exports.getSettingsPage = catchAsync(async (req, res, next) => {
 			  }
 			: { settingsToken: req.params.token };
 	const serverData = await Servers.findOne(serverFilter).select(
-		'-settingsToken -settingsTokenExpires'
+		'-settingsToken -settingsTokenExpires -editToken -editTokenExpires'
 	);
 	if (!serverData) {
 		return res.status(200).render(`404`, {

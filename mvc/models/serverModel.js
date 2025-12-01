@@ -43,6 +43,10 @@ const serverSchema = new mongoose.Schema({
 	settingsToken: String,
 	settingsTokenExpires: Date,
 	settingsTokenUsed: Boolean,
+	editToken: String,
+	editTokenExpires: Date,
+	editTokenUsed: Boolean,
+	editingUser: String,
 	created: Date,
 });
 
