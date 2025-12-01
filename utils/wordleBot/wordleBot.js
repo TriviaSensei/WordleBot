@@ -77,7 +77,7 @@ const sendAdminEmail = async (subject, text) => {
 	try {
 		await sgMail.send(msg);
 	} catch (e) {
-		console.log(e.response.body.errors[0]);
+		console.log(e);
 	}
 };
 const logError = async (err) => {};
@@ -777,16 +777,15 @@ client.on('interactionCreate', async (data) => {
 				flags: MessageFlags.Ephemeral,
 			});
 		}
-		console.log('Getting server data');
 		const serverData = (
 			await axios.get(`${url}/guilds/${data.guildId}`, authObj)
 		).data;
-		console.log(serverData);
 
 		const user = await axios.get(
 			`${url}/guilds/${serverData.id}/members/${data.user.id}`,
 			authObj
 		);
+		console.log(user.data);
 		if (!serverData || !user)
 			return data.reply({
 				type: 4,
@@ -853,12 +852,30 @@ client.on('interactionCreate', async (data) => {
 				srvr.markModified('settingsTokenExpires');
 				srvr.markModified('settingsTokenUsed');
 				await srvr.save();
-				content = `Do not share this link - it is good for only ${settingsTokenDuration} minutes, or one click. After you save your settings, you will need to run this command again to generate a new link. Edit your server settings here at the link here: https://${hostname}/settings/${id}`;
+				content = `Do not share this link - it is good for only ${settingsTokenDuration} minutes, or one click. After you save your settings, you will need to run this command again to generate a new link. Edit your server settings at the link here: https://${hostname}/settings/${id}`;
 			} else if (data.commandName.toLowerCase() === 'sethome') {
 				srvr.channelId = data.channelId;
 				srvr.markModified('channelId');
 				await srvr.save();
 				content = 'Home channel set';
+			} else if (data.commandName.toLowerCase() === 'delete') {
+				const id = uuidV4();
+				srvr.editToken = id;
+				srvr.editTokenExpires = Date.now() + settingsTokenDuration * 60 * 1000;
+				srvr.editTokenUsed = false;
+				srvr.editingUser = user.data.global_name
+					? user.data.global_name
+					: user.data.username;
+				srvr.markModified('editToken');
+				srvr.markModified('editTokenExpires');
+				srvr.markModified('editTokenUsed');
+				srvr.markModified('editingUser');
+				await srvr.save();
+				content = `Do not share this link - it is good for only ${settingsTokenDuration} minutes, or one click. After you leave the page, you will need to run this command again to generate a new link. Delete results at the link here: ${
+					process.env.NODE_ENV === 'production' ? 'https' : 'http'
+				}://${hostname}/server/delete/${
+					srvr.guildId
+				}/${id}. USERS WILL BE NOTIFIED THAT THEIR RESULTS WILL BE DELETED.`;
 			}
 		} else if (data.isStringSelectMenu()) {
 			if (data.customId === 'game_select') {
