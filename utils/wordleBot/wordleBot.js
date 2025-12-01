@@ -186,9 +186,8 @@ const handlePostQueue = async () => {
 				console.log(err.response.data);
 				postQueue[0].failures++;
 				if (postQueue[0].failures === 3)
-					await sendAdminEmail(
-						'Failed to send Discord message',
-						err.response.data
+					console.log(
+						`Failed to send discord message (channel ID: ${channelId})`
 					);
 			}
 		}
