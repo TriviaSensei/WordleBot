@@ -649,7 +649,7 @@ const sendAdHocUpdate = async () => {
 		addMessage({
 			channelId: s.channelId,
 			data: {
-				content: `@everyone Apologies for the previously broken link! Your monthly server update is here: https://${hostname}/server/${s.guildId}/${currentYear}/${currentMonth}\nIf you enjoy this bot, please consider donating here: ${process.env.DONATE_LINK}`,
+				content: `@everyone WordleBot choked this morning while sending out monthly updates - if you submitted a result for 12/1, it may not have been picked up - please resubmit it and it will be registered`,
 			},
 		});
 	});
@@ -1254,7 +1254,7 @@ client.on('ready', async (c) => {
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
 	await sendMonthlyUpdate();
-	// await sendAdHocUpdate();
+	await sendAdHocUpdate();
 });
 
 // const sandbox = require('../../sandbox');
