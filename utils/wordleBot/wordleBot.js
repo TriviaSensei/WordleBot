@@ -121,6 +121,7 @@ const handlePostQueue = async () => {
 	}
 
 	const { type, action } = postQueue[0];
+	console.log(type, action);
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
 		const re = /^(\%[0-9A-F]{2})+$/;
@@ -195,7 +196,11 @@ const handlePostQueue = async () => {
 	lastPostTime = Date.now();
 
 	if (postQueue.length > 0) {
-		if (postQueue[0].failures >= 3) postQueue.shift();
+		if (postQueue[0].failures >= 3) {
+			const item = postQueue.shift();
+			console.log(`Failed to address post queue item:`);
+			console.log(item);
+		}
 		if (postQueue.length > 0)
 			nextPost = setTimeout(handlePostQueue, coolDownTime);
 	} else if (nextPost) clearTimeout(nextPost);
