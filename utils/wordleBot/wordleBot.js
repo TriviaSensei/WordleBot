@@ -117,6 +117,7 @@ const handlePostQueue = async () => {
 		const timeLeft = coolDownTime - (Date.now() - lastPostTime);
 		if (nextPost) clearTimeout(nextPost);
 		nextPost = setTimeout(handlePostQueue, timeLeft);
+		console.log(`${timeLeft} ms until next post`);
 		return;
 	}
 
