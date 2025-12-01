@@ -117,12 +117,10 @@ const handlePostQueue = async () => {
 		const timeLeft = coolDownTime - (Date.now() - lastPostTime);
 		if (nextPost) clearTimeout(nextPost);
 		nextPost = setTimeout(handlePostQueue, timeLeft);
-		console.log(`${timeLeft} ms until next post`);
 		return;
 	}
 
 	const { type, action } = postQueue[0];
-	console.log(type, action);
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
 		const re = /^(\%[0-9A-F]{2})+$/;
@@ -206,7 +204,6 @@ const handlePostQueue = async () => {
 			const item = postQueue.shift();
 			console.log(`Failed to address post queue item:`);
 			console.log(item);
-			console.log(`Queue length: ${postQueue.length}`);
 		}
 		if (postQueue.length > 0)
 			nextPost = setTimeout(handlePostQueue, coolDownTime);
@@ -247,7 +244,6 @@ const removeReaction = (msg, emoji) => {
 };
 
 const addMessage = (data) => {
-	console.log(`Adding message to ${data.channelId} to queue`);
 	postQueue.push({ type: 'message', action: 'send', data, failures: 0 });
 	if (postQueue.length === 1) handlePostQueue();
 };
@@ -1274,7 +1270,7 @@ client.on('ready', async (c) => {
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
 	await sendMonthlyUpdate();
-	await sendAdHocUpdate();
+	// await sendAdHocUpdate();
 });
 
 // const sandbox = require('../../sandbox');
