@@ -121,7 +121,6 @@ const handlePostQueue = async () => {
 	}
 
 	const { type, action } = postQueue[0];
-	console.log(type, action);
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
 		const re = /^(\%[0-9A-F]{2})+$/;
@@ -656,6 +655,7 @@ const sendAdHocUpdate = async () => {
 				? 'www.wordlebot.gg'
 				: 'localhost:3000';
 		const addr = `${protocol}://${url}/server/${s.guildId}/${currentYear}/${currentMonth}`;
+
 		addMessage({
 			channelId: s.channelId,
 			data: {
@@ -1263,7 +1263,7 @@ client.on('ready', async (c) => {
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
 	await sendMonthlyUpdate();
-	await sendAdHocUpdate();
+	// await sendAdHocUpdate();
 });
 
 // const sandbox = require('../../sandbox');
