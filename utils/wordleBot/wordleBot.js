@@ -177,6 +177,7 @@ const handlePostQueue = async () => {
 			? postQueue[0].data.channelId
 			: postQueue[0].channel_id;
 		console.log(`Attempting message to ${channelId}`);
+		console.log(postQueue[0].data);
 		if (channelId) {
 			try {
 				await axios.post(
