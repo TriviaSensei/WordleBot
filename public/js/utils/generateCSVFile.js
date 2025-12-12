@@ -1,6 +1,8 @@
 import { getElementArray } from './getElementArray.js';
 const monthSelect = document.querySelector('#month-select');
-const gid = document.querySelector('#guild-id').value;
+const gid = (
+	document.querySelector('#guild-id') || document.querySelector('#user-id')
+)?.value;
 
 export const generateCSVFile = (game, columnData) => {
 	const pane = document.querySelector(

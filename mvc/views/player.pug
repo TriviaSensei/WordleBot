@@ -38,6 +38,10 @@ block content
                 li(class=`nav-item` role="presentation")
                     button(class=`nav-link ${noTabs ? 'active':''}` id=`achievements-tab` data-bs-toggle="tab" data-bs-target=`#achievements-tab-pane` type="button" role="tab" aria-controls=`achievements-tab-pane` aria-selected=`${noTabs}`)
                         .d-flex.flex-row.align-items-center 🎖️ Achievements 
+
+            .w-100.my-2
+                button#csv-button.btn.btn-primary.w-100 Download data as .csv
+                
             #report-panes.tab-content
                 - if (data.gameData.data.length === 0)
                     div No data is available for this month 
