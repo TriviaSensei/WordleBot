@@ -101,3 +101,34 @@ area.addEventListener('data-update', (e) => {
 		sortOrder
 	);
 });
+
+import { getDateFromHeader } from '../utils/getDateFromHeader.js';
+const columnData = [
+	{
+		name: 'Date',
+		calc: getDateFromHeader,
+		header: true,
+	},
+	{
+		name: 'Correct',
+		calc: (d) => d.correctAnswers,
+	},
+	{
+		name: 'Incorrect',
+		calc: (d) => d.misses,
+	},
+	{
+		name: 'Score',
+		calc: (d) => d.score,
+	},
+	{
+		name: 'Time',
+		calc: (d) => d.time,
+	},
+];
+
+import { generateCSVFile } from '../utils/generateCSVFile.js';
+const csvButton = document.querySelector('#csv-button');
+csvButton.addEventListener('click', () => {
+	generateCSVFile('Tightrope', columnData);
+});

@@ -41,3 +41,26 @@ area.addEventListener('data-update', (e) => {
 		sortOrder
 	);
 });
+
+import { getDateFromHeader } from '../utils/getDateFromHeader.js';
+const columnData = [
+	{
+		name: 'Number',
+		calc: (d) => d.number,
+	},
+	{
+		name: 'Date',
+		header: true,
+		calc: getDateFromHeader,
+	},
+	{
+		name: 'Score',
+		calc: (d) => d.score,
+	},
+];
+
+import { generateCSVFile } from '../utils/generateCSVFile.js';
+const csvButton = document.querySelector('#csv-button');
+csvButton.addEventListener('click', () => {
+	generateCSVFile('Digits', columnData);
+});

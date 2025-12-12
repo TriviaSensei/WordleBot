@@ -4,8 +4,10 @@ import { handleRequest } from '../utils/requestHandler.js';
 import { createElement } from '../utils/createElementFromSelector.js';
 import { getElementArray } from '../utils/getElementArray.js';
 import { getPage } from '../utils/page.js';
+import { getDateFromHeader } from '../utils/getDateFromHeader.js';
 
 import { gamesPlayed, gamesWon, winPercent, average } from './_general.js';
+
 const lsItem = 'wordle-solution-cache';
 
 const table = area.querySelector('.standings-table');
@@ -229,4 +231,30 @@ area.addEventListener('data-update', (e) => {
 			bar.setAttribute('style', `height: ${2 + (88 * value) / m}%;`);
 		});
 	});
+});
+
+const columnData = [
+	{
+		name: 'Number',
+		calc: (d) => d.number,
+	},
+	{
+		name: 'Date',
+		header: true,
+		calc: getDateFromHeader,
+	},
+	{
+		name: 'Score',
+		calc: (d) => d.score,
+	},
+	{
+		name: 'HardMode',
+		calc: (d) => d.hardMode,
+	},
+];
+
+import { generateCSVFile } from '../utils/generateCSVFile.js';
+const csvButton = document.querySelector('#csv-button');
+csvButton.addEventListener('click', () => {
+	generateCSVFile('Wordle', columnData);
 });

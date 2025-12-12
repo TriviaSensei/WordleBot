@@ -7,6 +7,7 @@ import { fillIns } from './fillIns.js';
 import { gameList } from './gameList.js';
 
 const dateRanges = getElementArray(document, '.date-range');
+const csvButton = document.querySelector('#csv-button');
 let timezone;
 
 const handleImageError = (e) => {
@@ -193,7 +194,11 @@ document.addEventListener('DOMContentLoaded', () => {
 					(dr) =>
 						(dr.innerHTML = `${res.data.gameData.startDate} to ${res.data.gameData.endDate}`)
 				);
-			// console.log(res);
+
+			csvButton.disabled = res.data.gameData.data.every(
+				(d) => d.results.length === 0
+			);
+
 			res.data.gameData.data.forEach((d) => {
 				const gameId = d.game.toLowerCase().split(' ').join('-');
 				//show the tab/pane if there are results

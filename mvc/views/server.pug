@@ -30,6 +30,8 @@ block content
                             .d-flex.flex-row.align-items-center 
                                 img.game-icon(src=`/img/icons/${game.game.toLowerCase().split(' ').join('_')}.svg`)
                                 span= game.game
+            .w-100.my-2
+                button#csv-button.btn.btn-primary.w-100 Download data as .csv
             #report-panes.tab-content
                 - if (data.gameData.data.length === 0)
                     div No data is available for this month 

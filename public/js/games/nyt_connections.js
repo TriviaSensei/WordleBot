@@ -125,3 +125,31 @@ area.addEventListener('data-update', (e) => {
 		sortOrder
 	);
 });
+
+const columnData = [
+	{
+		name: 'Number',
+		calc: (d) => d.number,
+	},
+	{
+		name: 'Date',
+		header: true,
+		calc: getDateFromHeader,
+	},
+	...['Purple', 'Blue', 'Green', 'Yellow'].map((n, i) => {
+		return {
+			name: n,
+			calc: (d) => d.scores[i],
+		};
+	}),
+	{
+		name: 'Mistakes',
+		calc: (d) => d.mistakes,
+	},
+];
+
+import { generateCSVFile } from '../utils/generateCSVFile.js';
+const csvButton = document.querySelector('#csv-button');
+csvButton.addEventListener('click', () => {
+	generateCSVFile('Wordle', columnData);
+});

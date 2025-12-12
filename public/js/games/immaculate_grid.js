@@ -64,3 +64,30 @@ area.addEventListener('data-update', (e) => {
 		sortOrder
 	);
 });
+
+import { getDateFromHeader } from '../utils/getDateFromHeader.js';
+const columnData = [
+	{
+		name: 'Number',
+		calc: (d) => d.number,
+	},
+	{
+		name: 'Date',
+		header: true,
+		calc: getDateFromHeader,
+	},
+	{
+		name: 'Correct',
+		calc: (d) => d.correct,
+	},
+	{
+		name: 'Rarity',
+		calc: (d) => d.rarity,
+	},
+];
+
+import { generateCSVFile } from '../utils/generateCSVFile.js';
+const csvButton = document.querySelector('#csv-button');
+csvButton.addEventListener('click', () => {
+	generateCSVFile('Immaculate Grid', columnData);
+});

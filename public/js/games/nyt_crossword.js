@@ -71,3 +71,24 @@ const handleDataUpdate = (e) => {
 };
 
 areas.forEach((a) => a.addEventListener('data-update', handleDataUpdate));
+
+import { generateCSVFile } from '../utils/generateCSVFile.js';
+const csvButton = document.querySelector('#csv-button');
+const columnData = [
+	{
+		name: 'Date',
+		header: true,
+		calc: getDateFromHeader,
+	},
+	{
+		name: 'Time',
+		calc: (d) => d.time,
+	},
+];
+csvButton.addEventListener('click', () => {
+	const game = document
+		.querySelector(`.tab-pane.fade.active.show[data-game]`)
+		.getAttribute('data-game');
+	if (['NYT Crossword', 'NYT Mini'].includes(game))
+		generateCSVFile(game, columnData);
+});

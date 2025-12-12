@@ -97,3 +97,32 @@ const handleDataUpdate = (maxGuesses) => {
 areas.forEach((a, i) =>
 	a.addEventListener('data-update', handleDataUpdate(guessLimit[i]))
 );
+
+import { getDateFromHeader } from '../utils/getDateFromHeader.js';
+const columnData = [
+	{
+		name: 'Number',
+		calc: (d) => d.number,
+	},
+	{
+		name: 'Date',
+		header: true,
+		calc: getDateFromHeader,
+	},
+	...[0, 1, 2, 3].map((n) => {
+		return {
+			name: `Score${n + 1}`,
+			calc: (d) => d.scores[n],
+		};
+	}),
+];
+
+import { generateCSVFile } from '../utils/generateCSVFile.js';
+const csvButton = document.querySelector('#csv-button');
+csvButton.addEventListener('click', () => {
+	const game = document
+		.querySelector(`.tab-pane.fade.active.show[data-game]`)
+		.getAttribute('data-game');
+	if (['Quordle', 'Quordle Extreme', 'Sequence Quordle'].includes(game))
+		generateCSVFile(game, columnData);
+});
