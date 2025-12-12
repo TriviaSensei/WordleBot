@@ -42,7 +42,10 @@ export const generateCSVFile = (game, columnData) => {
 	const arr = monthSelect.value.split('-');
 	if (arr.length > 1 && arr[1].trim().length === 1)
 		arr[1] = `0${arr[1].trim()}`;
-	dlAnchorElem.setAttribute('download', `${gid}_${arr.join('-')}_${game}.csv`);
+	dlAnchorElem.setAttribute(
+		'download',
+		`${gid}_${arr.join('-')}_${game.split(' ').join('_')}.csv`
+	);
 	dlAnchorElem.click();
 	dlAnchorElem.remove();
 };
