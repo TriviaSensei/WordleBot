@@ -153,5 +153,5 @@ const columnData = [
 import { generateCSVFile } from '../utils/generateCSVFile.js';
 const csvButton = document.querySelector('#csv-button');
 csvButton.addEventListener('click', () => {
-	generateCSVFile('Wordle', columnData);
+	generateCSVFile('NYT Connections', columnData);
 });
