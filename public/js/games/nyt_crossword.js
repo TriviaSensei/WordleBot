@@ -73,6 +73,8 @@ const handleDataUpdate = (e) => {
 areas.forEach((a) => a.addEventListener('data-update', handleDataUpdate));
 
 import { generateCSVFile } from '../utils/generateCSVFile.js';
+import { getDateFromHeader } from '../utils/getDateFromHeader.js';
+
 const csvButton = document.querySelector('#csv-button');
 const columnData = [
 	{

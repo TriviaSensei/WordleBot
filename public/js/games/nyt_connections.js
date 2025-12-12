@@ -126,6 +126,8 @@ area.addEventListener('data-update', (e) => {
 	);
 });
 
+import { getDateFromHeader } from '../utils/getDateFromHeader.js';
+
 const columnData = [
 	{
 		name: 'Number',
