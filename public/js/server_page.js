@@ -392,15 +392,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	monthSelect.addEventListener('change', getData);
 
-	const handleCSVButton = () => {
-		const cell = document
-			.querySelector('.tab-pane.active.show.fade')
-			.querySelector('.result-cell');
-		console.log(cell);
+	const handleCSVButton = (e) => {
+		const button =
+			e?.target || document.querySelector('button.nav-link.active');
+		if (!button) return (csvButton.disabled = true);
+
+		const pane = document.querySelector(
+			`${button.getAttribute('data-bs-target')}`
+		);
+
+		const cell = pane.querySelector('.result-cell');
 		if (!cell) csvButton.disabled = true;
 		else csvButton.disabled = false;
 	};
-
 	document.addEventListener('shown.bs.tab', handleCSVButton);
 	handleCSVButton();
 	getData({ target: monthSelect });
