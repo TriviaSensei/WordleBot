@@ -184,6 +184,19 @@ document.addEventListener('DOMContentLoaded', () => {
 	);
 	const panes = getElementArray(document, '.tab-pane');
 
+	const handleCSVButton = (e) => {
+		const button =
+			e?.target || document.querySelector('button.nav-link.active');
+		if (!button) return (csvButton.disabled = true);
+
+		const pane = document.querySelector(
+			`${button.getAttribute('data-bs-target')}`
+		);
+
+		const cell = pane.querySelector('.result-cell');
+		if (!cell) csvButton.disabled = true;
+		else csvButton.disabled = false;
+	};
 	const getData = (e) => {
 		if (!e.target.value) return;
 		const handler = (res) => {
@@ -375,6 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
 					document.dispatchEvent(evt2);
 				}
 			});
+
+			handleCSVButton();
 		};
 		if (data) {
 			handler({ status: 'success', data });
@@ -392,20 +407,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	monthSelect.addEventListener('change', getData);
 
-	const handleCSVButton = (e) => {
-		const button =
-			e?.target || document.querySelector('button.nav-link.active');
-		if (!button) return (csvButton.disabled = true);
-
-		const pane = document.querySelector(
-			`${button.getAttribute('data-bs-target')}`
-		);
-
-		const cell = pane.querySelector('.result-cell');
-		if (!cell) csvButton.disabled = true;
-		else csvButton.disabled = false;
-	};
 	document.addEventListener('shown.bs.tab', handleCSVButton);
-	handleCSVButton();
 	getData({ target: monthSelect });
 });
