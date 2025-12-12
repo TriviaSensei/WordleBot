@@ -8,7 +8,7 @@ export const generateCSVFile = (game, columnData) => {
 	);
 	if (!pane) return;
 
-	const rows = getElementArray(document, '.standings-row');
+	const rows = getElementArray(pane, '.standings-row');
 
 	let csvContent = 'data:text;charset=utf-8,\uFEFF';
 	csvContent += 'Name,ID,' + columnData.map((cd) => cd.name).join(',') + '\n';
