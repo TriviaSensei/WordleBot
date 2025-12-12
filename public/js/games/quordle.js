@@ -122,7 +122,7 @@ const csvButton = document.querySelector('#csv-button');
 csvButton.addEventListener('click', () => {
 	const game = document
 		.querySelector(`.tab-pane.fade.active.show[data-game]`)
-		.getAttribute('data-game');
+		?.getAttribute('data-game');
 	if (['Quordle', 'Quordle Extreme', 'Sequence Quordle'].includes(game))
 		generateCSVFile(game, columnData);
 });

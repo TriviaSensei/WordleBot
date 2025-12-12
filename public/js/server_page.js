@@ -195,10 +195,6 @@ document.addEventListener('DOMContentLoaded', () => {
 						(dr.innerHTML = `${res.data.gameData.startDate} to ${res.data.gameData.endDate}`)
 				);
 
-			csvButton.disabled = res.data.gameData.data.every(
-				(d) => d.results.length === 0
-			);
-
 			res.data.gameData.data.forEach((d) => {
 				const gameId = d.game.toLowerCase().split(' ').join('-');
 				//show the tab/pane if there are results
@@ -396,5 +392,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	monthSelect.addEventListener('change', getData);
 
+	const handleCSVButton = () => {
+		const cell = document
+			.querySelector('.tab-pane.active.show.fade')
+			.querySelector('.result-cell');
+		console.log(cell);
+		if (!cell) csvButton.disabled = true;
+		else csvButton.disabled = false;
+	};
+
+	document.addEventListener('shown.bs.tab', handleCSVButton);
+	handleCSVButton();
 	getData({ target: monthSelect });
 });

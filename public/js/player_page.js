@@ -14,7 +14,6 @@ let timezone;
 document.addEventListener('DOMContentLoaded', () => {
 	const dataArea = document.querySelector('#data-area');
 	let data = JSON.parse(dataArea.getAttribute('data'));
-	console.log(data);
 	const tt = getElementArray(document, '[data-bs-toggle="tooltip"]');
 	tt.forEach((t) => new bootstrap.Tooltip(t));
 	timezone = data.timezone || 'America/New_York';
@@ -214,6 +213,27 @@ document.addEventListener('DOMContentLoaded', () => {
 				//remove summary rows
 				getElementArray(table, '.summary-row').forEach((r) => r.remove());
 			});
+			if (noneShown) {
+				const [tab, button, pane] = [
+					document.querySelector(`li.nav-item[data-game="achievements"]`),
+					document.querySelector(
+						`li.nav-item[data-game="achievements"] > button`
+					),
+					document.querySelector(`#achievements-tab-pane`),
+				];
+				[tab, button, pane].forEach((el) => el.classList.add('active'));
+				pane.classList.add('show');
+			} else {
+				const [tab, button, pane] = [
+					document.querySelector(`li.nav-item[data-game="achievements"]`),
+					document.querySelector(
+						`li.nav-item[data-game="achievements"] > button`
+					),
+					document.querySelector(`#achievements-tab-pane`),
+				];
+				[tab, button, pane].forEach((el) => el.classList.remove('active'));
+				pane.classList.remove('show');
+			}
 			if (res?.data?.gameData?.startDate && res?.data?.gameData?.endDate)
 				dateRanges.forEach(
 					(dr) =>
@@ -235,5 +255,22 @@ document.addEventListener('DOMContentLoaded', () => {
 		handleRequest(url, 'GET', null, handler);
 	};
 	monthSelect.addEventListener('change', getData);
+
+	const csvButton = document.querySelector('#csv-button');
+	const handleCSVButton = (e) => {
+		const button =
+			e?.target || document.querySelector('button.nav-link.active');
+		if (!button) return (csvButton.disabled = true);
+
+		const pane = document.querySelector(
+			`${button.getAttribute('data-bs-target')}`
+		);
+
+		const cell = pane.querySelector('.result-cell');
+		if (!cell) csvButton.disabled = true;
+		else csvButton.disabled = false;
+	};
+	document.addEventListener('shown.bs.tab', handleCSVButton);
+	handleCSVButton();
 	getData({ target: monthSelect });
 });

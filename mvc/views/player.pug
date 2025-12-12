@@ -35,7 +35,7 @@ block content
                             .d-flex.flex-row.align-items-center 
                                 img.game-icon(src=`/img/icons/${game.game.toLowerCase().split(' ').join('_')}.svg`)
                                 span= game.game
-                li(class=`nav-item` role="presentation")
+                li(class=`nav-item` data-game="achievements" role="presentation")
                     button(class=`nav-link ${noTabs ? 'active':''}` id=`achievements-tab` data-bs-toggle="tab" data-bs-target=`#achievements-tab-pane` type="button" role="tab" aria-controls=`achievements-tab-pane` aria-selected=`${noTabs}`)
                         .d-flex.flex-row.align-items-center 🎖️ Achievements 
 
