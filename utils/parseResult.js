@@ -145,7 +145,7 @@ const checkValidDateOnly = (date) => {
 	const currentTimeGMT = new Date(moment.tz(new Date(), 'GMT'));
 	//maxTime is the latest time anywhere on earth right now
 	const maxTime = new Date(
-		currentTimeGMT.setHours(currentTimeGMT.getHours() + maxTimeZoneOffset)
+		currentTimeGMT.setHours(currentTimeGMT.getHours() + maxTimeZoneOffset),
 	);
 	//if the submission date is less than maxTime, then this puzzle submit could be valid. Otherwise, it's definitely in the future.
 	if (date.getFullYear() > maxTime.getFullYear()) return false;
@@ -186,10 +186,10 @@ const processCrossword = (name, dateIndex) => {
 				timeInfo.length > 3
 					? null
 					: timeInfo.length === 3
-					? 3600 * timeInfo[0] + 60 * timeInfo[1] + timeInfo[2]
-					: timeInfo.length === 2
-					? 60 * timeInfo[0] + timeInfo[1]
-					: null,
+						? 3600 * timeInfo[0] + 60 * timeInfo[1] + timeInfo[2]
+						: timeInfo.length === 2
+							? 60 * timeInfo[0] + timeInfo[1]
+							: null,
 		};
 		if (data.time !== null && !isNaN(data.time)) return { status: 0, data };
 		return {
@@ -217,9 +217,9 @@ const processCrosswordDate = (dateIndex) => {
 						`${yr}-${mo >= 10 ? mo : `0${mo}`}-${
 							dt >= 10 ? dt : `0${dt}`
 						} 00:00`,
-						timezone
+						timezone,
 					)
-					.format()
+					.format(),
 			);
 		}
 		return null;
@@ -246,7 +246,7 @@ const getDateExtremes = () => {
 		{
 			maxOffset: null,
 			minOffset: null,
-		}
+		},
 	);
 	return [
 		moment.tz(now, extremes.maxOffset.name).format(),
@@ -282,7 +282,7 @@ const currentCrosswords = () => {
 	const currentDate = currentDT.split('T')[0];
 	//day of week in NY
 	const currentDOW = new Date(
-		moment.tz(`${currentDate} 00:00`, 'GMT').format()
+		moment.tz(`${currentDate} 00:00`, 'GMT').format(),
 	).getDay();
 	//current hour in NY
 	const currentHr = Number(currentDT.split('T')[1].split(':')[0]);
@@ -338,7 +338,7 @@ const matchers = [
 						return {
 							status: 1,
 							message: `Wordle puzzle number (${tokens[1].split(
-								','
+								',',
 							)}) is not valid`,
 						};
 					} else {
@@ -362,7 +362,7 @@ const matchers = [
 			},
 			getDate: (str) => {
 				const number = parseInt(
-					str.split('\n')[0].split(' ')[1].split(',').join('')
+					str.split('\n')[0].split(' ')[1].split(',').join(''),
 				);
 				return getPuzzleDate(number, 1300, '2025-01-09');
 			},
@@ -451,7 +451,7 @@ const matchers = [
 	//NYT Connections
 	{
 		regex:
-			/Connections(\n|\s)Puzzle #(\d{1,3},)?(\d{3})+(\n(\uD83D[\uDFE8\uDFE9\uDFE6\uDFEA]){4})+/g,
+			/Connections(\n|\s)Puzzle #(\d)+(.*)(\n(\uD83D[\uDFE8\uDFE9\uDFE6\uDFEA]){4})+/g,
 		data: {
 			name: 'NYT Connections',
 			checkValidDate: checkValidDateOnly,
@@ -578,10 +578,10 @@ const matchers = [
 			getData: (str) => {
 				const lines = str.split('\n');
 				const number = parseInt(
-					lines[0].split(' ')[1].split('#').slice(-1).pop()
+					lines[0].split(' ')[1].split('#').slice(-1).pop(),
 				);
 				const score = parseInt(
-					lines[0].split(' ')[2].split('/')[0].split('(').slice(-1).pop()
+					lines[0].split(' ')[2].split('/')[0].split('(').slice(-1).pop(),
 				);
 				if (number && score >= 0)
 					return {
@@ -602,7 +602,7 @@ const matchers = [
 			checkValidDate: checkValidDateTime(0, timezone),
 			getDate: (str) => {
 				const number = parseInt(
-					str.split('\n')[0].split(' ')[1].split('#').slice(-1).pop()
+					str.split('\n')[0].split(' ')[1].split('#').slice(-1).pop(),
 				);
 				return getPuzzleDate(number, 645, '2025-01-13');
 			},
@@ -644,7 +644,7 @@ const matchers = [
 				lines.some((l) => {
 					if (
 						l.match(
-							/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\. (\d){1,2}, (\d){4}/
+							/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\. (\d){1,2}, (\d){4}/,
 						)
 					) {
 						const tokens = l.split(' ');
@@ -661,9 +661,9 @@ const matchers = [
 							`${yr}-${mo >= 10 ? mo : `0${mo}`}-${
 								dt >= 10 ? dt : `0${dt}`
 							} 00:00`,
-							timezone
+							timezone,
 						)
-						.format()
+						.format(),
 				);
 				return toReturn;
 			},
@@ -706,7 +706,7 @@ const matchers = [
 					lines.some((l) => {
 						if (
 							l.match(
-								/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\. (\d){1,2}, (\d){4}/
+								/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\. (\d){1,2}, (\d){4}/,
 							)
 						) {
 							const tokens = l.split(' ');
@@ -723,9 +723,9 @@ const matchers = [
 								`${yr}-${mo >= 10 ? mo : `0${mo}`}-${
 									dt >= 10 ? dt : `0${dt}`
 								} 00:00`,
-								timezone
+								timezone,
 							)
-							.format()
+							.format(),
 					);
 					const dow = gameDate.getDay();
 					const difficulty = dow === 0 ? 320 : 180 + 20 * dow;
@@ -774,7 +774,7 @@ const matchers = [
 							.find((l) => l.match(/Rarity/g))
 							?.split(' ')
 							.slice(-1)
-							.pop()
+							.pop(),
 					),
 				};
 				if (isNaN(data.rarity))

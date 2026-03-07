@@ -134,7 +134,7 @@ const handlePostQueue = async () => {
 					await axios.put(
 						`${url}/channels/${channelId}/messages/${msg.id}/reactions/${encoded}/@me`,
 						null,
-						authObj
+						authObj,
 					);
 				else if (action === 'remove')
 					await axios.delete(
@@ -142,7 +142,7 @@ const handlePostQueue = async () => {
 							msg.id
 						}/reactions/${encoded}/@me`,
 						null,
-						authObj
+						authObj,
 					);
 
 				postQueue.shift();
@@ -175,14 +175,14 @@ const handlePostQueue = async () => {
 		const channelId = postQueue[0].data.channelId
 			? postQueue[0].data.channelId
 			: postQueue[0].channel_id
-			? postQueue[0].channel_id
-			: postQueue[0].channelId;
+				? postQueue[0].channel_id
+				: postQueue[0].channelId;
 		if (channelId) {
 			try {
 				await axios.post(
 					`${url}/channels/${channelId}/messages`,
 					data,
-					authObj
+					authObj,
 				);
 				postQueue.shift();
 				console.log(`Sent message to channel ${channelId}`);
@@ -192,7 +192,7 @@ const handlePostQueue = async () => {
 				postQueue[0].failures++;
 				if (postQueue[0].failures === 3) {
 					console.log(
-						`Failed to send discord message (channel ID: ${channelId})`
+						`Failed to send discord message (channel ID: ${channelId})`,
 					);
 				}
 			}
@@ -289,7 +289,7 @@ const handleAchievements = async (data) => {
 	//see what achievements can be accomplished with this one,
 	//push to the user's list if not already there
 	const gameAchievements = achievements.filter(
-		(a) => a.games.length === 0 || a.games.includes(data.game)
+		(a) => a.games.length === 0 || a.games.includes(data.game),
 	);
 	const toReturn = [];
 	//push to the user if they don't have data for this achievement
@@ -300,7 +300,7 @@ const handleAchievements = async (data) => {
 			//otherwise get the data item (if any) in the user's progress that has the progress in it
 			if (a.dataItem) {
 				let existingProgress = user.achievements.progress.find(
-					(ua) => ua.name === a.dataItem
+					(ua) => ua.name === a.dataItem,
 				);
 				//push a fresh item to the user's progress if they haven't started on this one
 				if (!existingProgress) {
@@ -311,7 +311,7 @@ const handleAchievements = async (data) => {
 					user.markModified('achievements');
 				}
 			}
-		})
+		}),
 	);
 	await user.save();
 
@@ -321,7 +321,7 @@ const handleAchievements = async (data) => {
 		const ga = gameAchievements[i];
 		//if they've already completed this one, do nothing
 		const completedItem = user.achievements.completed.find(
-			(ca) => ca.id === ga.id
+			(ca) => ca.id === ga.id,
 		);
 		if (completedItem) continue;
 		//otherwise get the data item if there is one
@@ -424,11 +424,11 @@ const processResults = async (usr, gameInfo) => {
 									gameResult.data.number
 										? gameResult.data.number
 										: data.date.getMonth() +
-										  1 +
-										  '/' +
-										  data.date.getDate() +
-										  '/' +
-										  data.date.getFullYear()
+											1 +
+											'/' +
+											data.date.getDate() +
+											'/' +
+											data.date.getFullYear()
 								} result was recorded, but was duplicated in your paste. Ensure you didn't mean to submit a different day's result.`,
 								reaction: '👯',
 							});
@@ -456,19 +456,19 @@ const processResults = async (usr, gameInfo) => {
 								gameResult.data.number
 									? gameResult.data.number
 									: data.date.getMonth() +
-									  1 +
-									  '/' +
-									  data.date.getDate() +
-									  '/' +
-									  data.date.getFullYear()
+										1 +
+										'/' +
+										data.date.getDate() +
+										'/' +
+										data.date.getFullYear()
 							} result was already found in the database. No duplicate entry added.`,
 							reaction: '⚠️',
 						});
 						return null;
 					}
-				})
+				}),
 			);
-		})
+		}),
 	);
 
 	const allResults = results.reduce((p, c) => {
@@ -498,7 +498,7 @@ const checkCorrectChannel = async (srvr, msg, ...suppressWarnings) => {
 		try {
 			const correctChannel = await axios.get(
 				`${url}/channels/${srvr.channelId}`,
-				authObj
+				authObj,
 			);
 			if (correctChannel) {
 				if (!suppressWarnings)
@@ -653,20 +653,14 @@ const sendAdHocUpdate = async () => {
 	serverData.forEach((s) => {
 		if (!checkCorrectServer(s.guildId))
 			return console.log(
-				`Not sending update to ${s.guildId} (env=${process.env.NODE_ENV})`
+				`Not sending update to ${s.guildId} (env=${process.env.NODE_ENV})`,
 			);
-		const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-		const url =
-			process.env.NODE_ENV === 'production'
-				? 'www.wordlebot.gg'
-				: 'localhost:3000';
-		const addr = `${protocol}://${url}/server/${s.guildId}/${currentYear}/${currentMonth}`;
 
 		addMessage({
 			channelId: s.channelId,
 			data: {
 				channelId: s.channelId,
-				content: `@everyone Apologies - WordleBot choked this morning while sending out monthly updates, so two things: if you submitted a result for 12/1, it may not have been picked up - please resubmit it and it should be registered. Additionally, here is your monthly server update: ${addr}`,
+				content: `@everyone WordleBot seems to have choked on this morning's NYT Connections puzzle. If you submitted a result for it, please resend it.`,
 			},
 		});
 	});
@@ -680,7 +674,7 @@ const sendMonthlyUpdate = async () => {
 	if (!monthlyUpdateTimeout) {
 		const nextMonth = formatLeadingZeroes(
 			((currentDate.getMonth() + 1) % 12) + 1,
-			2
+			2,
 		);
 		const year = currentDate.getFullYear() + (nextMonth === '01' ? 1 : 0);
 
@@ -692,8 +686,8 @@ const sendMonthlyUpdate = async () => {
 			new Date(nextUpdateDT) - new Date(currentDT) + 1000;
 		console.log(
 			`Next monthly wordle update going out in ${getTimeStr(
-				timeUntilNextUpdate
-			)}`
+				timeUntilNextUpdate,
+			)}`,
 		);
 		//can't set a timeout for a time greater than what a 32-bit signed integer can hold - don't save the timeout, but set it for 2 weeks from now (about 1/2 month) if the amount of time is too big
 		if (timeUntilNextUpdate >= Math.pow(2, 31) - 1) {
@@ -717,7 +711,7 @@ const sendMonthlyUpdate = async () => {
 	serverData.forEach((s) => {
 		if (!checkCorrectServer(s.guildId))
 			return console.log(
-				`Not sending update to ${s.guildId} (env=${process.env.NODE_ENV})`
+				`Not sending update to ${s.guildId} (env=${process.env.NODE_ENV})`,
 			);
 		addMessage({
 			channelId: s.channelId,
@@ -771,7 +765,7 @@ client.on('interactionCreate', async (data) => {
 		else content = `You are already associated with this server.`;
 	} else if (commandName.toLowerCase() === 'myservers') {
 		const usr = await Users.findOne({ userId: data.user.id }).populate(
-			'servers'
+			'servers',
 		);
 		if (!usr) {
 			content =
@@ -782,7 +776,7 @@ client.on('interactionCreate', async (data) => {
 			return s.name;
 		});
 		content = `You are registered on the following servers:\n${serverData.join(
-			'\n'
+			'\n',
 		)}`;
 	} else {
 		//these commands all require admin to run them
@@ -800,7 +794,7 @@ client.on('interactionCreate', async (data) => {
 
 		const user = await axios.get(
 			`${url}/guilds/${serverData.id}/members/${data.user.id}`,
-			authObj
+			authObj,
 		);
 		if (!serverData || !user)
 			return data.reply({
@@ -812,10 +806,10 @@ client.on('interactionCreate', async (data) => {
 			user.data.roles.map(async (r) => {
 				const role = await axios.get(
 					`${url}/guilds/${serverData.id}/roles/${r}`,
-					authObj
+					authObj,
 				);
 				return role.data;
-			})
+			}),
 		);
 
 		const isOwner = data.user.id === serverData.owner_id;
@@ -907,7 +901,7 @@ client.on('interactionCreate', async (data) => {
 
 					content =
 						`You have set your server game list to:\n${data.values.join(
-							', '
+							', ',
 						)}` +
 						(data.values.length === gameList.length
 							? `\nOther game results may be posted and recorded, but will not show up on standings reports unless you enable them here.`
@@ -971,7 +965,7 @@ client.on('messageCreate', async (msg) => {
 	//process the actual result string(s)
 	const { results, failures, successes, achievements } = await processResults(
 		usr,
-		gameInfo
+		gameInfo,
 	);
 
 	//message or reaction with results of post
@@ -983,8 +977,8 @@ client.on('messageCreate', async (msg) => {
 				content: `<@${msg.author.id}> ${
 					successes.length > 0
 						? successes.length +
-						  (successes.length > 1 ? ' results were' : ' result was') +
-						  ' successfully posted. '
+							(successes.length > 1 ? ' results were' : ' result was') +
+							' successfully posted. '
 						: ''
 				}One or more failures occurred while posting results:\n${failures
 					.map((f) => `⚠️ ${f.message}`)
@@ -1059,7 +1053,7 @@ client.on('messageCreate', async (msg) => {
 					try {
 						await axios.get(
 							`${url}/guilds/${otherServer.guildId}/members/${msg.author.id}`,
-							authObj
+							authObj,
 						);
 						const toSend = successes.filter((su) => {
 							return otherServer.games.includes(su.name);
@@ -1089,14 +1083,14 @@ client.on('messageCreate', async (msg) => {
 					//remove the user from the server's list
 					const server = await Servers.findById(s);
 					server.users = server.users.filter(
-						(u) => u.toString() !== user._id.toString()
+						(u) => u.toString() !== user._id.toString(),
 					);
 					await server.save();
 					//remove the server from the user's list
 					user.servers = user.servers.filter(
-						(srv) => srv.toString() !== s.toString()
+						(srv) => srv.toString() !== s.toString(),
 					);
-				})
+				}),
 			);
 			s.markModified('users');
 			await s.save();
@@ -1175,8 +1169,8 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 					content: `<@${newMessage.author.id}> On edit, ${
 						successes.length > 0
 							? successes.length +
-							  (successes.length > 1 ? ' results were' : ' result was') +
-							  ' successfully added. '
+								(successes.length > 1 ? ' results were' : ' result was') +
+								' successfully added. '
 							: ''
 					}One or more failures occurred while posting edited results:\n${failures
 						.map((f) => `⚠️ ${f}`)
@@ -1197,8 +1191,8 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 						content: `<@${newMessage.author.id}> On edit, ${
 							successes.length > 0
 								? successes.length +
-								  (successes.length > 1 ? ' results were' : ' result was') +
-								  ' successfully added. '
+									(successes.length > 1 ? ' results were' : ' result was') +
+									' successfully added. '
 								: ''
 						}`,
 						message_reference: {
@@ -1221,7 +1215,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 					//make sure the member is still a part of that server (in discord's record)
 					const members = await axios.get(
 						`${url}/guilds/${otherServer.guildId}/members`,
-						authObj
+						authObj,
 					);
 					if (members && !members.some((m) => m.user.id === msg.author.id)) {
 						serversToRemove.push(s._id);
@@ -1249,14 +1243,14 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 						//remove the user from the server's list
 						const server = await Servers.findById(s);
 						server.users = server.users.filter(
-							(u) => u.toString() !== user._id.toString()
+							(u) => u.toString() !== user._id.toString(),
 						);
 						await server.save();
 						//remove the server from the user's list
 						user.servers = user.servers.filter(
-							(srv) => srv.toString() !== s.toString()
+							(srv) => srv.toString() !== s.toString(),
 						);
-					})
+					}),
 				);
 				s.markModified('users');
 				await s.save();
@@ -1270,7 +1264,7 @@ client.on('ready', async (c) => {
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
 	await sendMonthlyUpdate();
-	// await sendAdHocUpdate();
+	await sendAdHocUpdate();
 });
 
 // const sandbox = require('../../sandbox');
