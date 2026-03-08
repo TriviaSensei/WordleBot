@@ -1264,7 +1264,7 @@ client.on('ready', async (c) => {
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
 	await sendMonthlyUpdate();
-	await sendAdHocUpdate();
+	// await sendAdHocUpdate();
 });
 
 // const sandbox = require('../../sandbox');
