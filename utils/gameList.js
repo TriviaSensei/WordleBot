@@ -353,6 +353,12 @@ const gameList = [
 		...crosswordSettings,
 	},
 	{
+		name: 'NYT Midi',
+		script: false,
+		url: 'https://www.nytimes.com/crosswords/game/midi',
+		...crosswordSettings,
+	},
+	{
 		name: 'NYT Connections',
 		script: true,
 		url: 'https://www.nytimes.com/games/connections',

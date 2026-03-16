@@ -38,16 +38,16 @@ const getAnyRes = (game, filterFunction) => {
 			? {
 					user: userId,
 					game,
-			  }
+				}
 			: {
 					user: userId,
-			  };
+				};
 		const res = await Results.find(f).sort({ date: 1 }).lean();
 		if (res.length > 0) {
 			const r = filterFunction
 				? res.find((r) => {
 						return filterFunction(r.data);
-				  })
+					})
 				: res[0];
 
 			if (r) return r.date;
@@ -232,7 +232,7 @@ const streakUpdater = (game) => {
 			})
 		) {
 			const temp = [...old.other, thisDate].sort(
-				(a, b) => new Date(a) - new Date(b)
+				(a, b) => new Date(a) - new Date(b),
 			);
 			const streakData = {
 				current: 0,
@@ -333,8 +333,8 @@ gameList.forEach((el, i) => {
 		el.name === 'Immaculate Grid'
 			? 'Completely fill an Immaculate Grid'
 			: el.name === 'Digits'
-			? 'Get 20 stars on Digits'
-			: `Win at ${el.name}`;
+				? 'Get 20 stars on Digits'
+				: `Win at ${el.name}`;
 	[10, 25, 50, 100, 365].forEach((n, j) => {
 		const name = el.name.toLowerCase().split(' ').join('-');
 		const id = `${name}-win-streak-${n}`;
@@ -521,10 +521,10 @@ const quordleAchievements = (game) => {
 		game === 'Quordle'
 			? ['Quordelicious', 'Quordelightful', 'Quordetastic']
 			: game === 'Sequence Quordle'
-			? ['Sequentelligent', 'Sequensational', 'Sequenlightened']
-			: game === 'Quordle Extreme'
-			? ['Extremarkable', 'Extravishing', 'Extrexcellent']
-			: [];
+				? ['Sequentelligent', 'Sequensational', 'Sequenlightened']
+				: game === 'Quordle Extreme'
+					? ['Extremarkable', 'Extravishing', 'Extrexcellent']
+					: [];
 	return [
 		...[7, 6, 5].map((n, i) => {
 			const id = `${gameName}-win-${n}`;
@@ -540,7 +540,7 @@ const quordleAchievements = (game) => {
 					data ? data.scores.reduce((p, c) => Math.max(p, c)) === n : false,
 				retro: getAnyRes(
 					game,
-					(data) => data.scores.reduce((p, c) => Math.max(p, c)) === n
+					(data) => data.scores.reduce((p, c) => Math.max(p, c)) === n,
 				),
 			};
 		}),
@@ -560,7 +560,7 @@ const quordleAchievements = (game) => {
 					game,
 					(data) =>
 						data.scores.reduce((p, c) => Math.max(p, c)) <= maxGuesses &&
-						data.scores.reduce((p, c) => p + c) === n
+						data.scores.reduce((p, c) => p + c) === n,
 				),
 			};
 		}),
@@ -634,7 +634,7 @@ const nytMiniAchievements = [
 		return {
 			id,
 			name: `${el.desc} Mini Cruciverbalist`,
-			description: `Solve the New York Times Crossword in ${
+			description: `Solve the New York Times Mini Crossword in ${
 				el.time >= 60 ? el.time / 60 : el.time
 			} ${
 				el.time === 60 ? 'minute' : el.time >= 60 ? 'minutes' : 'seconds'
@@ -666,6 +666,59 @@ const nytMiniAchievements = [
 				isComplete: (data) => data.getDay() === i,
 				retro: async (user) => {
 					const res = await Results.find({ user, game: 'NYT Mini' })
+						.sort({ date: 1 })
+						.lean();
+					const dRes = res.find((r) => r.date.getDay() === dow);
+					if (dRes) return dRes.date;
+					return null;
+				},
+			};
+		}),
+];
+
+const nytMidiAchievements = [
+	...[
+		{ time: 300, color: '#66fff2', desc: 'Budding' },
+		{ time: 180, color: '#b5ff66', desc: 'Amateur' },
+		{ time: 120, color: '#fff266', desc: 'Expert' },
+		{ time: 60, color: `#ff7366`, desc: `Blazing` },
+	].map((el) => {
+		const id = `nyt-midi-speed-${el.time}`;
+		return {
+			id,
+			name: `${el.desc} Midi Cruciverbalist`,
+			description: `Solve the New York Times Midi Crossword in ${
+				el.time >= 60 ? el.time / 60 : el.time
+			} ${
+				el.time === 60 ? 'minute' : el.time >= 60 ? 'minutes' : 'seconds'
+			} or better`,
+			color: el.color,
+			games: ['NYT Midi'],
+			updateProgress: returnData,
+			getProgress: printProgress(1, () => 0),
+			isComplete: (data) => data.time <= el.time,
+			retro: getAnyRes('NYT Midi', (data) => data.time <= el.time),
+		};
+	}),
+	...new Array(7)
+		.fill(0)
+		.map((el, i) => i)
+		.map((dow, i) => {
+			const id = `nyt-midi-day-${dow}`;
+			const d = dows[dow];
+			return {
+				id,
+				name: `${d} NYT Midi`,
+				description: `Complete a ${d} New York Times Midi`,
+				color: `#ffffff`,
+				games: ['NYT Midi'],
+				updateProgress: (old, data) => {
+					return data.date;
+				},
+				getProgress: printProgress(1, () => 0),
+				isComplete: (data) => data.getDay() === i,
+				retro: async (user) => {
+					const res = await Results.find({ user, game: 'NYT Midi' })
 						.sort({ date: 1 })
 						.lean();
 					const dRes = res.find((r) => r.date.getDay() === dow);
@@ -729,7 +782,7 @@ const tightropeAchievements = [
 			retro: getAnyRes(
 				'Tightrope',
 				(data) =>
-					data.time !== null && !isNaN(data.time) && data.time <= el.time
+					data.time !== null && !isNaN(data.time) && data.time <= el.time,
 			),
 		};
 	}),
@@ -829,7 +882,7 @@ const immaculateGridAchievements = [
 			isComplete: (data) => data.correct === 9 && data.rarity <= el.rarity,
 			retro: getAnyRes(
 				'Immaculate Grid',
-				(data) => data.correct === 9 && data.rarity <= el.rarity
+				(data) => data.correct === 9 && data.rarity <= el.rarity,
 			),
 		};
 	}),
@@ -845,6 +898,7 @@ const achievements = [
 	...quordleAchievements('Quordle Extreme'),
 	...quordleAchievements('Sequence Quordle'),
 	...nytXWordAchievements,
+	...nytMidiAchievements,
 	...nytMiniAchievements,
 	...connectionsAchievements,
 	...tightropeAchievements,

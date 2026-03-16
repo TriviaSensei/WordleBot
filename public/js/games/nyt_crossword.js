@@ -1,6 +1,7 @@
 const areas = [
 	document.querySelector('#nyt-crossword-tab-pane'),
 	document.querySelector('#nyt-mini-tab-pane'),
+	document.querySelector('#nyt-midi-tab-pane'),
 ];
 
 import { updateTable } from '../updateTable.js';
@@ -66,7 +67,7 @@ const handleDataUpdate = (e) => {
 		operators,
 		page === 'server' ? operators : [],
 		e.detail.serverData?.customStats,
-		sortOrder
+		sortOrder,
 	);
 };
 

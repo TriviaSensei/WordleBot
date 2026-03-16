@@ -877,6 +877,34 @@ const matchers = [
 			},
 		},
 	},
+	//NYT Midi
+	{
+		regex:
+			/I solved the (\d)+\/(\d)+\/(\d)+ New York Times Midi Crossword in (\d)+(:(\d){2})+/g,
+		data: {
+			name: 'NYT Midi',
+			getData: processCrossword('NYT Midi', 3),
+			getLivePuzzleDate: (date) => {
+				return date.split('T')[0];
+			},
+			compareData: compareCrossword,
+			getDate: processCrosswordDate(3),
+			getPuzzleNumberByDate: () => {
+				return null;
+			},
+			checkValidDate: (date) => {
+				let func;
+				if (date.getDay() <= 1) func = checkValidDateTime(-6, timezone);
+				else func = checkValidDateTime(-2, timezone);
+				return func(date);
+			},
+			getCurrentPuzzles: currentCrosswords,
+			checkWin: (data) => true,
+			getReaction: () => {
+				return ['✅'];
+			},
+		},
+	},
 	//NYT Crossword
 	{
 		regex:
