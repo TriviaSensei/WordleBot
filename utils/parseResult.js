@@ -792,7 +792,7 @@ const matchers = [
 				if (lineCount !== 3)
 					return {
 						status: 1,
-						message: `${lineCount} lines of Immaculate Grid results detected; 3 expected`,
+						message: `${lineCount} lines of Immaculate Grid results detected; 3 expected. As of 3/16/2026, you must paste the squares with your Immaculate Grid results, as extra guesses are not reflected in the first line of the result.`,
 					};
 				else if (correct > 9)
 					return {
