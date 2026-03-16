@@ -185,8 +185,8 @@ const handlePostQueue = async () => {
 					authObj,
 				);
 				postQueue.shift();
-				console.log(`Sent message to channel ${channelId}`);
-				console.log(`Queue length: ${postQueue.length}`);
+				// console.log(`Sent message to channel ${channelId}`);
+				// console.log(`Queue length: ${postQueue.length}`);
 			} catch (err) {
 				console.log(err.response.data);
 				postQueue[0].failures++;
@@ -264,9 +264,11 @@ const checkCorrectServer = (guildId) => {
 
 const testRegex = (str) => {
 	//		/Wordle (\d{1,3},)?(\d{3})+ [\dX]\/6(\*)?(\n)*(\n(\u2B1B|(\uD83D\uDFE9)|(\uD83D\uDFE8)){5}(.*)){1,6}/g;
-	const regex = /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+/g;
+	const regex =
+		/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n((\uD83D\uDFE9|\u2B1C\uFE0F){3}.*\n){3}/g;
 	const match = str.match(regex);
-	if (!match) return getCharCodes(str);
+	console.log(match);
+	// return getCharCodes(str);
 };
 
 const handleAchievements = async (data) => {
@@ -402,6 +404,7 @@ const processResults = async (usr, gameInfo) => {
 							reaction: '❓',
 						});
 					}
+					console.log(gameResult);
 					if (gameResult.status !== 0) {
 						failures.push({ message: gameResult.message, reaction: '⚠️' });
 						return null;
@@ -920,6 +923,8 @@ client.on('interactionCreate', async (data) => {
 client.on('messageCreate', async (msg) => {
 	if (!checkCorrectServer(msg.guildId)) return;
 
+	testRegex(msg.content);
+
 	if (!msg.author) {
 		console.log('No msg author');
 		console.log(msg);
@@ -944,7 +949,7 @@ client.on('messageCreate', async (msg) => {
 	//see if it's a game result being posted, and if not, ignore the message.
 	const gameInfo = parseResult(msg.content);
 	if (!gameInfo || gameInfo.length === 0) {
-		// if (process.env.NODE_ENV === 'development') testRegex(msg.content);
+		if (process.env.NODE_ENV === 'development') testRegex(msg.content);
 		return;
 	}
 

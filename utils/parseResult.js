@@ -761,14 +761,47 @@ const matchers = [
 	},
 	//Immaculate Grid
 	{
-		regex: /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+/g,
+		// regex: /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n/g,
+		regex:
+			/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n((\uD83D\uDFE9|\u2B1C\uFE0F){3}.*\n){3}/g,
 		data: {
 			name: 'Immaculate Grid',
 			getData: (str) => {
 				const lines = str.split('\n');
+				const number = parseInt(lines[0].split(' ')[2]);
+				if (isNaN(number))
+					return {
+						status: 1,
+						message: `Invalid puzzle number in an Immaculate Grid result (${lines[0]})`,
+					};
+				let lineCount = 0;
+				let correct = 0;
+				const boxRegex = /(\uD83D\uDFE9|\u2B1C\uFE0F){3}/g;
+
+				lines.forEach((line) => {
+					console.log(line);
+					const m = line.match(boxRegex);
+					if (line && m) {
+						lineCount++;
+						for (var i = 0; i < line.length; i += 2) {
+							const chars = [line.charCodeAt(i), line.charCodeAt(i + 1)];
+							if (chars[0] === 55357 && chars[1] === 57321) correct++;
+						}
+					}
+				});
+				if (lineCount !== 3)
+					return {
+						status: 1,
+						message: `${lineCount} lines of Immaculate Grid results detected; 3 expected`,
+					};
+				else if (correct > 9)
+					return {
+						status: 1,
+						message: `${correct} correct answers detected in Immaculate Grid ${number}`,
+					};
 				const data = {
-					number: parseInt(lines[0].split(' ')[2]),
-					correct: parseInt(lines[0].split(' ')[3].split('/')[0]),
+					number,
+					correct: correct,
 					rarity: parseInt(
 						lines
 							.find((l) => l.match(/Rarity/g))
@@ -876,10 +909,10 @@ const matchers = [
 
 exports.parseResult = (str) => {
 	const gameInfo = matchers
-		.filter((m, i) => {
+		.filter((m) => {
 			return str.match(m.regex);
 		})
-		.map((m, i) => {
+		.map((m) => {
 			return {
 				...m.data,
 				match: str.match(m.regex),
