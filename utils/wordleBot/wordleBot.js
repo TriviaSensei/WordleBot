@@ -267,7 +267,6 @@ const testRegex = (str) => {
 	const regex =
 		/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n((\uD83D\uDFE9|\u2B1C\uFE0F){3}.*\n){3}/g;
 	const match = str.match(regex);
-	console.log(match);
 	// return getCharCodes(str);
 };
 
@@ -404,7 +403,6 @@ const processResults = async (usr, gameInfo) => {
 							reaction: '❓',
 						});
 					}
-					console.log(gameResult);
 					if (gameResult.status !== 0) {
 						failures.push({ message: gameResult.message, reaction: '⚠️' });
 						return null;
