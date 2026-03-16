@@ -726,196 +726,211 @@ const sendMonthlyUpdate = async () => {
 };
 
 client.on('interactionCreate', async (data) => {
-	if (!checkCorrectServer(data.guildId)) return;
-	if (!data.isChatInputCommand() && !data.isStringSelectMenu()) return;
+	try {
+		if (!checkCorrectServer(data.guildId)) return;
+		if (!data.isChatInputCommand() && !data.isStringSelectMenu()) return;
 
-	const { commandName } = data;
+		let { commandName } = data;
+		if (!commandName) commandName = '';
 
-	let content;
-	if (!commandName) return;
-	else if (commandName.toLowerCase() === 'i')
-		content = `Here is your personal stats page: https://${hostname}/player/${data.user.id}`;
-	else if (commandName.toLowerCase() === 'we')
-		content = `Here is your server stats page: https://${hostname}/server/${data.guildId}`;
-	else if (commandName.toLowerCase() === 'faq')
-		content = `Here is the FAQ page: https://${hostname}/faq/`;
-	else if (commandName.toLowerCase() === 'docs')
-		content = `Here is the documentation page: https://${hostname}/docs`;
-	else if (commandName.toLowerCase() === 'addme') {
-		let srvr = await Servers.findOne({ guildId: data.guildId });
-		let usr = await Users.findOne({ userId: data.user.id });
+		let content;
+		if (data.isChatInputCommand() && !commandName)
+			content = `Invalid or missing command`;
+		else if (commandName.toLowerCase() === 'i')
+			content = `Here is your personal stats page: https://${hostname}/player/${data.user.id}`;
+		else if (commandName.toLowerCase() === 'we')
+			content = `Here is your server stats page: https://${hostname}/server/${data.guildId}`;
+		else if (commandName.toLowerCase() === 'faq')
+			content = `Here is the FAQ page: https://${hostname}/faq/`;
+		else if (commandName.toLowerCase() === 'docs')
+			content = `Here is the documentation page: https://${hostname}/docs`;
+		else if (commandName.toLowerCase() === 'addme') {
+			let srvr = await Servers.findOne({ guildId: data.guildId });
+			let usr = await Users.findOne({ userId: data.user.id });
 
-		let serverAdded = false;
-		let userAdded = false;
+			let serverAdded = false;
+			let userAdded = false;
 
-		if (!srvr) srvr = await updateServerData(data.guildId);
-		if (!usr) usr = await updateUserData(data.user.id);
-		if (!usr.servers.some((s) => s.toString() === srvr._id.toString())) {
-			usr.servers.push(srvr._id);
-			serverAdded = true;
-			usr.markModified('servers');
-			await usr.save();
-		}
-		if (!srvr.users.some((u) => u.toString() === usr._id.toString())) {
-			srvr.users.push(usr._id);
-			userAdded = true;
-			srvr.markModified('users');
-			await srvr.save();
-		}
-		if (serverAdded || userAdded) content = `Data saved.`;
-		else content = `You are already associated with this server.`;
-	} else if (commandName.toLowerCase() === 'myservers') {
-		const usr = await Users.findOne({ userId: data.user.id }).populate(
-			'servers',
-		);
-		if (!usr) {
-			content =
-				'You are not registered as a player - please past a result to register yourself.';
-			return;
-		}
-		const serverData = usr.servers.map((s) => {
-			return s.name;
-		});
-		content = `You are registered on the following servers:\n${serverData.join(
-			'\n',
-		)}`;
-	} else {
-		//these commands all require admin to run them
-		const srvr = await Servers.findOne({ guildId: data.guildId });
-		if (!srvr) {
-			return data.reply({
-				type: 4,
-				content: 'Server was not found in the data',
-				flags: MessageFlags.Ephemeral,
+			if (!srvr) srvr = await updateServerData(data.guildId);
+			if (!usr) usr = await updateUserData(data.user.id);
+			if (!usr.servers.some((s) => s.toString() === srvr._id.toString())) {
+				usr.servers.push(srvr._id);
+				serverAdded = true;
+				usr.markModified('servers');
+				await usr.save();
+			}
+			if (!srvr.users.some((u) => u.toString() === usr._id.toString())) {
+				srvr.users.push(usr._id);
+				userAdded = true;
+				srvr.markModified('users');
+				await srvr.save();
+			}
+			if (serverAdded || userAdded) content = `Data saved.`;
+			else content = `You are already associated with this server.`;
+		} else if (commandName.toLowerCase() === 'myservers') {
+			const usr = await Users.findOne({ userId: data.user.id }).populate(
+				'servers',
+			);
+			if (!usr) {
+				content =
+					'You are not registered as a player - please past a result to register yourself.';
+				return;
+			}
+			const serverData = usr.servers.map((s) => {
+				return s.name;
 			});
-		}
-		const serverData = (
-			await axios.get(`${url}/guilds/${data.guildId}`, authObj)
-		).data;
-
-		const user = await axios.get(
-			`${url}/guilds/${serverData.id}/members/${data.user.id}`,
-			authObj,
-		);
-		if (!serverData || !user)
-			return data.reply({
-				type: 4,
-				content: 'Something went wrong.',
-				flags: MessageFlags.Ephemeral,
-			});
-		const roles = await Promise.all(
-			user.data.roles.map(async (r) => {
-				const role = await axios.get(
-					`${url}/guilds/${serverData.id}/roles/${r}`,
-					authObj,
-				);
-				return role.data;
-			}),
-		);
-
-		const isOwner = data.user.id === serverData.owner_id;
-		const isAdmin = roles.some((r) => {
-			return (r.permissions & 8) === 8;
-		});
-
-		if (!isOwner && !isAdmin) {
-			return data.reply({
-				type: 4,
-				content: '⛔ You must be an owner or admin to perform this command ⛔',
-				flags: MessageFlags.Ephemeral,
-			});
-		}
-		if (data.isChatInputCommand()) {
-			if (data.commandName.toLowerCase() === 'setgames') {
+			content = `You are registered on the following servers:\n${serverData.join(
+				'\n',
+			)}`;
+		} else {
+			//these commands all require admin to run them
+			const srvr = await Servers.findOne({ guildId: data.guildId });
+			if (!srvr) {
 				return data.reply({
 					type: 4,
-					content: `<@${data.user.id}> Select the games to track on this server.`,
-					components: [
-						{
-							type: 1,
-							components: [
-								{
-									type: 3,
-									custom_id: 'game_select',
-									options: gameList.map((g) => {
-										return {
-											label: g,
-											value: g,
-											default: srvr.games.includes(g),
-										};
-									}),
-									placeholder: 'Choose games',
-									min_values: 0,
-									max_values: gameList.length,
-								},
-							],
-						},
-					],
+					content: 'Server was not found in the data',
 					flags: MessageFlags.Ephemeral,
 				});
-			} else if (data.commandName.toLowerCase() === 'settings') {
-				const id = uuidV4();
-				srvr.settingsToken = id;
-				srvr.settingsTokenExpires =
-					Date.now() + settingsTokenDuration * 60 * 1000;
-				srvr.settingsTokenUsed = false;
-				srvr.markModified('settingsToken');
-				srvr.markModified('settingsTokenExpires');
-				srvr.markModified('settingsTokenUsed');
-				await srvr.save();
-				content = `Do not share this link - it is good for only ${settingsTokenDuration} minutes, or one click. After you save your settings, you will need to run this command again to generate a new link. Edit your server settings at the link here: https://${hostname}/settings/${id}`;
-			} else if (data.commandName.toLowerCase() === 'sethome') {
-				srvr.channelId = data.channelId;
-				srvr.markModified('channelId');
-				await srvr.save();
-				content = 'Home channel set';
-			} else if (data.commandName.toLowerCase() === 'delete') {
-				const id = uuidV4();
-				srvr.editToken = id;
-				srvr.editTokenExpires = Date.now() + settingsTokenDuration * 60 * 1000;
-				srvr.editTokenUsed = false;
-				srvr.editingUser = user.data.global_name
-					? user.data.global_name
-					: user.data.username;
-				srvr.markModified('editToken');
-				srvr.markModified('editTokenExpires');
-				srvr.markModified('editTokenUsed');
-				srvr.markModified('editingUser');
-				await srvr.save();
-				content = `Do not share this link - it is good for only ${settingsTokenDuration} minutes, or one click. After you leave the page, you will need to run this command again to generate a new link. Delete results at the link here: ${
-					process.env.NODE_ENV === 'production' ? 'https' : 'http'
-				}://${hostname}/server/delete/${
-					srvr.guildId
-				}/${id}. You are responsible for telling your users that their results were deleted.`;
 			}
-		} else if (data.isStringSelectMenu()) {
-			if (data.customId === 'game_select') {
-				const userId = data.message.content
-					.split(' ')[0]
-					.split('@')[1]
-					.split('>')[0];
+			const serverData = (
+				await axios.get(`${url}/guilds/${data.guildId}`, authObj)
+			).data;
 
-				if (data.message.interactionMetadata.user.id === userId) {
-					srvr.games = data.values;
-					srvr.markModified('games');
+			const user = await axios.get(
+				`${url}/guilds/${serverData.id}/members/${data.user.id}`,
+				authObj,
+			);
+			if (!serverData || !user)
+				return data.reply({
+					type: 4,
+					content: 'Something went wrong.',
+					flags: MessageFlags.Ephemeral,
+				});
+			const roles = await Promise.all(
+				user.data.roles.map(async (r) => {
+					const role = await axios.get(
+						`${url}/guilds/${serverData.id}/roles/${r}`,
+						authObj,
+					);
+					return role.data;
+				}),
+			);
+
+			const isOwner = data.user.id === serverData.owner_id;
+			const isAdmin = roles.some((r) => {
+				return (r.permissions & 8) === 8;
+			});
+
+			if (!isOwner && !isAdmin) {
+				return data.reply({
+					type: 4,
+					content:
+						'⛔ You must be an owner or admin to perform this command ⛔',
+					flags: MessageFlags.Ephemeral,
+				});
+			}
+
+			if (data.isChatInputCommand()) {
+				if (data.commandName.toLowerCase() === 'setgames') {
+					return data.reply({
+						type: 4,
+						content: `<@${data.user.id}> Select the games to track on this server.`,
+						components: [
+							{
+								type: 1,
+								components: [
+									{
+										type: 3,
+										custom_id: 'game_select',
+										options: gameList.map((g) => {
+											return {
+												label: g,
+												value: g,
+												default: srvr.games.includes(g),
+											};
+										}),
+										placeholder: 'Choose games',
+										min_values: 0,
+										max_values: gameList.length,
+									},
+								],
+							},
+						],
+						flags: MessageFlags.Ephemeral,
+					});
+				} else if (data.commandName.toLowerCase() === 'settings') {
+					const id = uuidV4();
+					srvr.settingsToken = id;
+					srvr.settingsTokenExpires =
+						Date.now() + settingsTokenDuration * 60 * 1000;
+					srvr.settingsTokenUsed = false;
+					srvr.markModified('settingsToken');
+					srvr.markModified('settingsTokenExpires');
+					srvr.markModified('settingsTokenUsed');
 					await srvr.save();
+					content = `Do not share this link - it is good for only ${settingsTokenDuration} minutes, or one click. After you save your settings, you will need to run this command again to generate a new link. Edit your server settings at the link here: https://${hostname}/settings/${id}`;
+				} else if (data.commandName.toLowerCase() === 'sethome') {
+					srvr.channelId = data.channelId;
+					srvr.markModified('channelId');
+					await srvr.save();
+					content = 'Home channel set';
+				} else if (data.commandName.toLowerCase() === 'delete') {
+					const id = uuidV4();
+					srvr.editToken = id;
+					srvr.editTokenExpires =
+						Date.now() + settingsTokenDuration * 60 * 1000;
+					srvr.editTokenUsed = false;
+					srvr.editingUser = user.data.global_name
+						? user.data.global_name
+						: user.data.username;
+					srvr.markModified('editToken');
+					srvr.markModified('editTokenExpires');
+					srvr.markModified('editTokenUsed');
+					srvr.markModified('editingUser');
+					await srvr.save();
+					content = `Do not share this link - it is good for only ${settingsTokenDuration} minutes, or one click. After you leave the page, you will need to run this command again to generate a new link. Delete results at the link here: ${
+						process.env.NODE_ENV === 'production' ? 'https' : 'http'
+					}://${hostname}/server/delete/${
+						srvr.guildId
+					}/${id}. You are responsible for telling your users that their results were deleted.`;
+				}
+			} else if (data.isStringSelectMenu()) {
+				if (data.customId === 'game_select') {
+					const userId = data.message.content
+						.split(' ')[0]
+						.split('@')[1]
+						.split('>')[0];
 
-					content =
-						`You have set your server game list to:\n${data.values.join(
-							', ',
-						)}` +
-						(data.values.length === gameList.length
-							? `\nOther game results may be posted and recorded, but will not show up on standings reports unless you enable them here.`
-							: '');
-				} else content = `This message was not intended for you.`;
+					if (data.message.interactionMetadata.user.id === userId) {
+						srvr.games = data.values;
+						srvr.markModified('games');
+						await srvr.save();
+
+						content =
+							`You have set your server game list to:\n${data.values.join(
+								', ',
+							)}` +
+							(data.values.length === gameList.length
+								? `\nOther game results may be posted and recorded, but will not show up on standings reports unless you enable them here.`
+								: '');
+					} else content = `This message was not intended for you.`;
+				}
 			}
 		}
+		return data.reply({
+			type: 4,
+			content,
+			flags: MessageFlags.Ephemeral,
+		});
+	} catch (err) {
+		console.log('Error creating interaction');
+		console.log(err);
+		return data.reply({
+			type: 4,
+			content: 'Something went wrong - try again later',
+			flags: MessageFlags.Ephemeral,
+		});
 	}
-	return data.reply({
-		type: 4,
-		content,
-		flags: MessageFlags.Ephemeral,
-	});
 });
 
 client.on('messageCreate', async (msg) => {
