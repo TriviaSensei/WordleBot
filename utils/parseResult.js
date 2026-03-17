@@ -933,6 +933,22 @@ const matchers = [
 			},
 		},
 	},
+	//Revealed
+	/**
+	 REVEALED: Mar 16, 2026 
+
+	Arts & Culture:
+	⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️
+
+	I couldn’t solve it.  Can you?
+
+	REVEALED: Mar 16, 2026 
+
+	Arts & Culture:
+	⬜️⬜️⬜️⬜️⬜️⬜️⬜️⬜️
+
+	I solved it in 0️⃣ Reveals & 0️⃣ Hints!
+	 */
 ];
 
 exports.parseResult = (str) => {

@@ -936,8 +936,6 @@ client.on('interactionCreate', async (data) => {
 client.on('messageCreate', async (msg) => {
 	if (!checkCorrectServer(msg.guildId)) return;
 
-	testRegex(msg.content);
-
 	if (!msg.author) {
 		console.log('No msg author');
 		console.log(msg);
@@ -957,6 +955,7 @@ client.on('messageCreate', async (msg) => {
 		});
 		return console.log('Me not defined');
 	}
+	//if there's no author, or the author is the bot, or the bot is not defined, return
 	if (!msg?.author || !me || msg.author.id === me.id) return;
 
 	//see if it's a game result being posted, and if not, ignore the message.
