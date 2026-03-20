@@ -763,7 +763,7 @@ const matchers = [
 	{
 		// regex: /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n/g,
 		regex:
-			/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n((\uD83D\uDFE9|\u2B1C\uFE0F){3}.*\n){3}/g,
+			/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g,
 		data: {
 			name: 'Immaculate Grid',
 			getData: (str) => {
@@ -779,7 +779,6 @@ const matchers = [
 				const boxRegex = /(\uD83D\uDFE9|\u2B1C\uFE0F){3}/g;
 
 				lines.forEach((line) => {
-					console.log(line);
 					const m = line.match(boxRegex);
 					if (line && m) {
 						lineCount++;

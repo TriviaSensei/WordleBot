@@ -265,8 +265,11 @@ const checkCorrectServer = (guildId) => {
 const testRegex = (str) => {
 	//		/Wordle (\d{1,3},)?(\d{3})+ [\dX]\/6(\*)?(\n)*(\n(\u2B1B|(\uD83D\uDFE9)|(\uD83D\uDFE8)){5}(.*)){1,6}/g;
 	const regex =
-		/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n((\uD83D\uDFE9|\u2B1C\uFE0F){3}.*\n){3}/g;
+		/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g;
+
+	// /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n(((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*\n){3}/g;
 	const match = str.match(regex);
+
 	// return getCharCodes(str);
 };
 
