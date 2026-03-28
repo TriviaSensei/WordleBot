@@ -763,7 +763,7 @@ const matchers = [
 	{
 		// regex: /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n/g,
 		regex:
-			/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g,
+			/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g,
 		data: {
 			name: 'Immaculate Grid',
 			getData: (str) => {
