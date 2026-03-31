@@ -1121,7 +1121,7 @@ client.on('messageCreate', async (msg) => {
 client.on('messageUpdate', async (oldMessage, newMessage) => {
 	if (!checkCorrectServer(newMessage.guildId)) return;
 
-	if (newMessage.author.id === me.id) return;
+	if (!newMessage?.author?.id || newMessage.author.id === me.id) return;
 
 	// check the current discord server data against what we have in the DB,
 	// if it exists, and update the data accordingly
