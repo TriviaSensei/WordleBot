@@ -21,7 +21,7 @@ const fs = require('fs');
 let dict = fs
 	.readFileSync(
 		path.join(__dirname, '../../utils/wordleBot/wordlist.txt'),
-		'utf8'
+		'utf8',
 	)
 	.split('\n')
 	.map((el) => {
@@ -31,7 +31,7 @@ console.log(`${dict.length} valid guesses read`);
 let answers = fs
 	.readFileSync(
 		path.join(__dirname, '../../utils/wordleBot/answers.txt'),
-		'utf8'
+		'utf8',
 	)
 	.split('\n')
 	.map((el) => {
@@ -117,7 +117,7 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 			}).select('-editToken -editTokenExpires');
 			if (serverData) {
 				const ua = req.rawHeaders.findIndex(
-					(h) => h.toLowerCase() === 'user-agent'
+					(h) => h.toLowerCase() === 'user-agent',
 				);
 				let isDiscord = true;
 				if (ua >= 0 && ua < req.rawHeaders.length) {
@@ -145,6 +145,7 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 		result = await getServerStats(req.params.id, year, month);
 	} else {
 		result = await getPlayerStats(req.params.id, year, month);
+		console.log(result);
 	}
 	if (result.status !== 'success') {
 		return res.status(200).render(`404`, { data: result });
@@ -174,13 +175,13 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 							achievements.map(async (a, i) => {
 								const completedAchievement =
 									result?.data?.playerData?.achievements?.completed?.find(
-										(ca) => ca.id === a.id
+										(ca) => ca.id === a.id,
 									);
 								let progress;
 								if (!completedAchievement) {
 									const di =
 										result?.data?.playerData?.achievements?.progress?.find(
-											(p) => p.name === a.dataItem
+											(p) => p.name === a.dataItem,
 										);
 									if (di) {
 										//it's not a streak achievement, so just get the progress
@@ -208,14 +209,14 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 												if (
 													currentPuzzleDates.includes(nextDate) ||
 													currentPuzzleDates.every(
-														(cpd) => new Date(nextDate) > new Date(cpd)
+														(cpd) => new Date(nextDate) > new Date(cpd),
 													)
 												)
 													progress = a.getProgress(
 														Math.max(
 															di.progress.current,
-															di.progress.other ? di.progress.other.length : 0
-														)
+															di.progress.other ? di.progress.other.length : 0,
+														),
 													);
 												else progress = a.getProgress(0);
 											}
@@ -236,7 +237,7 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 											: games[0].toLowerCase().split(' ').join('-');
 									const folder = path.join(
 										__dirname,
-										`../../public/img/achievements/${subfolder}`
+										`../../public/img/achievements/${subfolder}`,
 									);
 									let file = path.join(folder, `/${id}.svg`);
 									let fname = '';
@@ -267,8 +268,8 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 										color,
 									};
 								})(a);
-							})
-					  )
+							}),
+						)
 					: null,
 			timezone: process.env.DEFAULT_TIMEZONE,
 		},
@@ -294,10 +295,10 @@ exports.getSettingsPage = catchAsync(async (req, res, next) => {
 					settingsToken: req.params.token,
 					settingsTokenUsed: false,
 					settingsTokenExpires: { $gte: Date.now() },
-			  }
+				}
 			: { settingsToken: req.params.token };
 	const serverData = await Servers.findOne(serverFilter).select(
-		'-settingsToken -settingsTokenExpires -editToken -editTokenExpires'
+		'-settingsToken -settingsTokenExpires -editToken -editTokenExpires',
 	);
 	if (!serverData) {
 		return res.status(200).render(`404`, {
@@ -342,13 +343,13 @@ exports.getSettingsPage = catchAsync(async (req, res, next) => {
 		if (!settingData) return;
 		s.settings = settingData.settings.map((sd) => {
 			const currentSetting = s.settings.find(
-				(s) => s.name.toLowerCase() === sd.name.toLowerCase()
+				(s) => s.name.toLowerCase() === sd.name.toLowerCase(),
 			);
 			if (
 				!currentSetting ||
 				(sd.enum &&
 					!sd.enum.some(
-						(e) => e.label.toLowerCase() === currentSetting.value.toLowerCase()
+						(e) => e.label.toLowerCase() === currentSetting.value.toLowerCase(),
 					))
 			)
 				return {

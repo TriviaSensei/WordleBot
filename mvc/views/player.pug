@@ -17,7 +17,8 @@ block content
         div
             .w-100.h-100.banner-div(style=`background-image:url('/img/banner_default.svg')`)
             img.avatar(src=`${!data.playerData.avatar ? '/img/favicon.svg' : `https://cdn.discordapp.com/avatars/${data.playerData.userId}/${data.playerData.avatar}.png`}`)
-            .name-banner= `${data.playerData.globalName}${data.playerData.globalName.toLowerCase() === data.playerData.username.toLowerCase() ? '':` (${data.playerData.username})`}`
+            div(data=`${data.playerData}`)
+            .name-banner= `${data.playerData.globalName? data.playerData.globalName : data.playerData.username}${data.playerData.globalName.toLowerCase() === data.playerData.username.toLowerCase() ? '':` (${data.playerData.username})`}`
     .body-container
         h5.mt-5 Select month:
         input#user-id(type="hidden" value=`${data.playerData.userId}`)

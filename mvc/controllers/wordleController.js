@@ -45,7 +45,7 @@ const getResults = async (year, month, users, gameFilter) => {
 	).filter((r) => !r.deletedFlag);
 
 	const monthDays = Math.round(
-		(new Date(nextMonth) - new Date(firstOfMonth)) / msInDay
+		(new Date(nextMonth) - new Date(firstOfMonth)) / msInDay,
 	);
 	const gameInfo = {
 		year,
@@ -77,7 +77,7 @@ const getResults = async (year, month, users, gameFilter) => {
 				const livePuzzleDate = matcher.data.getLivePuzzleDate(currentDT);
 				days =
 					Math.round(
-						(new Date(livePuzzleDate) - new Date(firstOfMonthStr)) / msInDay
+						(new Date(livePuzzleDate) - new Date(firstOfMonthStr)) / msInDay,
 					) + 1;
 			} else {
 				while (!matcher.data.checkValidDate(maxDate)) {
@@ -119,7 +119,7 @@ const getResults = async (year, month, users, gameFilter) => {
 			ind = r.data.number - g.startNumber;
 		else
 			ind = Math.round(
-				(new Date(r.date) - new Date(gameInfo.startDate)) / msInDay
+				(new Date(r.date) - new Date(gameInfo.startDate)) / msInDay,
 			);
 		if (
 			!g.results.some((res) => {
@@ -171,7 +171,7 @@ const getServerStats = async (guildId, year, month) => {
 		year,
 		month,
 		serverData.users,
-		serverData.games
+		serverData.games,
 	);
 
 	delete serverData.users;
@@ -202,6 +202,10 @@ const getPlayerStats = async (userId, year, month) => {
 		};
 	const playerData = await Users.findOne({ userId }).select(['-__v']).lean();
 
+	if (!playerData)
+		return { status: 'fail', code: 404, message: 'Player not found' };
+
+	if (!playerData.globalName) playerData.globalName = playerData.username;
 	const allResults = await Results.aggregate([
 		{
 			$match: {
@@ -302,12 +306,12 @@ exports.checkServerSettings = catchAsync(async (req, res, next) => {
 		req.params.token
 			? { settingsToken: req.params.token }
 			: req.params.editToken
-			? {
-					editToken: req.params.editToken,
-					// editTokenExpires: { $gte: Date.now() },
-					// editTokenUsed: false,
-			  }
-			: { guildId: req.params.id }
+				? {
+						editToken: req.params.editToken,
+						// editTokenExpires: { $gte: Date.now() },
+						// editTokenUsed: false,
+					}
+				: { guildId: req.params.id },
 	);
 	if (!server)
 		return res.status(200).render(`404`, {
@@ -356,7 +360,7 @@ exports.checkServerSettings = catchAsync(async (req, res, next) => {
 			} else {
 				ds.settings.forEach((s) => {
 					const existingSetting = setting.settings.find(
-						(s2) => s2.name === s.name
+						(s2) => s2.name === s.name,
 					);
 					if (!existingSetting) {
 						setting.settings.push({
@@ -369,7 +373,7 @@ exports.checkServerSettings = catchAsync(async (req, res, next) => {
 		});
 		server.settings.sort((a, b) => {
 			const inds = [a, b].map((s) =>
-				defaultSettings.findIndex((ds) => ds.name === s.name)
+				defaultSettings.findIndex((ds) => ds.name === s.name),
 			);
 			return inds[0] - inds[1];
 		});
@@ -462,7 +466,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 				console.log('Checking server name in Discord');
 				const sd = await axios.get(
 					`${process.env.DISCORD_API_URL}/guilds/${server.guildId}`,
-					authObj
+					authObj,
 				)?.data;
 				if (!sd)
 					return res.status(404).json({
@@ -508,7 +512,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 					.some(
 						(d) =>
 							d.toLowerCase().indexOf('discord.com') >= 0 &&
-							d.indexOf(inviteCode) >= 0
+							d.indexOf(inviteCode) >= 0,
 					)
 			)
 				return res.status(400).json({
@@ -553,14 +557,14 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 				const serverSetting = data.settings.find((d) => d.name === gs.name);
 				if (!serverSetting)
 					return failures.push(
-						`Setting ${gs.name} not found for game ${data.name}`
+						`Setting ${gs.name} not found for game ${data.name}`,
 					);
 				//convert to number if necessary
 				if (serverSetting.type === Number) {
 					gs.value = Number(gs.value);
 					if (isNaN(gs.value))
 						return failures.push(
-							`Invalid value (${gs.value}) submitted for ${data.name}:${serverSetting.name} (number required)`
+							`Invalid value (${gs.value}) submitted for ${data.name}:${serverSetting.name} (number required)`,
 						);
 				}
 				//if there's an enum for this setting, make sure it's a valid value
@@ -569,7 +573,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 						return failures.push(
 							`Invalid value ${gs.value} submitted for ${data.name}:${
 								serverSetting.name
-							} (Allowed values: ${serverSetting.enum.join(', ')})`
+							} (Allowed values: ${serverSetting.enum.join(', ')})`,
 						);
 				}
 				//if there's a validation for this setting, make sure the validation passes
@@ -577,7 +581,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 					return failures.push(
 						`Validation failed for ${data.name}:${serverSetting.name} (${
 							serverSetting.message || `Submitted value: ${gs.value}`
-						})`
+						})`,
 					);
 
 				//edit the actual server setting
@@ -605,7 +609,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 				if (!stat.filters || !Array.isArray(stat.filters)) {
 					stat.filters = [];
 					warnings.push(
-						`Invalid value submitted for ${game.game}:${stat.name} filters. Defaulting to no filter for this stat.`
+						`Invalid value submitted for ${game.game}:${stat.name} filters. Defaulting to no filter for this stat.`,
 					);
 				}
 				//for each filter
@@ -614,7 +618,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 						//needs a name
 						if (!f.name) {
 							failures.push(
-								`Filter #${i + 1} for ${stat.name} was not given a name`
+								`Filter #${i + 1} for ${stat.name} was not given a name`,
 							);
 							return false;
 						}
@@ -623,7 +627,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 							failures.push(
 								`Invalid value for filter type (${f.type || 'blank'}) on ${
 									stat.name
-								} filter #${i + 1}`
+								} filter #${i + 1}`,
 							);
 							return false;
 						}
@@ -634,21 +638,21 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 								?.dataItems.find((d) => d.name === f.dataItem);
 							if (!valid) {
 								failures.push(
-									`Data item ${f.dataItem} not found for game ${stat.game}`
+									`Data item ${f.dataItem} not found for game ${stat.game}`,
 								);
 								return false;
 							}
 							//...and a valid comparator
 							if (!['lte', 'lt', 'eq', 'gt', 'gte'].includes(f.comparator)) {
 								failures.push(
-									`Invalid comparator for ${f.name} (${f.comparator})`
+									`Invalid comparator for ${f.name} (${f.comparator})`,
 								);
 								return false;
 							}
 							//and a valid number to compare to
 							if (isNaN(Number(f.dataValue))) {
 								failures.push(
-									`Invalid data value for ${f.name} (${f.dataValue})`
+									`Invalid data value for ${f.name} (${f.dataValue})`,
 								);
 								return false;
 							}
@@ -657,7 +661,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 
 							if (!Number.isInteger(f.keepValue)) {
 								failures.push(
-									`Invalid value for number of days to drop/keep on ${f.name} (integer required; 1-28 for keep, 1-10 for drop)`
+									`Invalid value for number of days to drop/keep on ${f.name} (integer required; 1-28 for keep, 1-10 for drop)`,
 								);
 								return false;
 							}
@@ -666,7 +670,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 							if (f.type === 'keep') {
 								if (!(kv >= 10 && kv <= 28)) {
 									failures.push(
-										`Invalid value for number of days to keep on ${f.name} (integer 1-28 required)`
+										`Invalid value for number of days to keep on ${f.name} (integer 1-28 required)`,
 									);
 									return false;
 								}
@@ -674,7 +678,7 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 							//if drop filter, must drop from 1 to 10 values
 							else if (!(kv >= 1 && kv <= 10)) {
 								failures.push(
-									`Invalid value for number of days to drop on ${f.name} (integer 1-10 required)`
+									`Invalid value for number of days to drop on ${f.name} (integer 1-10 required)`,
 								);
 								return false;
 							}
@@ -687,13 +691,13 @@ exports.editServerSettings = catchAsync(async (req, res, next) => {
 				const vc = verifyCalculation(stat.calc);
 				if (vc.status !== 0) {
 					failures.push(
-						`Error saving custom stat ${stat.game}:${stat.name}: ${vc.message}`
+						`Error saving custom stat ${stat.game}:${stat.name}: ${vc.message}`,
 					);
 				}
 				//verify that the calculation will result in a number (is properly aggregated)
 				else if (!verifyNumber(stat.calc)) {
 					failures.push(
-						`Custom stat ${stat.game}:${stat.name} has an unaggregated data item`
+						`Custom stat ${stat.game}:${stat.name} has an unaggregated data item`,
 					);
 				}
 			});
@@ -748,14 +752,14 @@ exports.deleteResults = catchAsync(async (req, res, next) => {
 								.tz(r.date, process.env.DEFAULT_TIMEZONE)
 								.format()
 								.split('T')[0]
-						})`
+						})`,
 					);
 				}
 			} else
 				failures.push(
-					`Failed to delete result ${r._id} - user does not belong to this server`
+					`Failed to delete result ${r._id} - user does not belong to this server`,
 				);
-		})
+		}),
 	);
 
 	server.editToken = '';
