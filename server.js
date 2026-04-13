@@ -50,3 +50,12 @@ if (process.env.NODE_ENV === 'production') {
 		}, logInterval);
 	}, timeLeft);
 }
+
+const handleShutdown = async () => {
+	console.log('Shutting down.');
+	console.trace();
+	server.close(() => {
+		console.log('Process terminated.');
+	});
+};
+process.on('SIGTERM', handleShutdown);
