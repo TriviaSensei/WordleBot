@@ -264,13 +264,14 @@ const checkCorrectServer = (guildId) => {
 
 const testRegex = (str) => {
 	//		/Wordle (\d{1,3},)?(\d{3})+ [\dX]\/6(\*)?(\n)*(\n(\u2B1B|(\uD83D\uDFE9)|(\uD83D\uDFE8)){5}(.*)){1,6}/g;
-	const regex =
-		/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g;
+	//	/Immaculate Grid (\d)+ (\d)\/9:(\n\D83D\DDC4\FE0F.*)?Rarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}){3}/g
+	const regex = /Immaculate Grid (\d)+ (\d)\/9:/g;
 
 	// /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n(((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*\n){3}/g;
 	const match = str.match(regex);
-
-	// return getCharCodes(str);
+	const res = getCharCodes(str);
+	console.log(match);
+	return res;
 };
 
 const handleAchievements = async (data) => {
@@ -936,325 +937,164 @@ client.on('interactionCreate', async (data) => {
 	}
 });
 
-client.on('messageCreate', async (msg) => {
-	if (!checkCorrectServer(msg.guildId)) return;
+const handleMessageCreate = async (msg) => {
+	try {
+		if (!checkCorrectServer(msg.guildId)) return;
 
-	if (!msg.author) {
-		console.log('No msg author');
-		console.log(msg);
-		await Errors.create({
-			description: 'Parse failed',
-			message: 'No message author',
-			data: msg,
-			stack: null,
-		});
-		return;
-	} else if (!me) {
-		await Errors.create({
-			description: 'Parse failed',
-			message: 'Me not defined',
-			data: null,
-			stack: null,
-		});
-		return console.log('Me not defined');
-	}
-	//if there's no author, or the author is the bot, or the bot is not defined, return
-	if (!msg?.author || !me || msg.author.id === me.id) return;
-
-	//see if it's a game result being posted, and if not, ignore the message.
-	const gameInfo = parseResult(msg.content);
-	if (!gameInfo || gameInfo.length === 0) {
-		if (process.env.NODE_ENV === 'development') testRegex(msg.content);
-		return;
-	}
-
-	// check the current discord server data against what we have in the DB,
-	// if it exists, and update the data accordingly
-	const srvr = await updateServerData(msg.guildId);
-
-	//if so, see if there is a valid home channel set, set it if not, and ignore the result if not in the home channel
-	const correctChannel = await checkCorrectChannel(srvr, msg);
-	if (!correctChannel) return;
-
-	// check the current discord user data against what we have in the DB,
-	// if it exists, and update the data accordingly
-	const usr = await updateUserData(msg.author.id);
-	//update the list of users on the server, and the list of servers on the user, if necessary
-	await updateLists(usr, srvr);
-
-	//process the actual result string(s)
-	const { results, failures, successes, achievements } = await processResults(
-		usr,
-		gameInfo,
-	);
-
-	//message or reaction with results of post
-	if (failures.length !== 0) {
-		addReaction(msg, '⚠️');
-		addMessage({
-			channelId: msg.channelId,
-			data: {
-				content: `<@${msg.author.id}> ${
-					successes.length > 0
-						? successes.length +
-							(successes.length > 1 ? ' results were' : ' result was') +
-							' successfully posted. '
-						: ''
-				}One or more failures occurred while posting results:\n${failures
-					.map((f) => `⚠️ ${f.message}`)
-					.join('\n')}`,
-				message_reference: {
-					type: 0,
-					message_id: msg.id,
-				},
-				flags: MessageFlags.Ephemeral,
-			},
-		});
-	} else {
-		if (results.length > 1 || results[0].length > 1) {
-			if (successes.length <= 10) {
-				try {
-					addReaction(msg, [keyCaps[successes.length], '✅']);
-				} catch (err) {
-					console.log(keyCaps[successes.length]);
-				}
-			} else {
-				addReaction(msg, '✅');
-
-				addMessage({
-					channelId: msg.channelId,
-					data: {
-						content: `<@${msg.author.id}> ${successes.length} ${
-							successes.length === 1 ? 'result' : 'results'
-						} successfully parsed`,
-						message_reference: {
-							type: 0,
-							message_id: msg.id,
-						},
-					},
-					flags: MessageFlags.Ephemeral,
-				});
-			}
-		} else addReaction(msg, results[0][0].reaction);
-	}
-	//handle achievements
-	if (achievements.length > 0) {
-		addReaction(msg, '🎖️');
-		addMessage({
-			channelId: msg.channelId,
-			data: {
-				content: `<@${msg.author.id}> Congratulations! You've unlocked ${
-					achievements.length === 1
-						? 'an achievement'
-						: `${achievements.length} achievements`
-				}!\n${achievements
-					.map((a) => {
-						return `\t🎖️ ${a.name}: ${a.description}`;
-					})
-					.join('\n')}`,
-				message_reference: {
-					type: 0,
-					message_id: msg.id,
-				},
-			},
-		});
-	}
-
-	//handle crossposting message if user is part of multiple servers
-	const serversToRemove = [];
-
-	if (checkCorrectServer(srvr.guildId)) {
-		usr.servers.forEach(async (s) => {
-			if (s._id.toString() !== srvr._id.toString()) {
-				const otherServer = await Servers.findById(s._id);
-				if (!checkCorrectServer(otherServer.guildId)) return;
-				if (otherServer && otherServer.channelId) {
-					//make sure the member is still a part of that server (in discord's record)
-					try {
-						await axios.get(
-							`${url}/guilds/${otherServer.guildId}/members/${msg.author.id}`,
-							authObj,
-						);
-						const toSend = successes.filter((su) => {
-							return otherServer.games.includes(su.name);
-						});
-
-						if (toSend.length > 0)
-							return addMessage({
-								channelId: otherServer.channelId,
-								data: {
-									content: `On behalf of <@${msg.author.id}>:\n${toSend
-										.map((su) => su.match)
-										.join('\n\n')}`,
-								},
-							});
-					} catch (err) {
-						serversToRemove.push(s._id);
-					}
-				}
-			}
-			return null;
-		});
-		//for every server where the user is no longer a member
-		if (serversToRemove.length > 0) {
-			const user = await Users.findById(usr._id);
-			await Promise.all(
-				serversToRemove.map(async (s) => {
-					//remove the user from the server's list
-					const server = await Servers.findById(s);
-					server.users = server.users.filter(
-						(u) => u.toString() !== user._id.toString(),
-					);
-					await server.save();
-					//remove the server from the user's list
-					user.servers = user.servers.filter(
-						(srv) => srv.toString() !== s.toString(),
-					);
-				}),
-			);
-			s.markModified('users');
-			await s.save();
+		if (!msg.author) {
+			console.log('No msg author');
+			console.log(msg);
+			await Errors.create({
+				description: 'Parse failed',
+				message: 'No message author',
+				data: msg,
+				stack: null,
+			});
+			return;
+		} else if (!me) {
+			await Errors.create({
+				description: 'Parse failed',
+				message: 'Me not defined',
+				data: null,
+				stack: null,
+			});
+			return console.log('Me not defined');
 		}
-	}
-});
+		//if there's no author, or the author is the bot, or the bot is not defined, return
+		if (!msg?.author || !me || msg.author.id === me.id) return;
 
-client.on('messageUpdate', async (oldMessage, newMessage) => {
-	if (!checkCorrectServer(newMessage.guildId)) return;
+		//see if it's a game result being posted, and if not, ignore the message.
+		const gameInfo = parseResult(msg.content);
+		if (process.env.NODE_ENV === 'development') testRegex(msg.content);
+		if (!gameInfo || gameInfo.length === 0) return;
 
-	if (!newMessage?.author?.id || newMessage.author.id === me.id) return;
+		// check the current discord server data against what we have in the DB,
+		// if it exists, and update the data accordingly
+		const srvr = await updateServerData(msg.guildId);
 
-	// check the current discord server data against what we have in the DB,
-	// if it exists, and update the data accordingly
-	const srvr = await updateServerData(newMessage.guildId);
+		//if so, see if there is a valid home channel set, set it if not, and ignore the result if not in the home channel
+		const correctChannel = await checkCorrectChannel(srvr, msg);
+		if (!correctChannel) return;
 
-	//see if it's a game result being posted, and if not, ignore the message.
-	const oldGameInfo = parseResult(oldMessage.content);
-	const newGameInfo = parseResult(newMessage.content);
-
-	if (!newGameInfo || newGameInfo.length === 0) {
-		if (process.env.NODE_ENV === 'development') testRegex(newMessage.content);
-		return;
-	}
-
-	//if not, see if there is a valid home channel set, and ignore the result if not in the home channel
-	const correctChannel = await checkCorrectChannel(srvr, newMessage);
-	if (!correctChannel) return;
-
-	//3 categories of things can happen: adding, removing, or editing entries
-	// we could just delete the original info from the DB and re-add whatever is in the edited message,
-	// but that would take longer and we would not have the necessary information to acknowledge the request
-	const oldGameList = [];
-	oldGameInfo.forEach((info) => {
-		info.match.forEach((match) => {
-			oldGameList.push({
-				...info,
-				match: [match],
-			});
-		});
-	});
-	const newGameList = [];
-	newGameInfo.forEach((info) => {
-		info.match.forEach((match) => {
-			newGameList.push({
-				...info,
-				match: [match],
-			});
-		});
-	});
-
-	const added = newGameList.filter((info) => {
-		return oldGameList.every((oldInfo) => {
-			if (oldInfo.name !== info.name) return true;
-			return (
-				info.getDate(info.match[0]) - oldInfo.getDate(oldInfo.match[0]) !== 0
-			);
-		});
-	});
-
-	if (added.length > 0) {
 		// check the current discord user data against what we have in the DB,
 		// if it exists, and update the data accordingly
-		const usr = await updateUserData(newMessage.author.id);
-
+		const usr = await updateUserData(msg.author.id);
 		//update the list of users on the server, and the list of servers on the user, if necessary
 		await updateLists(usr, srvr);
 
-		const { failures, successes } = await processResults(usr, added);
+		//process the actual result string(s)
+		const { results, failures, successes, achievements } = await processResults(
+			usr,
+			gameInfo,
+		);
 
+		//message or reaction with results of post
 		if (failures.length !== 0) {
-			addReaction(newMessage, '⚠️');
+			addReaction(msg, '⚠️');
 			addMessage({
-				channelId: newMessage.channelId,
+				channelId: msg.channelId,
 				data: {
-					content: `<@${newMessage.author.id}> On edit, ${
+					content: `<@${msg.author.id}> ${
 						successes.length > 0
 							? successes.length +
 								(successes.length > 1 ? ' results were' : ' result was') +
-								' successfully added. '
+								' successfully posted. '
 							: ''
-					}One or more failures occurred while posting edited results:\n${failures
-						.map((f) => `⚠️ ${f}`)
+					}One or more failures occurred while posting results:\n${failures
+						.map((f) => `⚠️ ${f.message}`)
 						.join('\n')}`,
 					message_reference: {
 						type: 0,
-						message_id: newMessage.id,
+						message_id: msg.id,
 					},
 					flags: MessageFlags.Ephemeral,
 				},
 			});
 		} else {
-			try {
-				addReaction(newMessage, ['✏️']);
-				addMessage({
-					channelId: newMessage.channelId,
-					data: {
-						content: `<@${newMessage.author.id}> On edit, ${
-							successes.length > 0
-								? successes.length +
-									(successes.length > 1 ? ' results were' : ' result was') +
-									' successfully added. '
-								: ''
-						}`,
-						message_reference: {
-							type: 0,
-							message_id: newMessage.id,
+			if (results.length > 1 || results[0].length > 1) {
+				if (successes.length <= 10) {
+					try {
+						addReaction(msg, [keyCaps[successes.length], '✅']);
+					} catch (err) {
+						console.log(keyCaps[successes.length]);
+					}
+				} else {
+					addReaction(msg, '✅');
+
+					addMessage({
+						channelId: msg.channelId,
+						data: {
+							content: `<@${msg.author.id}> ${successes.length} ${
+								successes.length === 1 ? 'result' : 'results'
+							} successfully parsed`,
+							message_reference: {
+								type: 0,
+								message_id: msg.id,
+							},
 						},
 						flags: MessageFlags.Ephemeral,
+					});
+				}
+			} else addReaction(msg, results[0][0].reaction);
+		}
+		//handle achievements
+		if (achievements.length > 0) {
+			addReaction(msg, '🎖️');
+			addMessage({
+				channelId: msg.channelId,
+				data: {
+					content: `<@${msg.author.id}> Congratulations! You've unlocked ${
+						achievements.length === 1
+							? 'an achievement'
+							: `${achievements.length} achievements`
+					}!\n${achievements
+						.map((a) => {
+							return `\t🎖️ ${a.name}: ${a.description}`;
+						})
+						.join('\n')}`,
+					message_reference: {
+						type: 0,
+						message_id: msg.id,
 					},
-				});
-			} catch (err) {
-				console.log(err.data);
-			}
+				},
+			});
 		}
 
-		if (successes.length > 0) {
-			const serversToRemove = [];
+		//handle crossposting message if user is part of multiple servers
+		const serversToRemove = [];
+
+		if (checkCorrectServer(srvr.guildId)) {
 			usr.servers.forEach(async (s) => {
 				if (s._id.toString() !== srvr._id.toString()) {
 					const otherServer = await Servers.findById(s._id);
-					//make sure the member is still a part of that server (in discord's record)
-					const members = await axios.get(
-						`${url}/guilds/${otherServer.guildId}/members`,
-						authObj,
-					);
-					if (members && !members.some((m) => m.user.id === msg.author.id)) {
-						serversToRemove.push(s._id);
-						return;
-					}
+					if (!checkCorrectServer(otherServer.guildId)) return;
 					if (otherServer && otherServer.channelId) {
-						return addMessage({
-							channelId: otherServer.channelId,
-							data: {
-								content: `On behalf of <@${newMessage.author.id}>:\n${successes
-									.map((su) => su.match)
-									.join('\n\n')}`,
-							},
-						});
+						//make sure the member is still a part of that server (in discord's record)
+						try {
+							await axios.get(
+								`${url}/guilds/${otherServer.guildId}/members/${msg.author.id}`,
+								authObj,
+							);
+							const toSend = successes.filter((su) => {
+								return otherServer.games.includes(su.name);
+							});
+
+							if (toSend.length > 0)
+								return addMessage({
+									channelId: otherServer.channelId,
+									data: {
+										content: `On behalf of <@${msg.author.id}>:\n${toSend
+											.map((su) => su.match)
+											.join('\n\n')}`,
+									},
+								});
+						} catch (err) {
+							serversToRemove.push(s._id);
+						}
 					}
 				}
 				return null;
 			});
-
 			//for every server where the user is no longer a member
 			if (serversToRemove.length > 0) {
 				const user = await Users.findById(usr._id);
@@ -1276,13 +1116,193 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
 				await s.save();
 			}
 		}
+	} catch (err) {
+		await Errors.create({
+			description: 'Error parsing new message',
+			message: err.message || '',
+			data: err.response?.data || null,
+			stack: err.stack || null,
+		});
 	}
-});
+};
+
+const handleMessageUpdate = async (oldMessage, newMessage) => {
+	try {
+		if (!checkCorrectServer(newMessage.guildId)) return;
+		else if (!me) return console.log('Me not defined');
+
+		if (!newMessage?.author?.id || newMessage.author.id === me.id) return;
+
+		// check the current discord server data against what we have in the DB,
+		// if it exists, and update the data accordingly
+		const srvr = await updateServerData(newMessage.guildId);
+
+		//see if it's a game result being posted, and if not, ignore the message.
+		const oldGameInfo = parseResult(oldMessage.content);
+		const newGameInfo = parseResult(newMessage.content);
+
+		if (!newGameInfo || newGameInfo.length === 0) {
+			if (process.env.NODE_ENV === 'development') testRegex(newMessage.content);
+			return;
+		}
+
+		//if not, see if there is a valid home channel set, and ignore the result if not in the home channel
+		const correctChannel = await checkCorrectChannel(srvr, newMessage);
+		if (!correctChannel) return;
+
+		//3 categories of things can happen: adding, removing, or editing entries
+		// we could just delete the original info from the DB and re-add whatever is in the edited message,
+		// but that would take longer and we would not have the necessary information to acknowledge the request
+		const oldGameList = [];
+		oldGameInfo.forEach((info) => {
+			info.match.forEach((match) => {
+				oldGameList.push({
+					...info,
+					match: [match],
+				});
+			});
+		});
+		const newGameList = [];
+		newGameInfo.forEach((info) => {
+			info.match.forEach((match) => {
+				newGameList.push({
+					...info,
+					match: [match],
+				});
+			});
+		});
+
+		const added = newGameList.filter((info) => {
+			return oldGameList.every((oldInfo) => {
+				if (oldInfo.name !== info.name) return true;
+				return (
+					info.getDate(info.match[0]) - oldInfo.getDate(oldInfo.match[0]) !== 0
+				);
+			});
+		});
+
+		if (added.length > 0) {
+			// check the current discord user data against what we have in the DB,
+			// if it exists, and update the data accordingly
+			const usr = await updateUserData(newMessage.author.id);
+
+			//update the list of users on the server, and the list of servers on the user, if necessary
+			await updateLists(usr, srvr);
+
+			const { failures, successes } = await processResults(usr, added);
+
+			if (failures.length !== 0) {
+				addReaction(newMessage, '⚠️');
+				addMessage({
+					channelId: newMessage.channelId,
+					data: {
+						content: `<@${newMessage.author.id}> On edit, ${
+							successes.length > 0
+								? successes.length +
+									(successes.length > 1 ? ' results were' : ' result was') +
+									' successfully added. '
+								: ''
+						}One or more failures occurred while posting edited results:\n${failures
+							.map((f) => `⚠️ ${f}`)
+							.join('\n')}`,
+						message_reference: {
+							type: 0,
+							message_id: newMessage.id,
+						},
+						flags: MessageFlags.Ephemeral,
+					},
+				});
+			} else {
+				try {
+					addReaction(newMessage, ['✏️']);
+					addMessage({
+						channelId: newMessage.channelId,
+						data: {
+							content: `<@${newMessage.author.id}> On edit, ${
+								successes.length > 0
+									? successes.length +
+										(successes.length > 1 ? ' results were' : ' result was') +
+										' successfully added. '
+									: ''
+							}`,
+							message_reference: {
+								type: 0,
+								message_id: newMessage.id,
+							},
+							flags: MessageFlags.Ephemeral,
+						},
+					});
+				} catch (err) {
+					console.log(err.data);
+				}
+			}
+
+			if (successes.length > 0) {
+				const serversToRemove = [];
+				usr.servers.forEach(async (s) => {
+					if (s._id.toString() !== srvr._id.toString()) {
+						const otherServer = await Servers.findById(s._id);
+						//make sure the member is still a part of that server (in discord's record)
+						const members = await axios.get(
+							`${url}/guilds/${otherServer.guildId}/members`,
+							authObj,
+						);
+						if (members && !members.some((m) => m.user.id === msg.author.id)) {
+							serversToRemove.push(s._id);
+							return;
+						}
+						if (otherServer && otherServer.channelId) {
+							return addMessage({
+								channelId: otherServer.channelId,
+								data: {
+									content: `On behalf of <@${newMessage.author.id}>:\n${successes
+										.map((su) => su.match)
+										.join('\n\n')}`,
+								},
+							});
+						}
+					}
+					return null;
+				});
+
+				//for every server where the user is no longer a member
+				if (serversToRemove.length > 0) {
+					const user = await Users.findById(usr._id);
+					await Promise.all(
+						serversToRemove.map(async (s) => {
+							//remove the user from the server's list
+							const server = await Servers.findById(s);
+							server.users = server.users.filter(
+								(u) => u.toString() !== user._id.toString(),
+							);
+							await server.save();
+							//remove the server from the user's list
+							user.servers = user.servers.filter(
+								(srv) => srv.toString() !== s.toString(),
+							);
+						}),
+					);
+					s.markModified('users');
+					await s.save();
+				}
+			}
+		}
+	} catch (err) {
+		await Errors.create({
+			description: 'Error editing message',
+			message: err.message || '',
+			data: err.response?.data || null,
+			stack: err.stack || null,
+		});
+	}
+};
 
 client.on('ready', async (c) => {
-	console.log('Wordle Bot ready!');
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
+	client.on('messageCreate', handleMessageCreate);
+	client.on('messageUpdate', handleMessageUpdate);
+	console.log('Wordle Bot ready!');
 	await sendMonthlyUpdate();
 	// await sendAdHocUpdate();
 });
