@@ -768,7 +768,6 @@ const matchers = [
 			name: 'Immaculate Grid',
 			getData: (str) => {
 				const lines = str.split('\n');
-				console.log(lines);
 				const number = parseInt(lines[0].split(' ')[2]);
 				if (isNaN(number))
 					return {
