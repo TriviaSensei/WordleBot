@@ -763,11 +763,12 @@ const matchers = [
 	{
 		// regex: /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n/g,
 		regex:
-			/Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g,
+			/Immaculate Grid (\d)+ (\d)\/9:(\n\uD83D\uDDC4\uFE0F \(from the archives\))?\nRarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g,
 		data: {
 			name: 'Immaculate Grid',
 			getData: (str) => {
 				const lines = str.split('\n');
+				console.log(lines);
 				const number = parseInt(lines[0].split(' ')[2]);
 				if (isNaN(number))
 					return {
