@@ -721,7 +721,7 @@ const sendMonthlyUpdate = async () => {
 		addMessage({
 			channelId: s.channelId,
 			data: {
-				content: `@everyone Your monthly server update is here: https://${hostname}/server/${s.guildId}/${currentYear}/${currentMonth}\nIf you enjoy this bot, please consider donating here: ${process.env.DONATE_LINK}`,
+				content: `Your monthly server update is here: https://${hostname}/server/${s.guildId}/${currentYear}/${currentMonth}\nIf you enjoy this bot, please consider donating here: ${process.env.DONATE_LINK}`,
 			},
 		});
 	});
