@@ -1,11 +1,15 @@
-const area = document.querySelector('#immaculate-grid-tab-pane');
+const areas = [
+	document.querySelector('#immaculate-grid-tab-pane'),
+	document.querySelector('#immaculate-grid-football-tab-pane'),
+];
 
 import { updateTable } from '../updateTable.js';
 import { createElement } from '../utils/createElementFromSelector.js';
 import { getPage } from '../utils/page.js';
 import { gamesPlayed, average } from './_general.js';
-area.addEventListener('data-update', (e) => {
-	const table = area.querySelector('.standings-table');
+
+const updateData = (e) => {
+	const table = e.target.querySelector('.standings-table');
 	const page = getPage();
 	const getCellValue = (c) => {
 		const dataStr = c.getAttribute('data');
@@ -53,7 +57,7 @@ area.addEventListener('data-update', (e) => {
 		},
 	];
 	const sortOrder = e.detail.serverData?.settings
-		?.find((s) => s.name === area.getAttribute('data-game'))
+		?.find((s) => s.name === e.target.getAttribute('data-game'))
 		?.settings?.find((s) => s.name === 'sort')?.value;
 	updateTable(
 		table,
@@ -61,9 +65,10 @@ area.addEventListener('data-update', (e) => {
 		operators,
 		page === 'server' ? operators : [],
 		e.detail.serverData?.customStats,
-		sortOrder
+		sortOrder,
 	);
-});
+};
+areas.forEach((a) => a.addEventListener('data-update', updateData));
 
 import { getDateFromHeader } from '../utils/getDateFromHeader.js';
 const columnData = [
@@ -90,4 +95,11 @@ import { generateCSVFile } from '../utils/generateCSVFile.js';
 const csvButton = document.querySelector('#csv-button');
 csvButton.addEventListener('click', () => {
 	generateCSVFile('Immaculate Grid', columnData);
+});
+csvButton.addEventListener('click', () => {
+	const game = document
+		.querySelector(`.tab-pane.fade.active.show[data-game]`)
+		?.getAttribute('data-game');
+	if (['Immaculate Grid', 'Immaculate Grid Football'].includes(game))
+		generateCSVFile(game, columnData);
 });

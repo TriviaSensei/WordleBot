@@ -64,6 +64,11 @@ const getResults = async (year, month, users, gameFilter) => {
 			if (!matcher) return null;
 			const startNumber = matcher.data.getPuzzleNumberByDate(firstOfMonthStr);
 			const endNumber = matcher.data.getPuzzleNumberByDate(nextMonthStr);
+			if (game.name === 'Immaculate Grid Football') {
+				console.log(startNumber, endNumber, month);
+				console.log(firstOfMonthStr);
+				console.log(nextMonthStr);
+			}
 			let maxDate = new Date(nextMonth);
 			const currentDT = moment.tz(new Date(), timezone).format();
 			const currentMonth = Number(currentDT.split('-')[1]);
@@ -97,6 +102,7 @@ const getResults = async (year, month, users, gameFilter) => {
 			});
 			return {
 				game: game.name,
+				displayName: game.displayName,
 				script: game.script,
 				startNumber,
 				endNumber,
@@ -139,6 +145,7 @@ const getResults = async (year, month, users, gameFilter) => {
 	});
 
 	gameInfo.data.forEach((gd) => {
+		if (!gd?.results) return;
 		gd.results = gd.results.filter((res) => {
 			return res.data.some((d) => d !== null);
 		});
@@ -226,6 +233,8 @@ const getPlayerStats = async (userId, year, month) => {
 		return { status: 'fail', code: 404, message: 'Server ID not found' };
 
 	const data = await getResults(year, month, [playerData], gameList);
+
+	console.log(data);
 
 	if (data.errors.length === 0) delete data.errors;
 

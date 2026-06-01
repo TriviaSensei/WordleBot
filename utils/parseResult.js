@@ -302,6 +302,91 @@ const currentCrosswords = () => {
 	} else return [currentDate];
 };
 
+const igData = (baseNo, baseDate, icon) => {
+	return {
+		getData: (str) => {
+			const lines = str.split('\n');
+			const number = parseInt(lines[0].split(' ')[3]);
+			if (isNaN(number))
+				return {
+					status: 1,
+					message: `Invalid puzzle number in an Immaculate Grid ${icon} result (${lines[0]})`,
+				};
+			let lineCount = 0;
+			let correct = 0;
+			const boxRegex = /(\uD83D\uDFE9|\u2B1C\uFE0F){3}/g;
+
+			lines.forEach((line) => {
+				const m = line.match(boxRegex);
+				if (line && m) {
+					lineCount++;
+					for (var i = 0; i < line.length; i += 2) {
+						const chars = [line.charCodeAt(i), line.charCodeAt(i + 1)];
+						if (chars[0] === 55357 && chars[1] === 57321) correct++;
+					}
+				}
+			});
+			if (lineCount !== 3)
+				return {
+					status: 1,
+					message: `${lineCount} lines of Immaculate Grid results detected; 3 expected. As of 3/16/2026, you must paste the squares with your Immaculate Grid results, as extra guesses are not reflected in the first line of the result.`,
+				};
+			else if (correct > 9)
+				return {
+					status: 1,
+					message: `${correct} correct answers detected in Immaculate Grid ${number}`,
+				};
+			const data = {
+				number,
+				correct: correct,
+				rarity: parseInt(
+					lines
+						.find((l) => l.match(/Rarity/g))
+						?.split(' ')
+						.slice(-1)
+						.pop(),
+				),
+			};
+			if (isNaN(data.rarity))
+				return {
+					status: 1,
+					message: 'Invalid or no value detected for rarity',
+				};
+			return { status: 0, data };
+		},
+		compareData: (a, b) => {
+			return a.correct === b.correct && a.rarity === b.rarity;
+		},
+		checkValidDate: checkValidDateTime(6, timezone),
+		getCurrentPuzzles: () => {
+			const currentDT = moment.tz(new Date(), timezone).format();
+			const currentHr = Number(currentDT.split('T')[1].split(':')[0]);
+			if (currentHr < 6) {
+				const dt = new Date();
+				dt.setDate(dt.getDate() - 1);
+				const a = moment.tz(Date.parse(dt), timezone).format();
+				return [a.split('T')[0]];
+			}
+			return [currentDT.split('T')[0]];
+		},
+		getDate: (str) => {
+			const number = parseInt(str.split('\n')[0].split(' ')[3]);
+			return getPuzzleDate(number, baseNo, baseDate);
+		},
+		getPuzzleNumberByDate: (date) => {
+			return getPuzzleNumber(date, baseNo, baseDate);
+		},
+		checkWin: (data) => data.correct === 9,
+		getReaction: (data) => {
+			if (data.correct === 9) {
+				if (data.rarity < 100) return ['🔥'];
+				else if (data.rarity < 200) return [icon];
+				else return ['✅'];
+			} else return ['✅'];
+		},
+	};
+};
+
 /**
  * Regex - regex to match the result string
  * Data {
@@ -759,93 +844,26 @@ const matchers = [
 			},
 		},
 	},
-	//Immaculate Grid
+	//Immaculate Grid Baseball
 	{
 		// regex: /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n/g,
 		regex:
-			/Immaculate Grid (\d)+ (\d)\/9:(\n\uD83D\uDDC4\uFE0F \(from the archives\))?\nRarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g,
+			/\u26BE\uFE0F Immaculate Grid (\d)+ (\d)\/9:(\n\uD83D\uDDC4\uFE0F \(from the archives\))?\nRarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g,
 		data: {
 			name: 'Immaculate Grid',
-			getData: (str) => {
-				const lines = str.split('\n');
-				const number = parseInt(lines[0].split(' ')[2]);
-				if (isNaN(number))
-					return {
-						status: 1,
-						message: `Invalid puzzle number in an Immaculate Grid result (${lines[0]})`,
-					};
-				let lineCount = 0;
-				let correct = 0;
-				const boxRegex = /(\uD83D\uDFE9|\u2B1C\uFE0F){3}/g;
-
-				lines.forEach((line) => {
-					const m = line.match(boxRegex);
-					if (line && m) {
-						lineCount++;
-						for (var i = 0; i < line.length; i += 2) {
-							const chars = [line.charCodeAt(i), line.charCodeAt(i + 1)];
-							if (chars[0] === 55357 && chars[1] === 57321) correct++;
-						}
-					}
-				});
-				if (lineCount !== 3)
-					return {
-						status: 1,
-						message: `${lineCount} lines of Immaculate Grid results detected; 3 expected. As of 3/16/2026, you must paste the squares with your Immaculate Grid results, as extra guesses are not reflected in the first line of the result.`,
-					};
-				else if (correct > 9)
-					return {
-						status: 1,
-						message: `${correct} correct answers detected in Immaculate Grid ${number}`,
-					};
-				const data = {
-					number,
-					correct: correct,
-					rarity: parseInt(
-						lines
-							.find((l) => l.match(/Rarity/g))
-							?.split(' ')
-							.slice(-1)
-							.pop(),
-					),
-				};
-				if (isNaN(data.rarity))
-					return {
-						status: 1,
-						message: 'Invalid or no value detected for rarity',
-					};
-				return { status: 0, data };
-			},
-			compareData: (a, b) => {
-				return a.correct === b.correct && a.rarity === b.rarity;
-			},
-			checkValidDate: checkValidDateTime(6, timezone),
-			getCurrentPuzzles: () => {
-				const currentDT = moment.tz(new Date(), timezone).format();
-				const currentHr = Number(currentDT.split('T')[1].split(':')[0]);
-				if (currentHr < 6) {
-					const dt = new Date();
-					dt.setDate(dt.getDate() - 1);
-					const a = moment.tz(Date.parse(dt), timezone).format();
-					return [a.split('T')[0]];
-				}
-				return [currentDT.split('T')[0]];
-			},
-			getDate: (str) => {
-				const number = parseInt(str.split('\n')[0].split(' ')[2]);
-				return getPuzzleDate(number, 652, '2025-01-13');
-			},
-			getPuzzleNumberByDate: (date) => {
-				return getPuzzleNumber(date, 652, '2025-01-13');
-			},
-			checkWin: (data) => data.correct === 9,
-			getReaction: (data) => {
-				if (data.correct === 9) {
-					if (data.rarity < 100) return ['🔥'];
-					else if (data.rarity < 200) return ['⚾️'];
-					else return ['✅'];
-				} else return ['✅'];
-			},
+			displayName: 'Immaculate Grid ⚾',
+			...igData(652, '2025-01-13', '⚾'),
+		},
+	},
+	//Immaculate Grid Football
+	{
+		// regex: /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n/g,
+		regex:
+			/\uD83C\uDFC8 Immaculate Grid (\d)+ (\d)\/9:(\n\uD83D\uDDC4\uFE0F \(from the archives\))?\nRarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g,
+		data: {
+			name: 'Immaculate Grid Football',
+			displayName: 'Immaculate Grid 🏈',
+			...igData(1047, '2026-05-31', '🏈'),
 		},
 	},
 	//NYT Mini

@@ -199,6 +199,62 @@ const quordleDefaults = {
 	getPuzzleId: puzzleNumber,
 };
 
+const igSettings = {
+	settings: [
+		{
+			...defaultFillIn,
+			enum: [
+				{
+					label: 'None',
+					description: 'Unplayed days do not count towards the data',
+				},
+				{
+					label: '900',
+					description: 'Unplayed games are given a score of 900',
+				},
+				{
+					label: 'Server average',
+					description: 'Server average score that day',
+				},
+				{
+					label: 'Server worst',
+					description: 'Server worst score that day',
+				},
+				{
+					label: 'Server worst+',
+					description:
+						'10% higher than the worst score on the server that day, or 900, whichever is lower',
+				},
+			],
+			default: '900',
+		},
+		defaultSortOrder(['avg-rarity', 'avg-correct']),
+	],
+	dataItems: [
+		{
+			name: 'correct',
+			display: 'Correct answers',
+			getData: (data) => data.correct,
+			sortOrder: -1,
+		},
+		{
+			name: 'rarity',
+			display: 'Rarity',
+			getData: (data) => data.rarity,
+			sortOrder: 1,
+		},
+	],
+	sortItems: [
+		sortItems.played,
+		sortItems.avg,
+		{
+			id: 'avg-correct',
+			label: 'Average Correct',
+		},
+	],
+	getPuzzleId: puzzleNumber,
+};
+
 const gameList = [
 	{
 		name: 'Wordle',
@@ -456,61 +512,17 @@ const gameList = [
 	},
 	{
 		name: 'Immaculate Grid',
+		displayName: 'Immaculate Grid ⚾',
 		script: true,
-		url: 'https://www.immaculategrid.com',
-		settings: [
-			{
-				...defaultFillIn,
-				enum: [
-					{
-						label: 'None',
-						description: 'Unplayed days do not count towards the data',
-					},
-					{
-						label: '900',
-						description: 'Unplayed games are given a score of 900',
-					},
-					{
-						label: 'Server average',
-						description: 'Server average score that day',
-					},
-					{
-						label: 'Server worst',
-						description: 'Server worst score that day',
-					},
-					{
-						label: 'Server worst+',
-						description:
-							'10% higher than the worst score on the server that day, or 900, whichever is lower',
-					},
-				],
-				default: '900',
-			},
-			defaultSortOrder(['avg-rarity', 'avg-correct']),
-		],
-		dataItems: [
-			{
-				name: 'correct',
-				display: 'Correct answers',
-				getData: (data) => data.correct,
-				sortOrder: -1,
-			},
-			{
-				name: 'rarity',
-				display: 'Rarity',
-				getData: (data) => data.rarity,
-				sortOrder: 1,
-			},
-		],
-		sortItems: [
-			sortItems.played,
-			sortItems.avg,
-			{
-				id: 'avg-correct',
-				label: 'Average Correct',
-			},
-		],
-		getPuzzleId: puzzleNumber,
+		url: 'https://www.sports-reference.com/immaculate-grid/',
+		...igSettings,
+	},
+	{
+		name: 'Immaculate Grid Football',
+		displayName: 'Immaculate Grid 🏈',
+		script: false,
+		url: 'https://www.sports-reference.com/immaculate-grid/football',
+		...igSettings,
 	},
 ];
 

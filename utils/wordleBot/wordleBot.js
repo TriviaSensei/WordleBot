@@ -250,7 +250,7 @@ const addMessage = (data) => {
 
 const getCharCodes = (str) => {
 	for (var i = 0; i < str.length; i++) {
-		console.log(str.charAt(i), str.charCodeAt(i).toString(16));
+		// console.log(str.charAt(i), str.charCodeAt(i).toString(16));
 	}
 };
 
@@ -266,8 +266,7 @@ const testRegex = (str) => {
 	//		/Wordle (\d{1,3},)?(\d{3})+ [\dX]\/6(\*)?(\n)*(\n(\u2B1B|(\uD83D\uDFE9)|(\uD83D\uDFE8)){5}(.*)){1,6}/g;
 	//	/Immaculate Grid (\d)+ (\d)\/9:(\n\D83D\DDC4\FE0F.*)?Rarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}){3}/g
 	const regex =
-		/Immaculate Grid (\d)+ (\d)\/9:(\n\uD83D\uDDC4\uFE0F \(from the archives\))?\nRarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g;
-
+		/\uD83C\uDFC8 Immaculate Grid (\d)+ (\d)\/9:(\n\uD83D\uDDC4\uFE0F \(from the archives\))?\nRarity: (\d)+(\nIMMACULATE!)?(\n((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*){3}/g;
 	// /Immaculate Grid (\d)+ (\d)\/9:(\n.*)+Rarity: (\d)+\n(((\uD83D\uDFE9)|(\u2B1C\uFE0F)){3}.*\n){3}/g;
 	const match = str.match(regex);
 	const res = getCharCodes(str);
@@ -487,6 +486,7 @@ const processResults = async (usr, gameInfo) => {
 			achievements.push(a);
 		});
 	}
+
 	// if (process.env.NODE_ENV === 'development') await Results.deleteMany({});
 	return {
 		results,
@@ -965,6 +965,7 @@ const handleMessageCreate = async (msg) => {
 
 		//see if it's a game result being posted, and if not, ignore the message.
 		const gameInfo = parseResult(msg.content);
+
 		if (process.env.NODE_ENV === 'development') testRegex(msg.content);
 		if (!gameInfo || gameInfo.length === 0) return;
 
@@ -974,6 +975,7 @@ const handleMessageCreate = async (msg) => {
 
 		//if so, see if there is a valid home channel set, set it if not, and ignore the result if not in the home channel
 		const correctChannel = await checkCorrectChannel(srvr, msg);
+
 		if (!correctChannel) return;
 
 		// check the current discord user data against what we have in the DB,

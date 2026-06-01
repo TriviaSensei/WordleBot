@@ -836,7 +836,7 @@ const immaculateGridAchievements = [
 	{
 		id: `immaculate-grid-complete`,
 		name: `Immaculate!`,
-		description: `Completely fill an Immaculate Grid`,
+		description: `Completely fill a baseball Immaculate Grid`,
 		color: `#ffffff`,
 		games: ['Immaculate Grid'],
 		updateProgress: returnData,

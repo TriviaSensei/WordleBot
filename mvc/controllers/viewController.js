@@ -145,7 +145,6 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 		result = await getServerStats(req.params.id, year, month);
 	} else {
 		result = await getPlayerStats(req.params.id, year, month);
-		console.log(result);
 	}
 	if (result.status !== 'success') {
 		return res.status(200).render(`404`, { data: result });
@@ -153,6 +152,7 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 	const dataItems = games.map((g) => {
 		return {
 			game: g.name,
+			displayName: g.displayName || g.game,
 			script: g.script,
 			items: g.dataItems.map((d) => {
 				return {
@@ -162,6 +162,7 @@ exports.getWordleStats = catchAsync(async (req, res, next) => {
 			}),
 		};
 	});
+	// console.log(result.data.gameData);
 	res.status(200).render(`${loc.toLowerCase()}`, {
 		status: 'success',
 		data: {
@@ -367,6 +368,7 @@ exports.getSettingsPage = catchAsync(async (req, res, next) => {
 	const dataItems = games.map((g) => {
 		return {
 			game: g.name,
+			displayName: g.displayName || g.name,
 			script: g.script,
 			items: g.dataItems.map((d) => {
 				return {

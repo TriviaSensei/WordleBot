@@ -5,3 +5,5 @@ _sandbox/*
 data_export.txt
 .gitignore
 log*.txt
+AddNewGame.txt
+todo.txt

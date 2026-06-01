@@ -1,4 +1,5 @@
-#immaculate-grid-tab-pane {
+#immaculate-grid-tab-pane,
+#immaculate-grid-football-tab-pane {
 	.result-cell {
 		padding: 0;
 		font-size: 0.9em;
