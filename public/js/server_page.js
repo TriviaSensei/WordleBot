@@ -74,7 +74,7 @@ const getFilterFunction = (game, filter) => {
 		const cf = getComparatorFunction(
 			dataItem.getData,
 			filter.comparator,
-			filter.dataValue
+			filter.dataValue,
 		);
 		return {
 			filter,
@@ -180,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	);
 	const selectedValue = `${data.gameData.year}-${data.gameData.month}`;
 	monthSelect.selectedIndex = getElementArray(monthSelect, 'option').findIndex(
-		(o) => o.value === selectedValue
+		(o) => o.value === selectedValue,
 	);
 	const panes = getElementArray(document, '.tab-pane');
 
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (!button) return (csvButton.disabled = true);
 
 		const pane = document.querySelector(
-			`${button.getAttribute('data-bs-target')}`
+			`${button.getAttribute('data-bs-target')}`,
 		);
 
 		const cell = pane.querySelector('.result-cell');
@@ -205,8 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (res?.data?.gameData?.startDate && res?.data?.gameData?.endDate)
 				dateRanges.forEach(
 					(dr) =>
-						(dr.innerHTML = `${res.data.gameData.startDate} to ${res.data.gameData.endDate}`)
+						(dr.innerHTML = `${res.data.gameData.startDate} to ${res.data.gameData.endDate}`),
 				);
+			console.log(res.data.serverData.settings);
 
 			res.data.gameData.data.forEach((d) => {
 				const gameId = d.game.toLowerCase().split(' ').join('-');
@@ -238,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				//remove the existing headers
 				getElementArray(
 					headerRow,
-					'.summary-header, .result-header, .blank-cell'
+					'.summary-header, .result-header, .blank-cell',
 				).forEach((h) => h.remove());
 				getElementArray(table, '.summary-cell').forEach((c) => c.remove());
 				//add the new ones
@@ -247,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						? 1
 						: d.startNumber;
 				const startDt = new Date(
-					moment.tz(`${res.data.gameData.startDate} 00:00`, timezone)
+					moment.tz(`${res.data.gameData.startDate} 00:00`, timezone),
 				);
 				const maxN = n + d.days;
 
@@ -280,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				d.results.forEach((player, i) => {
 					const newRow = createElement(
 						'tr.standings-row.py-1.position-relative',
-						{ id: player.userId }
+						{ id: player.userId },
 					);
 					const c1 = createElement('td');
 					c1.setAttribute('colspan', '2');
@@ -305,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
 						'src',
 						player.avatar
 							? `https://cdn.discordapp.com/avatars/${player.userId}/${player.avatar}.png`
-							: `/img/avatar_default.svg`
+							: `/img/avatar_default.svg`,
 					);
 
 					picLink.appendChild(pic);
@@ -338,21 +339,21 @@ document.addEventListener('DOMContentLoaded', () => {
 				});
 
 				const settings = res.data.serverData.settings.find(
-					(s) => s.name === d.game
+					(s) => s.name === d.game,
 				)?.settings;
 				const fillIn = settings
 					? fillIns
 							.find((f) => f.name === d.game)
-							?.fillIns.find(
+							?.fillIns?.find(
 								(f) =>
-									f.name === settings.find((s) => s.name === 'fillIn')?.value
+									f.name === settings.find((s) => s.name === 'fillIn')?.value,
 							)
 					: null;
 
 				if (fillIn && fillIn.handleFillIn && settings)
 					fillIn.handleFillIn(
 						table,
-						settings.find((s) => s.name === 'failureScore')
+						settings.find((s) => s.name === 'failureScore'),
 					);
 				//remove summary rows
 				getElementArray(table, '.summary-row').forEach((r) => r.remove());
@@ -360,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			panes.forEach((p) => {
 				const game = p.getAttribute('data-game');
 				const customStats = res.data.serverData.customStats.find(
-					(s) => s.game === game
+					(s) => s.game === game,
 				);
 
 				const evt = new CustomEvent('data-update', {
@@ -376,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
 											filters: s.filters.map((f) => getFilterFunction(game, f)),
 											evaluator: new Evaluator(newCalc, false),
 										};
-								  })
+									})
 								: [],
 						},
 					},
