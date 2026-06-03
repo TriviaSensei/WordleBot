@@ -128,6 +128,42 @@ export const gameList = [
 			},
 		],
 	},
+	{
+		name: 'Immaculate Grid Football',
+		dataItems: [
+			{
+				name: 'correct',
+				display: 'Correct answers',
+				getData: (data) => data.correct,
+				sortOrder: -1,
+			},
+			{
+				name: 'rarity',
+				display: 'Rarity',
+				getData: (data) => data.rarity,
+				sortOrder: 1,
+			},
+		],
+	},
+	{
+		name: 'MapTap',
+		dataItems: [
+			{
+				name: 'score',
+				display: 'Score',
+				getData: (data) => data.score,
+				sortOrder: -1,
+			},
+			...[5, 4, 3, 2, 1].map((n) => {
+				return {
+					name: `p${n}`,
+					display: `P${n}`,
+					getData: (data) => data.parts[n - 1],
+					sortOrder: -1,
+				};
+			}),
+		],
+	},
 ];
 
 const updateStreak = (old, data) => {
@@ -170,7 +206,7 @@ const updateStreak = (old, data) => {
 const fitsAtEnd = (date, oldData) => {
 	const oldDate = new Date(moment.tz(oldData.start, timezone).format());
 	const desiredDate = new Date(
-		oldDate.setDate(oldDate.getDate() + oldData.length)
+		oldDate.setDate(oldDate.getDate() + oldData.length),
 	);
 	const desiredDateStr = moment.tz(desiredDate, timezone).format();
 	const testDateStr = moment.tz(date, timezone).format();

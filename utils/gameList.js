@@ -524,6 +524,56 @@ const gameList = [
 		url: 'https://www.sports-reference.com/immaculate-grid/football',
 		...igSettings,
 	},
+	{
+		name: 'MapTap',
+		script: true,
+		url: 'https://www.maptap.gg',
+		settings: [
+			{
+				...defaultFillIn,
+				enum: [
+					{
+						label: 'None',
+						description: 'Unplayed days do not count towards the data',
+					},
+					{
+						label: '0',
+						description: 'Unplayed games are given a score of 0',
+					},
+					{
+						label: 'Server average',
+						description: 'Server average score that day',
+					},
+					{
+						label: 'Server worst',
+						description: 'Server worst score that day',
+					},
+					{
+						label: 'Server worst-',
+						description:
+							'One less than the worst score on the server that day, or 0, whichever is higher',
+					},
+				],
+				default: '0',
+			},
+		],
+		dataItems: [
+			{
+				name: 'score',
+				display: 'Score',
+				getData: (data) => data.score,
+				sortOrder: -1,
+			},
+			...[5, 4, 3, 2, 1].map((n) => {
+				return {
+					name: `p${n}`,
+					display: `P${n}`,
+					getData: (data) => data.parts[n - 1],
+					sortOrder: -1,
+				};
+			}),
+		],
+	},
 ];
 
 module.exports = gameList;

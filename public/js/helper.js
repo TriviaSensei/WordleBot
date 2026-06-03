@@ -15,8 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		return Date.parse(new Date(d.date)) !== Date.parse(new Date(date));
 	});
 
-	console.log(data);
-
 	const sh = new StateHandler({
 		guesses: [
 			{
@@ -111,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (!letter) return;
 			const res = e.detail.guesses[row].result[col];
 			e.target.classList.add(
-				res === 0 ? 'gray' : res === 1 ? 'yellow' : 'green'
+				res === 0 ? 'gray' : res === 1 ? 'yellow' : 'green',
 			);
 		});
 		b.addEventListener('click', changeLetterResult);
@@ -203,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		k.addEventListener('click', handleKey);
 	});
 	const solutions = document.querySelector(
-		'.solution-container .solution-list'
+		'.solution-container .solution-list',
 	);
 	//green letter
 	const correctFilter = (letter, position) => {
@@ -283,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					const n = g.word.reduce(
 						(p, c, j) =>
 							p + (c === g.word[i] && j <= i && g.result[j] !== 0 ? 1 : 0),
-						0
+						0,
 					);
 					//there are at least [n] instances of this letter
 					filters.push({
@@ -306,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					//see if it was elsewhere indicated as correct here
 					if (
 						filters.some(
-							(f) => f.letter === g.word[i] && f.position === i && f.type === 2
+							(f) => f.letter === g.word[i] && f.position === i && f.type === 2,
 						)
 					) {
 						valid = false;
@@ -323,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					//count which instance this is
 					const n = g.word.reduce(
 						(p, c, j) => p + (c === g.word[i] && j <= i ? 1 : 0),
-						0
+						0,
 					);
 					//there are at least [n] instances of this letter
 					filters.push({
@@ -346,7 +344,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					//make sure we didn't previously indicate it to be a correct letter in this position
 					if (
 						filters.some(
-							(f) => f.type === 2 && f.letter === g.word[i] && f.position === i
+							(f) => f.type === 2 && f.letter === g.word[i] && f.position === i,
 						)
 					) {
 						valid = false;
@@ -355,7 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					//count how many correct instances of this letter we have - there are exactly this many instances of this letter
 					const n = g.word.reduce(
 						(p, c, j) => p + (c === g.word[i] && g.result[j] !== 0 ? 1 : 0),
-						0
+						0,
 					);
 					//there are less than [n+1] instances of this letter
 					filters.push({
@@ -368,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 
 		const allFilters = filters.map((f) =>
-			filterFunctions[f.type](f.letter, f.position)
+			filterFunctions[f.type](f.letter, f.position),
 		);
 
 		const keyword = '';

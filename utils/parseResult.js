@@ -2,6 +2,13 @@ const moment = require('moment-timezone');
 const maxTimeZoneOffset = 14;
 const timezone = process.env.DEFAULT_TIMEZONE;
 const msInDay = 86400000;
+
+const addLeadingZeroes = (str, totalLength) => {
+	let toReturn = `${str}`;
+	while (toReturn.length < totalLength) toReturn = `0${toReturn}`;
+	return toReturn;
+};
+
 /*
 Parses done:
 Wordle
@@ -214,9 +221,7 @@ const processCrosswordDate = (dateIndex) => {
 			return new Date(
 				moment
 					.tz(
-						`${yr}-${mo >= 10 ? mo : `0${mo}`}-${
-							dt >= 10 ? dt : `0${dt}`
-						} 00:00`,
+						`${yr}-${addLeadingZeroes(mo, 2)}-${addLeadingZeroes(dt, 2)} 00:00`,
 						timezone,
 					)
 					.format(),
@@ -253,6 +258,7 @@ const getDateExtremes = () => {
 		moment.tz(now, extremes.minOffset.name).format(),
 	];
 };
+//get the dates that exist anywhere in the world right now
 const getAvailableDates = () => {
 	const extremes = getDateExtremes();
 	const dates = [];
@@ -272,6 +278,7 @@ const getAvailableDates = () => {
 		newDt.setDate(newDt.getDate() + 1);
 		i = Date.parse(newDt);
 	}
+	dates.sort((a, b) => a.localeCompare(b));
 	return dates;
 };
 exports.getAvailableDates = getAvailableDates;
@@ -743,9 +750,10 @@ const matchers = [
 				const toReturn = new Date(
 					moment
 						.tz(
-							`${yr}-${mo >= 10 ? mo : `0${mo}`}-${
-								dt >= 10 ? dt : `0${dt}`
-							} 00:00`,
+							`${yr}-${addLeadingZeroes(mo, 2)}-${addLeadingZeroes(
+								dt,
+								2,
+							)} 00:00`,
 							timezone,
 						)
 						.format(),
@@ -805,9 +813,10 @@ const matchers = [
 					const gameDate = new Date(
 						moment
 							.tz(
-								`${yr}-${mo >= 10 ? mo : `0${mo}`}-${
-									dt >= 10 ? dt : `0${dt}`
-								} 00:00`,
+								`${yr}-${addLeadingZeroes(mo, 2)}-${addLeadingZeroes(
+									dt,
+									2,
+								)} 00:00`,
 								timezone,
 							)
 							.format(),
@@ -864,6 +873,130 @@ const matchers = [
 			name: 'Immaculate Grid Football',
 			displayName: 'Immaculate Grid 🏈',
 			...igData(1047, '2026-05-31', '🏈'),
+		},
+	},
+	//MapTap
+	{
+		regex:
+			/www\.maptap\.gg (January|February|March|April|May|June|July|August|September|October|November|December) (\d){1,2}\n(\d{1,3}[^0-9]+){5}\nFinal score: \d{1,4}/g,
+		data: {
+			name: 'MapTap',
+			getCurrentPuzzles: getAvailableDates,
+			//date, score, parts
+			getData: (str) => {
+				try {
+					const lines = str.split('\n');
+					const score = Number(lines[2].split(' ').slice(-1).pop());
+					const date = lines[0].split(' ').slice(1, 3).join(' ');
+					if (score < 0 || score > 1000 || score !== Math.floor(score))
+						return {
+							status: 1,
+							message: `MapTap result for ${date} has an invalid score`,
+						};
+					const parts = lines[1].split(' ').map((n) => parseInt(n));
+					if (parts.some((p) => p < 0 || p > 100 || p !== Math.floor(p)))
+						return {
+							status: 1,
+							message: `MapTap result for ${date} has an invalid score component`,
+						};
+					return {
+						status: 0,
+						data: {
+							score,
+							parts,
+						},
+					};
+				} catch (err) {
+					return {
+						status: 1,
+						message: `Unknown error on MapTap result (${lines[0].split(' ').slice(1, 3).join(' ')})`,
+					};
+				}
+			},
+			compareData: (a, b) => {
+				return (
+					a.score === b.score && a.parts.every((pt, i) => pt === b.parts[i])
+				);
+			},
+			getLivePuzzleDate: (date) => {
+				return date.split('T')[0];
+			},
+			getDate: (str) => {
+				const lines = str.split('\n');
+				const date = lines[0].split(' ').slice(1, 2).join(' ');
+
+				const mos = [
+					'January',
+					'February',
+					'March',
+					'April',
+					'May',
+					'June',
+					'July',
+					'August',
+					'September',
+					'October',
+					'November',
+					'December',
+				];
+				let mo, dt, yr;
+				lines.some((l) => {
+					if (
+						l.match(
+							/(January|February|March|April|May|June|July|August|September|October|November|December) (\d){1,2}/g,
+						)
+					) {
+						const tokens = l.split(' ');
+						mo = mos.findIndex((m) => m === tokens[1]) + 1;
+						dt = parseInt(tokens[2]);
+						const dates = getAvailableDates();
+						//figure out what year the game is from, since maptap result doesn't display the year for some reason
+						//normally, this would be the current year, but there's an edge case if we play a late December map in January, for example
+
+						//what is the latest date on Earth right now?
+						const ld = dates.pop();
+						//turn that into a date object
+						const latestDate = new Date(moment.tz(`${ld} 00:00`, 'GMT'));
+						const currentYear = latestDate.getFullYear();
+						//what date was submitted?
+						const submittedDate = new Date(
+							moment.tz(
+								`${currentYear}-${addLeadingZeroes(mo, 2)}-${addLeadingZeroes(dt, 2)} 00:00`,
+								'GMT',
+							),
+						);
+						//if this date is no later than the current latest date, then assume it is this year
+						if (submittedDate <= latestDate) yr = currentYear;
+						else yr = currentYear - 1;
+						return true;
+					}
+				});
+				if (!mo || !dt || !yr) return null;
+				const toReturn = new Date(
+					moment
+						.tz(
+							`${yr}-${addLeadingZeroes(mo, 2)}-${addLeadingZeroes(
+								dt,
+								2,
+							)} 00:00`,
+							timezone,
+						)
+						.format(),
+				);
+
+				return toReturn;
+			},
+			checkValidDate: checkValidDateOnly,
+			getReaction: (data) => {
+				if (data.score >= 1000) return ['🌎'];
+				if (data.score >= 950) return ['🔥'];
+				else if (data.score >= 900) return ['🎉'];
+				else if (data.score < 600) return ['😅'];
+				else return ['✅'];
+			},
+			getPuzzleNumberByDate: () => {
+				return null;
+			},
 		},
 	},
 	//NYT Mini

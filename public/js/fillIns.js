@@ -15,7 +15,7 @@ const getHeadersAndCells = (table) => {
 	return {
 		headers: getElementArray(table, '.result-header'),
 		cells: getElementArray(table, '.standings-row').map((r) =>
-			getElementArray(r, '.result-cell')
+			getElementArray(r, '.result-cell'),
 		),
 	};
 };
@@ -25,7 +25,7 @@ const calculateStats = (
 	columnAggregation,
 	startValue,
 	finalFn,
-	dataFn
+	dataFn,
 ) => {
 	const { headers, cells } = getHeadersAndCells(table);
 	//in each column
@@ -53,7 +53,7 @@ const calculateStats = (
 				if (result)
 					ec.setAttribute(
 						'data',
-						JSON.stringify({ ...dataFn(result), fillIn: true })
+						JSON.stringify({ ...dataFn(result), fillIn: true }),
 					);
 			ec.classList.add('blank');
 		});
@@ -123,7 +123,7 @@ const quordleHandlers = (maxGuesses) => {
 						return {
 							scores: [d, d - 1, d - 2, d - 3],
 						};
-					}
+					},
 				);
 			},
 		},
@@ -136,7 +136,7 @@ const quordleHandlers = (maxGuesses) => {
 						if (!c) return p;
 						return Math.max(
 							p,
-							c.scores.reduce((prev, curr) => Math.max(prev, curr))
+							c.scores.reduce((prev, curr) => Math.max(prev, curr)),
 						);
 					},
 					0,
@@ -148,7 +148,7 @@ const quordleHandlers = (maxGuesses) => {
 						return {
 							scores: [d, d - 1, d - 2, d - 3],
 						};
-					}
+					},
 				);
 			},
 		},
@@ -176,7 +176,7 @@ const crosswordHandlers = [
 					return {
 						time: d,
 					};
-				}
+				},
 			);
 		},
 	},
@@ -198,7 +198,7 @@ const crosswordHandlers = [
 					return {
 						time: d,
 					};
-				}
+				},
 			);
 		},
 	},
@@ -220,7 +220,106 @@ const crosswordHandlers = [
 					return {
 						time: d,
 					};
-				}
+				},
+			);
+		},
+	},
+];
+
+const igFillins = [
+	none,
+	{
+		name: '900',
+		handleFillIn: (table) => {
+			const { cells } = getHeadersAndCells(table);
+			cells.forEach((row) => {
+				row.forEach((c, i) => {
+					if (!c.getAttribute('data')) {
+						c.setAttribute(
+							'data',
+							JSON.stringify({
+								correct: 0,
+								rarity: 900,
+								fillIn: true,
+							}),
+						);
+						c.classList.add('blank');
+					}
+				});
+			});
+		},
+	},
+	{
+		name: 'Server average',
+		handleFillIn: (table) => {
+			calculateStats(
+				table,
+				(p, c) => {
+					if (!c) return p;
+					return { count: p.count + 1, sum: p.sum + c.rarity };
+				},
+				{ sum: 0, count: 0 },
+				(d) => {
+					if (d.count === 0) return null;
+					const average = d.sum / d.count;
+					return Number.isInteger(average)
+						? average
+						: Math.min(Math.floor(average) + 1, 900);
+				},
+				(d) => {
+					return {
+						correct: 0,
+						rarity: d,
+					};
+				},
+			);
+		},
+	},
+	{
+		name: 'Server worst',
+		handleFillIn: (table) => {
+			calculateStats(
+				table,
+				(p, c) => {
+					if (!c) return p;
+					return Math.max(c.rarity, p);
+				},
+				0,
+				(d) => {
+					if (d === 0) return null;
+					return d;
+				},
+				(d) => {
+					return {
+						correct: 0,
+						rarity: d,
+					};
+				},
+			);
+		},
+	},
+	{
+		name: 'Server worst+',
+		handleFillIn: (table) => {
+			calculateStats(
+				table,
+				(p, c) => {
+					if (!c) return p;
+					return Math.max(c.rarity, p);
+				},
+				0,
+				(d) => {
+					if (d === 0) return null;
+					let rarity = d * 1.1;
+					if (Number.isInteger(rarity)) return rarity;
+					return Math.floor(rarity) + 1;
+				},
+				(d) => {
+					return {
+						correct: 0,
+						rarity: d,
+					};
+				},
 			);
 		},
 	},
@@ -259,7 +358,7 @@ export const fillIns = [
 						},
 						(d) => {
 							return { score: d };
-						}
+						},
 					);
 				},
 			},
@@ -279,7 +378,7 @@ export const fillIns = [
 						},
 						(d) => {
 							return { score: d };
-						}
+						},
 					);
 				},
 			},
@@ -302,7 +401,7 @@ export const fillIns = [
 							return {
 								score: Math.min(d, settings.value),
 							};
-						}
+						},
 					);
 					const { headers, cells } = getHeadersAndCells(table);
 					cells.forEach((row) => {
@@ -316,7 +415,7 @@ export const fillIns = [
 												Number(headers[i].getAttribute('data-number')) || null,
 											score: Math.min(worsts[i] + 1, settings.value),
 											fillIn: true,
-										})
+										}),
 									);
 								c.classList.add('blank');
 							}
@@ -358,7 +457,7 @@ export const fillIns = [
 										misses: 0,
 										time: 0,
 										fillIn: true,
-									})
+									}),
 								);
 								c.classList.add('blank');
 							}
@@ -388,7 +487,7 @@ export const fillIns = [
 								misses: 0,
 								time: null,
 							};
-						}
+						},
 					);
 				},
 			},
@@ -413,7 +512,7 @@ export const fillIns = [
 								misses: 0,
 								time: null,
 							};
-						}
+						},
 					);
 				},
 			},
@@ -438,7 +537,7 @@ export const fillIns = [
 								misses: 0,
 								time: null,
 							};
-						}
+						},
 					);
 				},
 			},
@@ -477,7 +576,7 @@ export const fillIns = [
 									? 7 + c.scores.reduce(penalty, 0)
 									: c.scores.reduce((prev, curr) => {
 											return prev + curr;
-									  }, 0) + c.mistakes;
+										}, 0) + c.mistakes;
 							return { count: p.count + 1, sum: p.sum + score };
 						},
 						{ sum: 0, count: 0 },
@@ -490,7 +589,7 @@ export const fillIns = [
 						},
 						(d) => {
 							return { scores: [0, 0, 0, 0], mistakes: 4, score: d };
-						}
+						},
 					);
 				},
 			},
@@ -507,7 +606,7 @@ export const fillIns = [
 									? 7 + c.scores.reduce(penalty, 0)
 									: c.scores.reduce((prev, curr) => {
 											return prev + curr;
-									  }, 0) + c.mistakes;
+										}, 0) + c.mistakes;
 							return Math.max(score, p);
 						},
 						0,
@@ -521,7 +620,7 @@ export const fillIns = [
 								mistakes: 4,
 								score: d,
 							};
-						}
+						},
 					);
 				},
 			},
@@ -539,7 +638,7 @@ export const fillIns = [
 									? 7 + c.scores.reduce(penalty, 0)
 									: c.scores.reduce((prev, curr) => {
 											return prev + curr;
-									  }, 0) + c.mistakes;
+										}, 0) + c.mistakes;
 							return Math.max(score, p);
 						},
 						0,
@@ -553,7 +652,7 @@ export const fillIns = [
 								mistakes: 4,
 								score: d,
 							};
-						}
+						},
 					);
 				},
 			},
@@ -575,7 +674,7 @@ export const fillIns = [
 									JSON.stringify({
 										score: 0,
 										fillIn: true,
-									})
+									}),
 								);
 								c.classList.add('blank');
 							}
@@ -602,7 +701,7 @@ export const fillIns = [
 							return {
 								score: d,
 							};
-						}
+						},
 					);
 				},
 			},
@@ -624,7 +723,7 @@ export const fillIns = [
 							return {
 								score: d,
 							};
-						}
+						},
 					);
 				},
 			},
@@ -646,7 +745,7 @@ export const fillIns = [
 							return {
 								score: Math.max(0, d),
 							};
-						}
+						},
 					);
 				},
 			},
@@ -654,22 +753,30 @@ export const fillIns = [
 	},
 	{
 		name: 'Immaculate Grid',
-		fillIns: [
+		fillIns: igFillins,
+	},
+	{
+		name: 'Immaculate Grid Football',
+		fillins: igFillins,
+	},
+	{
+		name: 'MapTap',
+		fillins: [
 			none,
 			{
-				name: '900',
+				name: '0',
 				handleFillIn: (table) => {
-					const { cells } = getHeadersAndCells(table);
+					const { headers, cells } = getHeadersAndCells(table);
 					cells.forEach((row) => {
 						row.forEach((c, i) => {
 							if (!c.getAttribute('data')) {
 								c.setAttribute(
 									'data',
 									JSON.stringify({
-										correct: 0,
-										rarity: 900,
+										score: 0,
+										parts: [0, 0, 0, 0, 0],
 										fillIn: true,
-									})
+									}),
 								);
 								c.classList.add('blank');
 							}
@@ -684,22 +791,20 @@ export const fillIns = [
 						table,
 						(p, c) => {
 							if (!c) return p;
-							return { count: p.count + 1, sum: p.sum + c.rarity };
+							return { count: p.count + 1, sum: p.sum + c.score };
 						},
 						{ sum: 0, count: 0 },
 						(d) => {
 							if (d.count === 0) return null;
 							const average = d.sum / d.count;
-							return Number.isInteger(average)
-								? average
-								: Math.min(Math.floor(average) + 1, 900);
+							return Math.floor(average);
 						},
 						(d) => {
 							return {
-								correct: 0,
-								rarity: d,
+								score: d,
+								parts: [0, 0, 0, 0, 0],
 							};
-						}
+						},
 					);
 				},
 			},
@@ -710,44 +815,42 @@ export const fillIns = [
 						table,
 						(p, c) => {
 							if (!c) return p;
-							return Math.max(c.rarity, p);
+							return Math.min(c.score, p);
 						},
-						0,
+						99999,
 						(d) => {
-							if (d === 0) return null;
+							if (d === 99999) return null;
 							return d;
 						},
 						(d) => {
 							return {
-								correct: 0,
-								rarity: d,
+								score: d,
+								parts: [0, 0, 0, 0, 0],
 							};
-						}
+						},
 					);
 				},
 			},
 			{
-				name: 'Server worst+',
+				name: 'Server worst-',
 				handleFillIn: (table) => {
 					calculateStats(
 						table,
 						(p, c) => {
 							if (!c) return p;
-							return Math.max(c.rarity, p);
+							return Math.min(c.score, p);
 						},
-						0,
+						99999,
 						(d) => {
-							if (d === 0) return null;
-							let rarity = d * 1.1;
-							if (Number.isInteger(rarity)) return rarity;
-							return Math.floor(rarity) + 1;
+							if (d === 99999) return null;
+							return d - 1;
 						},
 						(d) => {
 							return {
-								correct: 0,
-								rarity: d,
+								score: Math.max(0, d),
+								parts: [0, 0, 0, 0, 0],
 							};
-						}
+						},
 					);
 				},
 			},

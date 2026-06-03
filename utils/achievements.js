@@ -328,7 +328,12 @@ gameList.forEach((el, i) => {
 
 //achieve a win streak in a specific game
 gameList.forEach((el, i) => {
-	if (el.name === 'NYT Crossword' || el.name === 'NYT Mini') return;
+	if (
+		el.name === 'NYT Crossword' ||
+		el.name === 'NYT Mini' ||
+		el.name === 'MapTap'
+	)
+		return;
 	const desc =
 		el.name === 'Immaculate Grid'
 			? 'Completely fill an Immaculate Grid'

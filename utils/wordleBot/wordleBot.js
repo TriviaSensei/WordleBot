@@ -185,8 +185,6 @@ const handlePostQueue = async () => {
 					authObj,
 				);
 				postQueue.shift();
-				// console.log(`Sent message to channel ${channelId}`);
-				// console.log(`Queue length: ${postQueue.length}`);
 			} catch (err) {
 				console.log(err.response.data);
 				postQueue[0].failures++;
@@ -382,6 +380,7 @@ const processResults = async (usr, gameInfo) => {
 						game: info.name,
 						date: info.getDate(match),
 					};
+
 					if (!data.date) {
 						failures.push({
 							message: `No game date or number could be found in result for ${data.game}`,
@@ -449,9 +448,10 @@ const processResults = async (usr, gameInfo) => {
 							};
 							const toReturn = await Results.create(toCreate);
 
+							const reaction = info.getReaction(gameResult.data);
 							return {
 								data: toReturn,
-								reaction: info.getReaction(gameResult.data),
+								reaction,
 							};
 						}
 					else {
@@ -1119,6 +1119,7 @@ const handleMessageCreate = async (msg) => {
 			}
 		}
 	} catch (err) {
+		console.log(err);
 		await Errors.create({
 			description: 'Error parsing new message',
 			message: err.message || '',

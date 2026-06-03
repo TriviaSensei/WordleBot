@@ -1,0 +1,37 @@
+#maptap-tab-pane {
+	.bar {
+		background-color: var(--green);
+	}
+
+	.header-row > th.result-header {
+		min-width: 3.5em;
+		height: 2em;
+	}
+
+	td.total-header {
+		text-align: center;
+	}
+
+	.graph-container {
+		.bar {
+			border: 1px solid black;
+			border-collapse: collapse;
+			box-sizing: border-box;
+		}
+		.bar:nth-child(1) {
+			background-color: rgb(144, 238, 144);
+		}
+		.bar:nth-child(2) {
+			background-color: rgb(173, 216, 230);
+		}
+		.bar:nth-child(3) {
+			background-color: #ff0;
+		}
+		.bar:nth-child(4) {
+			background-color: rgb(255, 165, 0);
+		}
+		.bar:nth-child(5) {
+			background-color: rgb(255, 99, 71);
+		}
+	}
+}

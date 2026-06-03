@@ -94,9 +94,6 @@ const columnData = [
 import { generateCSVFile } from '../utils/generateCSVFile.js';
 const csvButton = document.querySelector('#csv-button');
 csvButton.addEventListener('click', () => {
-	generateCSVFile('Immaculate Grid', columnData);
-});
-csvButton.addEventListener('click', () => {
 	const game = document
 		.querySelector(`.tab-pane.fade.active.show[data-game]`)
 		?.getAttribute('data-game');
