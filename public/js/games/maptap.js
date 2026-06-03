@@ -81,7 +81,7 @@ const updateData = (e) => {
 		},
 	];
 	const sortOrder = e.detail.serverData?.settings
-		?.find((s) => s.name === area.getAttribute('data-game'))
+		?.find((s) => s.name === e.target.getAttribute('data-game'))
 		?.settings?.find((s) => s.name === 'sort')?.value;
 	updateTable(
 		table,
