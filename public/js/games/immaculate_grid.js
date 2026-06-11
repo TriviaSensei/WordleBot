@@ -45,7 +45,7 @@ const updateData = (e) => {
 			...average((data) => data.rarity),
 			id: 'avg-rarity',
 			heading: 'AvgR',
-			defaultSort: -1,
+			defaultSort: 1,
 			initialSort: true,
 		},
 		{
