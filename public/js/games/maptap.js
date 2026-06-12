@@ -74,6 +74,7 @@ const updateData = (e) => {
 		gamesPlayed,
 		{
 			...average((c) => c.score, 2),
+			initialSort: true,
 		},
 		{
 			...distribution,
@@ -83,6 +84,7 @@ const updateData = (e) => {
 	const sortOrder = e.detail.serverData?.settings
 		?.find((s) => s.name === e.target.getAttribute('data-game'))
 		?.settings?.find((s) => s.name === 'sort')?.value;
+
 	updateTable(
 		table,
 		getCellValue,
