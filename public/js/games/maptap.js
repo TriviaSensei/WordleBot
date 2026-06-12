@@ -75,6 +75,7 @@ const updateData = (e) => {
 		{
 			...average((c) => c.score, 2),
 			initialSort: true,
+			defaultSort: -1,
 		},
 		{
 			...distribution,
