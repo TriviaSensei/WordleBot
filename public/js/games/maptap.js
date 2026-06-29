@@ -73,6 +73,11 @@ const updateData = (e) => {
 			if (!obj) obj = colorScales[colorScales.length - 1];
 
 			c.setAttribute('style', `background-color: ${obj.fn(data.score)}`);
+			c.setAttribute('data-bs-toggle', 'tooltip');
+			c.setAttribute('data-bs-html', 'true');
+			const html =
+				'<ol>' + data.parts.map((p) => `<li>${p}</li>`).join('') + '</ol>';
+			c.setAttribute('data-bs-title', html);
 		} else {
 			c.innerHTML = '';
 		}
@@ -126,18 +131,26 @@ const updateData = (e) => {
 		displayValue: () => '',
 	};
 
-	const operators = [
+	const rowOperators = [
+		gamesPlayed,
+		{
+			...average((c) => c.score, 2),
+			initialSort: true,
+			defaultSort: -1,
+		},
+		{
+			...distribution,
+			finally: createGraph(0),
+		},
+	];
+
+	const columnOperators = [
 		gamesPlayed,
 		{
 			...average((c) => c.score, 2),
 			initialSort: true,
 			defaultSort: -1,
 			finally: (cell) => {
-				const row = cell.closest('tr');
-				if (!row) return;
-				console.log(row);
-				console.log(row.classList);
-				if (!row.classList.contains('summary-row')) return;
 				const data = Number(cell.getAttribute('data-value'));
 				if (isNaN(data)) return;
 				let obj = colorScales.find((el) => data <= el.max && data >= el.min);
@@ -157,8 +170,8 @@ const updateData = (e) => {
 	updateTable(
 		table,
 		getCellValue,
-		operators,
-		operators,
+		rowOperators,
+		columnOperators,
 		e.detail.serverData?.customStats,
 		sortOrder,
 	);
