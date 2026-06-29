@@ -74,9 +74,14 @@ const updateData = (e) => {
 
 			c.setAttribute('style', `background-color: ${obj.fn(data.score)}`);
 			c.setAttribute('data-bs-toggle', 'tooltip');
+			c.setAttribute('data-bs-custom-class', 'cell-tooltip');
 			c.setAttribute('data-bs-html', 'true');
 			const html =
-				'<ol>' + data.parts.map((p) => `<li>${p}</li>`).join('') + '</ol>';
+				'<ol>' +
+				data.parts
+					.map((p) => `<li>${p}${i === 4 ? '× 3' : i >= 2 ? '× 2' : ''}</li>`)
+					.join('') +
+				'</ol>';
 			c.setAttribute('data-bs-title', html);
 		} else {
 			c.innerHTML = '';
@@ -183,7 +188,7 @@ const updateData = (e) => {
 		bar.setAttribute('style', `height: ${2 + (88 * value) / 100}%;`);
 	});
 
-	const tooltipTriggerList = document.querySelectorAll(
+	const tooltipTriggerList = e.target.querySelectorAll(
 		'[data-bs-toggle="tooltip"]',
 	);
 	const tooltipList = [...tooltipTriggerList].map(
