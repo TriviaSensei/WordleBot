@@ -132,6 +132,13 @@ const updateData = (e) => {
 			...average((c) => c.score, 2),
 			initialSort: true,
 			defaultSort: -1,
+			finally: (cell) => {
+				const data = Number(cell.getAttribute('data-value'));
+				if (!isNaN(data)) return;
+				let obj = colorScales.find((el) => data <= el.max && data >= el.min);
+				if (!obj) obj = colorScales[colorScales.length - 1];
+				cell.setAttribute('style', `background-color: ${obj.fn(data)}`);
+			},
 		},
 		{
 			...distribution,
