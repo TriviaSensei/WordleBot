@@ -6,6 +6,49 @@ import { getPage } from '../utils/page.js';
 import { gamesPlayed, average } from './_general.js';
 import { getElementArray } from '../utils/getElementArray.js';
 
+const bgColors = [
+	{
+		score: 1000,
+		background: '#ff0000',
+		color: '#fff',
+	},
+	{
+		score: 975,
+		background: '#ff7a0d',
+		color: '#fff',
+	},
+	{
+		score: 925,
+		background: '#ff0',
+		color: '#000',
+	},
+	{
+		score: 850,
+		background: '#008f00',
+		color: '#fff',
+	},
+	{
+		score: 750,
+		background: '#009fad',
+		color: '#fff',
+	},
+	{
+		score: 625,
+		background: '#00f',
+		color: '#fff',
+	},
+	{
+		score: 500,
+		background: '#000738',
+		color: '#fff',
+	},
+	{
+		score: 0,
+		background: '#000',
+		color: '#fff',
+	},
+];
+
 const updateData = (e) => {
 	const table = e.target.querySelector('.standings-table');
 	const page = getPage();
@@ -17,6 +60,13 @@ const updateData = (e) => {
 			if (!data) return;
 			c.classList.add('fw-semibold');
 			c.innerHTML = data.score;
+			let obj = bgColors.find((el) => el.score <= data.score);
+			if (!obj) obj = bgColors.slice(-1).pop();
+
+			c.setAttribute(
+				'style',
+				`background-color: ${obj.background};color:${obj.color}`,
+			);
 		} else {
 			c.innerHTML = '';
 		}
