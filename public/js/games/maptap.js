@@ -77,14 +77,12 @@ const updateData = (e) => {
 			c.setAttribute('data-bs-custom-class', 'cell-tooltip');
 			c.setAttribute('data-bs-html', 'true');
 			const html =
-				'<ol>' +
 				data.parts
 					.map(
-						(p, i) => `<li>${p}${i === 4 ? '× 3' : i >= 2 ? '× 2' : ''}</li>`,
+						(p, i) =>
+							`<div ${i === data.parts.length - 1 ? 'class="w-100 text-start border-bottom"' : ''}>${i + 1}. ${p}${i >= 3 ? ' × 3' : i >= 2 ? ' × 2' : ''}</div>`,
 					)
-					.join('') +
-				'</ol>' +
-				`<p>Total: ${data.score}</p>`;
+					.join('') + `<div>Σ: ${data.score}</div>`;
 			c.setAttribute('data-bs-title', html);
 		} else {
 			c.innerHTML = '';

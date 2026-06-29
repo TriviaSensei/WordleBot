@@ -34,8 +34,12 @@
 			background-color: rgb(255, 99, 71);
 		}
 	}
+}
 
-	.cell-tooltip {
-		text-align: left;
+body:has(#maptap-tab-pane.show.active) {
+	.tooltip-inner {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
 	}
 }
