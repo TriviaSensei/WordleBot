@@ -134,11 +134,9 @@ const updateData = (e) => {
 			defaultSort: -1,
 			finally: (cell) => {
 				const data = Number(cell.getAttribute('data-value'));
-				console.log(data);
-				if (!isNaN(data)) return;
+				if (isNaN(data)) return;
 				let obj = colorScales.find((el) => data <= el.max && data >= el.min);
 				if (!obj) obj = colorScales[colorScales.length - 1];
-				console.log(obj);
 				cell.setAttribute('style', `background-color: ${obj.fn(data)}`);
 			},
 		},
