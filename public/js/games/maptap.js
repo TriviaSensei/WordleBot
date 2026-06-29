@@ -79,9 +79,12 @@ const updateData = (e) => {
 			const html =
 				'<ol>' +
 				data.parts
-					.map((p) => `<li>${p}${i === 4 ? '× 3' : i >= 2 ? '× 2' : ''}</li>`)
+					.map(
+						(p, i) => `<li>${p}${i === 4 ? '× 3' : i >= 2 ? '× 2' : ''}</li>`,
+					)
 					.join('') +
-				'</ol>';
+				'</ol>' +
+				`<p>Total: ${data.score}</p>`;
 			c.setAttribute('data-bs-title', html);
 		} else {
 			c.innerHTML = '';
