@@ -135,6 +135,8 @@ const updateData = (e) => {
 			finally: (cell) => {
 				const row = cell.closest('tr');
 				if (!row) return;
+				console.log(row);
+				console.log(row.classList);
 				if (!row.classList.contains('summary-row')) return;
 				const data = Number(cell.getAttribute('data-value'));
 				if (isNaN(data)) return;
