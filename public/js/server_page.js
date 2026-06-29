@@ -207,7 +207,6 @@ document.addEventListener('DOMContentLoaded', () => {
 					(dr) =>
 						(dr.innerHTML = `${res.data.gameData.startDate} to ${res.data.gameData.endDate}`),
 				);
-			console.log(res.data.serverData.settings);
 
 			res.data.gameData.data.forEach((d) => {
 				const gameId = d.game.toLowerCase().split(' ').join('-');
