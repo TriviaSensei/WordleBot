@@ -133,6 +133,9 @@ const updateData = (e) => {
 			initialSort: true,
 			defaultSort: -1,
 			finally: (cell) => {
+				const row = cell.closest('tr');
+				if (!row) return;
+				if (!row.classList.contains('summary-row')) return;
 				const data = Number(cell.getAttribute('data-value'));
 				if (isNaN(data)) return;
 				let obj = colorScales.find((el) => data <= el.max && data >= el.min);
