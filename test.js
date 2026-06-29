@@ -1,5 +1,4 @@
-const moment = require('moment-timezone');
+const arr = [2, 1, 3];
 
-const current = moment.tz(new Date(), 'America/New_York').format();
-
-console.log(current);
+const arr2 = arr.sort((a, b) => a - b);
+console.log(arr2);

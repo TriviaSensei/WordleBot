@@ -59,6 +59,7 @@ block content
                 input#edit-token(type="hidden" value=`${data.editToken}`)
                 button#delete-results.w-75.btn.btn-danger.ms-1(disabled) Delete 0 results
 block scripts 
+    script(src="https://d3js.org/d3.v7.min.js")
     script(src="/js/evaluator.js")
     script(src="/js/server_page.js" type="module" defer)
     each game, ind in data.gameData.data

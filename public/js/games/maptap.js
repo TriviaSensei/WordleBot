@@ -9,45 +9,52 @@ import { getElementArray } from '../utils/getElementArray.js';
 const bgColors = [
 	{
 		score: 1000,
-		background: '#ff0000',
-		color: '#fff',
+		background: '#fc6a60',
 	},
 	{
 		score: 975,
-		background: '#ff7a0d',
-		color: '#fff',
+		background: '#fcae60',
 	},
 	{
 		score: 925,
-		background: '#ff0',
-		color: '#000',
+		background: '#fcae60',
 	},
 	{
 		score: 850,
-		background: '#008f00',
-		color: '#fff',
+		background: '#b1fc60',
 	},
 	{
 		score: 750,
-		background: '#009fad',
-		color: '#fff',
+		background: '#60fc63',
 	},
 	{
 		score: 625,
-		background: '#00f',
-		color: '#fff',
+		background: '#60fc63',
 	},
 	{
 		score: 500,
-		background: '#000738',
-		color: '#fff',
+		background: '#60c3fc',
 	},
 	{
 		score: 0,
-		background: '#000',
-		color: '#fff',
+		background: '#adadad',
 	},
-];
+].sort((a, b) => b.score - a.score);
+
+const colorScales = bgColors.map((c, i) => {
+	if (i === bgColors.length - 1) return null;
+	const min = bgColors[i + 1].score;
+	const max = c.score;
+	return {
+		min,
+		max,
+		fn: d3
+			.scaleLinear()
+			.domain([min, max])
+			.range([bgColors[i + 1].background, c.background]),
+	};
+});
+colorScales.pop();
 
 const updateData = (e) => {
 	const table = e.target.querySelector('.standings-table');
@@ -60,13 +67,12 @@ const updateData = (e) => {
 			if (!data) return;
 			c.classList.add('fw-semibold');
 			c.innerHTML = data.score;
-			let obj = bgColors.find((el) => el.score <= data.score);
-			if (!obj) obj = bgColors.slice(-1).pop();
-
-			c.setAttribute(
-				'style',
-				`background-color: ${obj.background};color:${obj.color}`,
+			let obj = colorScales.find(
+				(el) => data.score <= el.max && data.score >= el.min,
 			);
+			if (!obj) obj = colorScales[colorScales.length - 1];
+
+			c.setAttribute('style', `background-color: ${obj.fn(data.score)}`);
 		} else {
 			c.innerHTML = '';
 		}
