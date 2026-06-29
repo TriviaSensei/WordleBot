@@ -6,6 +6,7 @@ import { getPage } from '../utils/page.js';
 import { gamesPlayed, average } from './_general.js';
 import { getElementArray } from '../utils/getElementArray.js';
 
+const rn = ['I', 'II', 'III', 'IV', 'V'];
 const bgColors = [
 	{
 		score: 1000,
@@ -80,7 +81,7 @@ const updateData = (e) => {
 				data.parts
 					.map(
 						(p, i) =>
-							`<div ${i === data.parts.length - 1 ? 'class="w-100 text-start border-bottom"' : ''}>${i + 1}. ${p}${i >= 3 ? ' × 3' : i >= 2 ? ' × 2' : ''}</div>`,
+							`<div ${i === data.parts.length - 1 ? 'class="w-100 text-start border-bottom"' : ''}>${rn[i]}. ${p}${i >= 3 ? ' × 3' : i >= 2 ? ' × 2' : ''}</div>`,
 					)
 					.join('') + `<div>Σ: ${data.score}</div>`;
 			c.setAttribute('data-bs-title', html);
@@ -88,7 +89,6 @@ const updateData = (e) => {
 			c.innerHTML = '';
 		}
 	};
-	const rn = ['I', 'II', 'III', 'IV', 'V'];
 	const createGraph = (rc) => {
 		return (cell) => {
 			const data = JSON.parse(cell.getAttribute('data-value'));
