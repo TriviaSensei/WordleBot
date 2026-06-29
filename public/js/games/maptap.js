@@ -182,6 +182,13 @@ const updateData = (e) => {
 		if (isNaN(value)) value = 0;
 		bar.setAttribute('style', `height: ${2 + (88 * value) / 100}%;`);
 	});
+
+	const tooltipTriggerList = document.querySelectorAll(
+		'[data-bs-toggle="tooltip"]',
+	);
+	const tooltipList = [...tooltipTriggerList].map(
+		(tooltipTriggerEl) => new bootstrap.Tooltip(tooltipTriggerEl),
+	);
 };
 
 areas.forEach((a) => a.addEventListener('data-update', updateData));
