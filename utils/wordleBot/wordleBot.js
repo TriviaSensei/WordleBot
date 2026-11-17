@@ -108,6 +108,7 @@ const updateData = async (doc, data) => {
 
 const postQueue = [];
 const coolDownTime = 400;
+const maxFailures = 10;
 let lastPostTime = null;
 let nextPost = null;
 
@@ -155,7 +156,7 @@ const handlePostQueue = async () => {
 					data: err.response?.data || null,
 					stack: err.stack || null,
 				});
-				// if (postQueue[0].failures === 3)
+				// if (postQueue[0].failures === maxFailures)
 				// 	await sendAdminEmail(
 				// 		'Failed to react to Discord message',
 				// 		err.response.data
@@ -188,7 +189,7 @@ const handlePostQueue = async () => {
 			} catch (err) {
 				console.log(err.response.data);
 				postQueue[0].failures++;
-				if (postQueue[0].failures === 3) {
+				if (postQueue[0].failures > maxFailures) {
 					console.log(
 						`Failed to send discord message (channel ID: ${channelId})`,
 					);
@@ -198,7 +199,7 @@ const handlePostQueue = async () => {
 	}
 	lastPostTime = Date.now();
 	if (postQueue.length > 0) {
-		if (postQueue[0].failures >= 3) {
+		if (postQueue[0].failures > maxFailures) {
 			const item = postQueue.shift();
 			console.log(`Failed to address post queue item:`);
 			console.log(item);
@@ -646,29 +647,49 @@ const sendAdHocUpdate = async () => {
 
 	const currentDT = moment.tz(currentDate, timezone).format();
 
-	const serverData = await Servers.find();
-	const sp = currentDT.split('-');
-	let currentMonth = parseInt(sp[1]) - 1;
-	let currentYear = parseInt(sp[0]);
-	if (currentMonth === 0) {
-		currentYear--;
-		currentMonth = 12;
-	}
-	console.log(`${serverData.length} servers found`);
-	serverData.forEach((s) => {
-		if (!checkCorrectServer(s.guildId))
-			return console.log(
-				`Not sending update to ${s.guildId} (env=${process.env.NODE_ENV})`,
-			);
+	try {
+		const serverData = await Servers.find();
+		const shardIds = client.shard.ids;
 
-		addMessage({
-			channelId: s.channelId,
-			data: {
+		let shardGuilds = await Promise.all(
+			serverData.map(async (sd) => {
+				const guild = sd.guildId;
+				const res = await client.guilds.fetch({ guild });
+				const shardId = res.shardId;
+				if (shardIds.includes(shardId)) return sd;
+				return null;
+			}),
+		);
+		shardGuilds = shardGuilds.filter((sg) => sg !== null);
+
+		const sp = currentDT.split('-');
+		let currentMonth = parseInt(sp[1]) - 1;
+		let currentYear = parseInt(sp[0]);
+		if (currentMonth === 0) {
+			currentYear--;
+			currentMonth = 12;
+		}
+		console.log(
+			`${shardGuilds.length} servers found on shard ${shardIds.join(',')}`,
+		);
+		shardGuilds.forEach((s) => {
+			if (!checkCorrectServer(s.guildId))
+				return console.log(
+					`Not sending update to ${s.guildId} (env=${process.env.NODE_ENV})`,
+				);
+
+			addMessage({
 				channelId: s.channelId,
-				content: `@everyone WordleBot seems to have choked on this morning's NYT Connections puzzle. If you submitted a result for it, please resend it.`,
-			},
+				data: {
+					channelId: s.channelId,
+					content: `@everyone The bad news is that WordleBot seems to have choked today. Sorry about that. I believe it is back up and running at this point, but you'll have to re-submit any results from today, and possibly yesterday. Worst-case, it'll reject any duplicates. The good news is that this was because we reached 2,500 guilds where it is installed! Thanks as always for giving my contraption a try, and feel free to reach out on the dedicated server (link can be found at https://www.wordlebot.gg/docs) if you have any issues. Please bear with me as I navigate this surprise development.`,
+				},
+			});
 		});
-	});
+	} catch (err) {
+		console.log(err.message);
+		console.log(err.stack);
+	}
 };
 
 const sendMonthlyUpdate = async () => {
@@ -1303,11 +1324,22 @@ const handleMessageUpdate = async (oldMessage, newMessage) => {
 client.on('ready', async (c) => {
 	const res = await axios.get(`${url}/users/@me`, authObj);
 	me = res.data;
-	client.on('messageCreate', handleMessageCreate);
-	client.on('messageUpdate', handleMessageUpdate);
-	console.log('Wordle Bot ready!');
-	await sendMonthlyUpdate();
-	// await sendAdHocUpdate();
+	const databaseStr =
+		process.env.NODE_ENV === 'development'
+			? process.env.DATABASE_DEV
+			: process.env.DATABASE;
+	const DB = databaseStr.replace('<PASSWORD>', process.env.DB_PASSWORD);
+	mongoose.connect(DB).then(async () => {
+		client.on('messageCreate', handleMessageCreate);
+		client.on('messageUpdate', handleMessageUpdate);
+		console.log('Wordle Bot ready!');
+		try {
+			await sendMonthlyUpdate();
+			await sendAdHocUpdate();
+		} catch (err) {
+			console.log(err.stack);
+		}
+	});
 });
 
 // const sandbox = require('../../sandbox');

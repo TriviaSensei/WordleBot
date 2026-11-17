@@ -3,6 +3,7 @@ const app = express();
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
+const { ShardingManager } = require('discord.js');
 
 dotenv.config({ path: './config.env' });
 const port = process.env.PORT || 3000;
@@ -12,18 +13,23 @@ const databaseStr =
 		? process.env.DATABASE_DEV
 		: process.env.DATABASE;
 const DB = databaseStr.replace('<PASSWORD>', process.env.DB_PASSWORD);
-
 mongoose.connect(DB).then(async () => {
 	console.log('DB connection successful');
 });
-
 const server = app.listen(port, () => {
 	console.log(`App running on port ${port}`);
 });
 
 const viewRouter = require('./mvc/routes/viewRoutes');
 const wordleRouter = require('./mvc/routes/wordleRoutes');
-const wordleBot = require('./utils/wordleBot/wordleBot');
+// const wordleBot = require('./utils/wordleBot/wordleBot');
+const manager = new ShardingManager('./utils/wordleBot/wordleBot.js', {
+	token: process.env.WORDLE_BOT_TOKEN,
+});
+manager.on('shardCreate', (shard) => {
+	console.log(`Launched shard ${shard.id}`);
+});
+manager.spawn();
 
 const path = require('path');
 
