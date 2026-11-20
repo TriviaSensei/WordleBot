@@ -1,0 +1,32 @@
+name: CICD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: [ ubuntu-latest ]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name : Install dependencies
+        run: npm install
+      - name: Generate deployment package
+        run: zip -r wordlebot.zip .
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v22
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: WordleBot
+          environment_name: WordleBot-env
+          version_label: ${{ github.sha }}
+          region: us-east-1
+          deployment_package: wordlebot.zip
+        
