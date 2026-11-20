@@ -1327,24 +1327,28 @@ const handleMessageUpdate = async (oldMessage, newMessage) => {
 };
 
 client.on('ready', async (c) => {
-	const res = await axios.get(`${url}/users/@me`, authObj);
-	me = res.data;
-	const databaseStr =
-		process.env.NODE_ENV === 'development'
-			? process.env.DATABASE_DEV
-			: process.env.DATABASE;
-	const DB = databaseStr.replace('<PASSWORD>', process.env.DB_PASSWORD);
-	mongoose.connect(DB).then(async () => {
-		client.on('messageCreate', handleMessageCreate);
-		client.on('messageUpdate', handleMessageUpdate);
-		console.log('Wordle Bot ready!');
-		try {
-			await sendMonthlyUpdate();
-			await sendAdHocUpdate();
-		} catch (err) {
-			console.log(err.stack);
-		}
-	});
+	try {
+		const res = await axios.get(`${url}/users/@me`, authObj);
+		me = res.data;
+		const databaseStr =
+			process.env.NODE_ENV === 'development'
+				? process.env.DATABASE_DEV
+				: process.env.DATABASE;
+		const DB = databaseStr.replace('<PASSWORD>', process.env.DB_PASSWORD);
+		mongoose.connect(DB).then(async () => {
+			client.on('messageCreate', handleMessageCreate);
+			client.on('messageUpdate', handleMessageUpdate);
+			console.log('Wordle Bot ready!');
+			try {
+				await sendMonthlyUpdate();
+				// await sendAdHocUpdate();
+			} catch (err) {
+				console.log(err.stack);
+			}
+		});
+	} catch (err) {
+		console.log(`Error on client ready`);
+	}
 });
 
 // const sandbox = require('../../sandbox');
