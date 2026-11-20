@@ -653,11 +653,16 @@ const sendAdHocUpdate = async () => {
 
 		let shardGuilds = await Promise.all(
 			serverData.map(async (sd) => {
-				const guild = sd.guildId;
-				const res = await client.guilds.fetch({ guild });
-				const shardId = res.shardId;
-				if (shardIds.includes(shardId)) return sd;
-				return null;
+				try {
+					const guild = sd.guildId;
+					const res = await client.guilds.fetch({ guild });
+					const shardId = res.shardId;
+					if (shardIds.includes(shardId)) return sd;
+					return null;
+				} catch (err) {
+					console.log(err.message);
+					return null;
+				}
 			}),
 		);
 		shardGuilds = shardGuilds.filter((sg) => sg !== null);
