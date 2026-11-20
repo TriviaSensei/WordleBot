@@ -4,7 +4,11 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const { ShardingManager } = require('discord.js');
-
+process.on('unhandledRejection', (reason, promise) => {
+	console.log('Unhandled rejection error');
+	console.log(reason);
+	console.trace();
+});
 dotenv.config({ path: './config.env' });
 const port = process.env.PORT || 3000;
 
