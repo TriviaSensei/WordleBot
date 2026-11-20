@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 const morgan = require('morgan');
 const { ShardingManager } = require('discord.js');
+
+Error.stackTraceLimit = 25;
 process.on('unhandledRejection', (reason, promise) => {
 	console.log('Unhandled rejection error');
 	console.log(reason);
