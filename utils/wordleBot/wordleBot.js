@@ -129,7 +129,7 @@ const handlePostQueue = async () => {
 	const { type, action } = postQueue[0];
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
-		if (emoji && message) {
+		if (emoji && msg) {
 			const re = /^(\%[0-9A-F]{2})+$/;
 			let encoded;
 			if (emoji.match(re)) encoded = emoji;
@@ -1339,6 +1339,7 @@ const handleMessageUpdate = async (oldMessage, newMessage) => {
 		});
 	}
 };
+
 client.once('ready', async (c) => {
 	try {
 		const res = await axios.get(`${url}/users/@me`, authObj);
