@@ -154,7 +154,7 @@ const handlePostQueue = async () => {
 					postQueue.shift();
 				} catch (err) {
 					postQueue[0].failures++;
-					console.log(err.response.data);
+					console.log(err.response?.data);
 					try {
 						await Errors.create({
 							description: 'Reaction failed',
@@ -184,7 +184,7 @@ const handlePostQueue = async () => {
 				}
 				postQueue.shift();
 			}
-		}
+		} else postQueue.shift();
 	} else if (type === 'message') {
 		const { data } = postQueue[0].data;
 		const channelId = postQueue[0].data.channelId
@@ -1108,31 +1108,37 @@ const handleMessageCreate = async (msg) => {
 		if (checkCorrectServer(srvr.guildId)) {
 			usr.servers.forEach(async (s) => {
 				if (s._id.toString() !== srvr._id.toString()) {
-					const otherServer = await Servers.findById(s._id);
-					if (!checkCorrectServer(otherServer.guildId)) return;
-					if (otherServer && otherServer.channelId) {
-						//make sure the member is still a part of that server (in discord's record)
-						try {
-							await axios.get(
-								`${url}/guilds/${otherServer.guildId}/members/${msg.author.id}`,
-								authObj,
-							);
-							const toSend = successes.filter((su) => {
-								return otherServer.games.includes(su.name);
-							});
-
-							if (toSend.length > 0)
-								return addMessage({
-									channelId: otherServer.channelId,
-									data: {
-										content: `On behalf of <@${msg.author.id}>:\n${toSend
-											.map((su) => su.match)
-											.join('\n\n')}`,
-									},
+					try {
+						const otherServer = await Servers.findById(s._id);
+						if (!otherServer || !checkCorrectServer(otherServer.guildId))
+							return;
+						if (otherServer && otherServer.channelId) {
+							//make sure the member is still a part of that server (in discord's record)
+							try {
+								await axios.get(
+									`${url}/guilds/${otherServer.guildId}/members/${msg.author.id}`,
+									authObj,
+								);
+								const toSend = successes.filter((su) => {
+									return otherServer.games.includes(su.name);
 								});
-						} catch (err) {
-							serversToRemove.push(s._id);
+
+								if (toSend.length > 0)
+									return addMessage({
+										channelId: otherServer.channelId,
+										data: {
+											content: `On behalf of <@${msg.author.id}>:\n${toSend
+												.map((su) => su.match)
+												.join('\n\n')}`,
+										},
+									});
+							} catch (err) {
+								serversToRemove.push(s._id);
+							}
 						}
+					} catch (err) {
+						console.log(err.message);
+						return;
 					}
 				}
 				return null;
@@ -1282,31 +1288,36 @@ const handleMessageUpdate = async (oldMessage, newMessage) => {
 
 			if (successes.length > 0) {
 				const serversToRemove = [];
-				usr.servers.forEach(async (s) => {
-					if (s._id.toString() !== srvr._id.toString()) {
-						const otherServer = await Servers.findById(s._id);
-						//make sure the member is still a part of that server (in discord's record)
-						const members = await axios.get(
-							`${url}/guilds/${otherServer.guildId}/members`,
-							authObj,
-						);
-						if (members && !members.some((m) => m.user.id === msg.author.id)) {
-							serversToRemove.push(s._id);
-							return;
+				await Promise.all(
+					usr.servers.map(async (s) => {
+						if (s._id.toString() !== srvr._id.toString()) {
+							const otherServer = await Servers.findById(s._id);
+							//make sure the member is still a part of that server (in discord's record)
+							const members = await axios.get(
+								`${url}/guilds/${otherServer.guildId}/members`,
+								authObj,
+							);
+							if (
+								members &&
+								!members.some((m) => m.user.id === newMessage.author.id)
+							) {
+								serversToRemove.push(s._id);
+								return;
+							}
+							if (otherServer && otherServer.channelId) {
+								return addMessage({
+									channelId: otherServer.channelId,
+									data: {
+										content: `On behalf of <@${newMessage.author.id}>:\n${successes
+											.map((su) => su.match)
+											.join('\n\n')}`,
+									},
+								});
+							}
 						}
-						if (otherServer && otherServer.channelId) {
-							return addMessage({
-								channelId: otherServer.channelId,
-								data: {
-									content: `On behalf of <@${newMessage.author.id}>:\n${successes
-										.map((su) => su.match)
-										.join('\n\n')}`,
-								},
-							});
-						}
-					}
-					return null;
-				});
+						return null;
+					}),
+				);
 
 				//for every server where the user is no longer a member
 				if (serversToRemove.length > 0) {
@@ -1323,10 +1334,10 @@ const handleMessageUpdate = async (oldMessage, newMessage) => {
 							user.servers = user.servers.filter(
 								(srv) => srv.toString() !== s.toString(),
 							);
+							s.markModified('users');
+							await s.save();
 						}),
 					);
-					s.markModified('users');
-					await s.save();
 				}
 			}
 		}

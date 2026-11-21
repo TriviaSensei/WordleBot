@@ -42,8 +42,7 @@ console.log(`${answers.length} valid answers read`);
 let resultCount = null;
 const getResultCount = async () => {
 	if (resultCount === null) {
-		let res = await Results.countDocuments();
-		resultCount = res.length;
+		resultCount = await Results.countDocuments();
 	}
 	return resultCount;
 };
