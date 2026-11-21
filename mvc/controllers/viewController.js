@@ -12,6 +12,8 @@ const getNextDate = require('../../utils/getNextDate');
 const { matchers } = require('../../utils/parseResult');
 const { promises } = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const axios = require('axios');
 
 const timezone = process.env.DEFAULT_TIMEZONE;
 
@@ -451,4 +453,260 @@ exports.redirectToIndex = (req, res, next) => {
 		res.status(404).json({
 			status: 'fail',
 		});
+};
+
+/**
+ * Admin page
+ *
+ * Authentication: the password lives in ADMIN_PASSWORD (config.env). A successful
+ * login sets an httpOnly cookie holding "<expiry>.<HMAC of expiry>", keyed off the
+ * password, so changing the password invalidates every existing session.
+ */
+const adminCookieName = 'wb_admin';
+const adminSessionMs = 12 * 60 * 60 * 1000;
+const maxMessageLength = 2000; //Discord's limit for message content
+const broadcastDelay = 400; //matches the bot's post queue cool-down
+
+const adminCookieOptions = () => ({
+	httpOnly: true,
+	secure: process.env.NODE_ENV === 'production',
+	sameSite: 'strict',
+	path: '/admin',
+});
+
+const sha256 = (str) => crypto.createHash('sha256').update(str).digest();
+
+const signAdminToken = (expires) =>
+	crypto
+		.createHmac('sha256', sha256(`wordlebot-admin:${process.env.ADMIN_PASSWORD}`))
+		.update(`${expires}`)
+		.digest('hex');
+
+const safeEqual = (a, b) => {
+	const bufA = Buffer.from(a);
+	const bufB = Buffer.from(b);
+	return bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB);
+};
+
+const getCookie = (req, name) => {
+	const header = req.headers.cookie;
+	if (!header) return null;
+	for (const part of header.split(';')) {
+		const ind = part.indexOf('=');
+		if (ind < 0) continue;
+		if (part.slice(0, ind).trim() === name) {
+			try {
+				return decodeURIComponent(part.slice(ind + 1).trim());
+			} catch (err) {
+				return null;
+			}
+		}
+	}
+	return null;
+};
+
+const isAdmin = (req) => {
+	if (!process.env.ADMIN_PASSWORD) return false;
+	const token = getCookie(req, adminCookieName);
+	if (!token) return false;
+	const [expires, signature] = token.split('.');
+	if (!expires || !signature || !(Number(expires) > Date.now())) return false;
+	return safeEqual(signature, signAdminToken(expires));
+};
+
+//same rule the bot uses: dev guilds only in development, everything else in production
+const isCorrectEnvGuild = (guildId) => {
+	const devGuilds = (process.env.WORDLE_DEV_GUILD || '')
+		.split(',')
+		.map((g) => g.trim())
+		.filter((g) => g !== '');
+	const isDevGuild = devGuilds.includes(guildId);
+	return process.env.NODE_ENV === 'development' ? isDevGuild : !isDevGuild;
+};
+
+const getBroadcastTargets = async () => {
+	const servers = await Servers.find({ channelId: { $nin: [null, ''] } })
+		.select('guildId channelId')
+		.lean();
+	return servers.filter((s) => isCorrectEnvGuild(s.guildId));
+};
+
+//only one broadcast runs at a time; the failure list is capped so it can't grow without bound
+const maxBroadcastErrors = 100;
+const broadcastState = {
+	running: false,
+	total: 0,
+	sent: 0,
+	failed: 0,
+	startedAt: null,
+	finishedAt: null,
+	errors: [],
+};
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const runBroadcast = async (targets, content) => {
+	const authObj = {
+		headers: { Authorization: `Bot ${process.env.WORDLE_BOT_TOKEN}` },
+	};
+	try {
+		for (const target of targets) {
+			let attempts = 0;
+			while (true) {
+				try {
+					await axios.post(
+						`${process.env.DISCORD_API_URL}/channels/${target.channelId}/messages`,
+						{ content },
+						authObj,
+					);
+					broadcastState.sent++;
+					break;
+				} catch (err) {
+					const status = err.response?.status || null;
+					//rate limited - wait as long as Discord asks, then retry
+					if (status === 429 && attempts < 3) {
+						attempts++;
+						const retryAfter = Number(err.response?.data?.retry_after) || 1;
+						await sleep(retryAfter * 1000 + 100);
+						continue;
+					}
+					broadcastState.failed++;
+					if (broadcastState.errors.length < maxBroadcastErrors)
+						broadcastState.errors.push({
+							guildId: target.guildId,
+							channelId: target.channelId,
+							status,
+							message: err.response?.data?.message || err.message || '',
+						});
+					break;
+				}
+			}
+			await sleep(broadcastDelay);
+		}
+	} catch (err) {
+		console.log(`Admin broadcast stopped unexpectedly: ${err.message}`);
+	} finally {
+		broadcastState.running = false;
+		broadcastState.finishedAt = new Date();
+		console.log(
+			`Admin broadcast finished: ${broadcastState.sent} sent, ${broadcastState.failed} failed`,
+		);
+	}
+};
+
+const getBroadcastSnapshot = () => ({ ...broadcastState });
+
+exports.getAdmin = async (req, res, next) => {
+	res.set('Cache-Control', 'no-store');
+	const authenticated = isAdmin(req);
+	let guildCount = null;
+	if (authenticated) {
+		try {
+			guildCount = (await getBroadcastTargets()).length;
+		} catch (err) {
+			console.log(`Admin page: could not count guilds - ${err.message}`);
+		}
+	}
+	res.status(200).render('admin', {
+		title: 'WordleBot - Admin',
+		authenticated,
+		enabled: !!process.env.ADMIN_PASSWORD,
+		guildCount,
+		broadcast: authenticated ? getBroadcastSnapshot() : null,
+	});
+};
+
+exports.adminLogin = (req, res, next) => {
+	if (!process.env.ADMIN_PASSWORD)
+		return res.status(503).json({
+			status: 'fail',
+			message: 'The admin page is not configured on this server.',
+		});
+
+	const password =
+		typeof req.body?.password === 'string' ? req.body.password : '';
+	//compare fixed-length hashes so the comparison time doesn't leak the password length
+	const correct = crypto.timingSafeEqual(
+		sha256(password),
+		sha256(process.env.ADMIN_PASSWORD),
+	);
+	if (!correct)
+		return res
+			.status(401)
+			.json({ status: 'fail', message: 'Incorrect password.' });
+
+	const expires = Date.now() + adminSessionMs;
+	res.cookie(adminCookieName, `${expires}.${signAdminToken(expires)}`, {
+		...adminCookieOptions(),
+		maxAge: adminSessionMs,
+	});
+	res.status(200).json({ status: 'success' });
+};
+
+exports.adminLogout = (req, res, next) => {
+	res.clearCookie(adminCookieName, adminCookieOptions());
+	res.status(200).json({ status: 'success' });
+};
+
+exports.protectAdmin = (req, res, next) => {
+	if (!isAdmin(req))
+		return res.status(401).json({
+			status: 'fail',
+			message: 'Your session has expired. Please log in again.',
+		});
+	next();
+};
+
+exports.sendBroadcast = async (req, res, next) => {
+	const content =
+		typeof req.body?.message === 'string' ? req.body.message.trim() : '';
+	if (!content)
+		return res
+			.status(400)
+			.json({ status: 'fail', message: 'The message is empty.' });
+	if (content.length > maxMessageLength)
+		return res.status(400).json({
+			status: 'fail',
+			message: `The message is too long (${content.length}/${maxMessageLength} characters).`,
+		});
+	if (broadcastState.running)
+		return res.status(409).json({
+			status: 'fail',
+			message: 'A message is already being sent. Wait for it to finish.',
+		});
+
+	let targets;
+	try {
+		targets = await getBroadcastTargets();
+	} catch (err) {
+		return res.status(500).json({
+			status: 'fail',
+			message: `Could not load the server list: ${err.message}`,
+		});
+	}
+	if (targets.length === 0)
+		return res.status(400).json({
+			status: 'fail',
+			message: 'No servers with a home channel were found.',
+		});
+
+	Object.assign(broadcastState, {
+		running: true,
+		total: targets.length,
+		sent: 0,
+		failed: 0,
+		startedAt: new Date(),
+		finishedAt: null,
+		errors: [],
+	});
+	console.log(`Admin broadcast started to ${targets.length} servers`);
+	//sending takes ~0.4s per server, so run it in the background and let the page poll for progress
+	runBroadcast(targets, content);
+
+	res.status(202).json({ status: 'success', data: getBroadcastSnapshot() });
+};
+
+exports.getBroadcastStatus = (req, res, next) => {
+	res.set('Cache-Control', 'no-store');
+	res.status(200).json({ status: 'success', data: getBroadcastSnapshot() });
 };

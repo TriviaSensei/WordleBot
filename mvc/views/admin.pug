@@ -1,0 +1,57 @@
+extends _base_min
+
+block styles
+    link(rel="stylesheet" href="/css/admin.css")
+
+block navmenu
+    if authenticated
+        button#admin-logout.btn.btn-yellow.btn-sm(type="button") Log out
+
+block content
+    section#admin
+        .admin-card
+            h1.mb-4 Admin
+            if !enabled
+                p The admin page is not configured on this server. Set ADMIN_PASSWORD in config.env and restart.
+            else if !authenticated
+                form#admin-login-form
+                    label.form-label.fw-bold(for="admin-password") Password
+                    input#admin-password.form-control.admin-input.mb-3(type="password" name="password" autocomplete="current-password" required autofocus)
+                    button#admin-login-submit.btn.btn-green.w-100(type="submit") Log in
+            else
+                h2.admin-heading Message all servers
+                p.admin-hint
+                    | Sends this message as WordleBot to the home channel of every server with one set
+                    if guildCount !== null
+                        |  (
+                        span#guild-count= guildCount
+                        |  servers)
+                    | . It takes about #[span#send-estimate= guildCount !== null ? Math.ceil(guildCount * 0.4 / 60) : '?'] minutes to send to all of them.
+                form#broadcast-form
+                    label.form-label.fw-bold(for="broadcast-message") Message
+                    textarea#broadcast-message.form-control.admin-input(rows="8" maxlength="2000" required)
+                    .d-flex.justify-content-end.mt-1.mb-3
+                        small#char-count.admin-hint 0 / 2000
+                    button#broadcast-submit.btn.btn-green.w-100(type="submit") Send to all servers
+                #broadcast-status.mt-4.d-none(data-status=`${JSON.stringify(broadcast)}`)
+                    .fw-bold#broadcast-status-text
+                    .progress.mt-2(role="progressbar" aria-label="Messages sent")
+                        #broadcast-progress.progress-bar(style="width:0%")
+                    ul#broadcast-errors.mt-3.admin-hint
+
+    if authenticated
+        .modal#broadcast-confirm-modal(tabindex="-1" aria-labelledby="broadcast-confirm-label" aria-hidden="true")
+            .modal-dialog.modal-dialog-centered
+                .modal-content.admin-modal
+                    .modal-header
+                        h5.modal-title#broadcast-confirm-label Send to all servers?
+                        button.btn-close.btn-close-white(type="button" data-bs-dismiss="modal" aria-label="Close")
+                    .modal-body
+                        p#broadcast-confirm-text
+                        pre#broadcast-preview.admin-preview
+                    .modal-footer
+                        button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
+                        button#broadcast-confirm.btn.btn-green(type="button") Send
+
+block scripts
+    script(src="/js/admin.js" type="module" defer)
