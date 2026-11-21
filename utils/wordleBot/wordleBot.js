@@ -667,61 +667,6 @@ const getTimeStr = (ms) => {
 	return `${d}d ${h}h ${m}m ${s}s`;
 };
 
-const sendAdHocUpdate = async () => {
-	const currentDate = new Date();
-
-	const currentDT = moment.tz(currentDate, timezone).format();
-
-	try {
-		const serverData = await Servers.find();
-		const shardIds = client.shard.ids;
-
-		let shardGuilds = await Promise.all(
-			serverData.map(async (sd) => {
-				try {
-					const guild = sd.guildId;
-					const res = await client.guilds.fetch({ guild });
-					const shardId = res.shardId;
-					if (shardIds.includes(shardId)) return sd;
-					return null;
-				} catch (err) {
-					console.log(err.message);
-					return null;
-				}
-			}),
-		);
-		shardGuilds = shardGuilds.filter((sg) => sg !== null);
-
-		const sp = currentDT.split('-');
-		let currentMonth = parseInt(sp[1]) - 1;
-		let currentYear = parseInt(sp[0]);
-		if (currentMonth === 0) {
-			currentYear--;
-			currentMonth = 12;
-		}
-		console.log(
-			`${shardGuilds.length} servers found on shard ${shardIds.join(',')}`,
-		);
-		shardGuilds.forEach((s) => {
-			if (!checkCorrectServer(s.guildId))
-				return console.log(
-					`Not sending update to ${s.guildId} (env=${process.env.NODE_ENV})`,
-				);
-
-			addMessage({
-				channelId: s.channelId,
-				data: {
-					channelId: s.channelId,
-					content: `@everyone The bad news is that WordleBot seems to have choked today. Sorry about that. I believe it is back up and running at this point, but you'll have to re-submit any results from today, and possibly yesterday. Worst-case, it'll reject any duplicates. The good news is that this was because we reached 2,500 guilds where it is installed! Thanks as always for giving my contraption a try, and feel free to reach out on the dedicated server (link can be found at https://www.wordlebot.gg/docs) if you have any issues. Please bear with me as I navigate this surprise development.`,
-				},
-			});
-		});
-	} catch (err) {
-		console.log(err.message);
-		console.log(err.stack);
-	}
-};
-
 const sendMonthlyUpdate = async () => {
 	const currentDate = new Date();
 
@@ -1377,7 +1322,6 @@ client.once('ready', async (c) => {
 			console.log('Wordle Bot ready!');
 			try {
 				await sendMonthlyUpdate();
-				// await sendAdHocUpdate();
 			} catch (err) {
 				console.log(err.stack);
 			}
