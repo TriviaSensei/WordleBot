@@ -8,6 +8,7 @@ const GameData = require('../../mvc/models/gameDataModel');
 const { v4: uuidV4 } = require('uuid');
 const {
 	Client,
+	Options,
 	IntentsBitField,
 	MessageFlags,
 	Message,
@@ -56,6 +57,10 @@ const keyCaps = [
 const url = process.env.DISCORD_API_URL;
 
 const client = new Client({
+	makeCache: Options.cacheWithLimits({
+		...Options.DefaultMakeCacheSettings,
+		MessageManager: 50,
+	}),
 	intents: [
 		IntentsBitField.Flags.Guilds,
 		// IntentsBitField.Flags.GuildMembers,
@@ -124,52 +129,61 @@ const handlePostQueue = async () => {
 	const { type, action } = postQueue[0];
 	if (type === 'reaction') {
 		const { msg, emoji } = postQueue[0].data;
-		const re = /^(\%[0-9A-F]{2})+$/;
-		let encoded;
-		if (emoji.match(re)) encoded = emoji;
-		else encoded = encodeURIComponent(emoji);
-		const channelId = msg.channelId ? msg.channelId : msg.channel_id;
-		if (channelId) {
-			try {
-				if (action === 'add')
-					await axios.put(
-						`${url}/channels/${channelId}/messages/${msg.id}/reactions/${encoded}/@me`,
-						null,
-						authObj,
-					);
-				else if (action === 'remove')
-					await axios.delete(
-						`${url}/channels/${msg.channelId || msg.channel_id}/messages/${
-							msg.id
-						}/reactions/${encoded}/@me`,
-						null,
-						authObj,
-					);
+		if (emoji && message) {
+			const re = /^(\%[0-9A-F]{2})+$/;
+			let encoded;
+			if (emoji.match(re)) encoded = emoji;
+			else encoded = encodeURIComponent(emoji);
+			const channelId = msg.channelId ? msg.channelId : msg.channel_id;
+			if (channelId) {
+				try {
+					if (action === 'add')
+						await axios.put(
+							`${url}/channels/${channelId}/messages/${msg.id}/reactions/${encoded}/@me`,
+							null,
+							authObj,
+						);
+					else if (action === 'remove')
+						await axios.delete(
+							`${url}/channels/${msg.channelId || msg.channel_id}/messages/${
+								msg.id
+							}/reactions/${encoded}/@me`,
+							authObj,
+						);
 
+					postQueue.shift();
+				} catch (err) {
+					postQueue[0].failures++;
+					console.log(err.response.data);
+					try {
+						await Errors.create({
+							description: 'Reaction failed',
+							message: err.message || '',
+							data: err.response?.data || null,
+							stack: err.stack || null,
+						});
+					} catch (err2) {
+						console.log(`Reaction failed - ${err.message}`);
+					}
+					// if (postQueue[0].failures === maxFailures)
+					// 	await sendAdminEmail(
+					// 		'Failed to react to Discord message',
+					// 		err.response.data
+					// 	);
+				}
+			} else {
+				try {
+					await Errors.create({
+						description: 'Reaction failed',
+						message: 'Channel ID not found in message',
+						data: msg,
+						stack: null,
+					});
+				} catch (err) {
+					console.log(err.message);
+				}
 				postQueue.shift();
-			} catch (err) {
-				postQueue[0].failures++;
-				console.log(err.response.data);
-				await Errors.create({
-					description: 'Reaction failed',
-					message: err.message || '',
-					data: err.response?.data || null,
-					stack: err.stack || null,
-				});
-				// if (postQueue[0].failures === maxFailures)
-				// 	await sendAdminEmail(
-				// 		'Failed to react to Discord message',
-				// 		err.response.data
-				// 	);
 			}
-		} else {
-			await Errors.create({
-				description: 'Reaction failed',
-				message: 'Channel ID not found in message',
-				data: msg,
-				stack: null,
-			});
-			postQueue.shift();
 		}
 	} else if (type === 'message') {
 		const { data } = postQueue[0].data;
