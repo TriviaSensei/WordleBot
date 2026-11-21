@@ -1339,8 +1339,7 @@ const handleMessageUpdate = async (oldMessage, newMessage) => {
 		});
 	}
 };
-
-client.on('ready', async (c) => {
+client.once('ready', async (c) => {
 	try {
 		const res = await axios.get(`${url}/users/@me`, authObj);
 		me = res.data;
