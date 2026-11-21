@@ -61,6 +61,17 @@ const client = new Client({
 		...Options.DefaultMakeCacheSettings,
 		MessageManager: 50,
 	}),
+	sweepers: {
+		...Options.DefaultSweeperSettings,
+		messages: {
+			interval: 3600, // Every hour.
+			lifetime: 1800, // Remove messages older than 30 minutes.
+		},
+		users: {
+			interval: 3600, // Every hour.
+			filter: () => (user) => user.bot && user.id !== user.client.user.id, // Remove all bots.
+		},
+	},
 	intents: [
 		IntentsBitField.Flags.Guilds,
 		// IntentsBitField.Flags.GuildMembers,
@@ -201,7 +212,7 @@ const handlePostQueue = async () => {
 				);
 				postQueue.shift();
 			} catch (err) {
-				console.log(err.response.data);
+				if (err?.response?.data) console.log(err.response.data);
 				postQueue[0].failures++;
 				if (postQueue[0].failures > maxFailures) {
 					console.log(
